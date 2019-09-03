@@ -40,10 +40,10 @@ namespace TurtleGraphics {
 
 			switch (split[0]) {
 				case "move": {
-					ParsedData<Point> point = ParsePoint(split[1], variables);
+					ParsedData point = ParsePoint(split[1], variables);
 					return new MoveParseData(win) {
 						Exp = point.Exp,
-						MoveTo = point.Value(),
+						MoveTo = (Point)point.Value(),
 						Value = point.Value,
 						Variables = new Dictionary<string, object>(variables)
 					};
@@ -55,9 +55,9 @@ namespace TurtleGraphics {
 				}
 
 				case "rotate": {
-					ParsedData<double> data = ParseExpression<double>(split[1], variables);
+					ParsedData data = ParseExpression(split[1], variables);
 					return new RotateParseData(win) {
-						Angle = data.Value(),
+						Angle = Convert.ToDouble(data.Value()),
 						Variables = new Dictionary<string, object>(variables),
 						Exp = data.Exp,
 						Line = line,
@@ -66,9 +66,9 @@ namespace TurtleGraphics {
 				}
 
 				case "fwd": {
-					ParsedData<double> data = ParseExpression<double>(split[1], variables);
+					ParsedData data = ParseExpression(split[1], variables);
 					return new ForwardParseData(win) {
-						Distance = data.Value(),
+						Distance = Convert.ToDouble(data.Value()),
 						Variables = new Dictionary<string, object>(variables),
 						Exp = data.Exp,
 						Line = line,
@@ -117,30 +117,30 @@ namespace TurtleGraphics {
 			return new ForLoopData() { From = from, To = to, Var = variable, Queue = inner };
 		}
 
-		private static ParsedData<Point> ParsePoint(string v, Dictionary<string, object> variables) {
+		private static ParsedData ParsePoint(string v, Dictionary<string, object> variables) {
 			string[] split = v.Split(',');
 			if (v.StartsWith("(") && v.EndsWith(")")) {
 				split[0] = split[0].Replace("(", "");
 				split[1] = split[1].Replace(")", "");
 			}
 
-			ParsedData<double> X = ParseExpression<double>(split[0], variables);
+			ParsedData X = ParseExpression(split[0], variables);
 
-			ParsedData<double> Y = ParseExpression<double>(split[1], variables);
+			ParsedData Y = ParseExpression(split[1], variables);
 
-			return new ParsedData<Point> { Line = v, Variables = new Dictionary<string, object>(variables), Value = () => new Point(X.Exp.Evaluate(), Y.Exp.Evaluate()) };
+			return new PointParsedData { Line = v, Variables = new Dictionary<string, object>(variables), Value = () => new Point(Convert.ToDouble(X.Exp.Evaluate()), Convert.ToDouble(Y.Exp.Evaluate())) };
 
 		}
 
-		private static ParsedData<T> ParseExpression<T>(string v, Dictionary<string, object> variables) {
+		private static ParsedData ParseExpression(string v, Dictionary<string, object> variables) {
 			ExpressionContext context = new ExpressionContext();
 
 			foreach (KeyValuePair<string, object> item in variables) {
 				context.Variables.Add(item.Key, item.Value);
 			}
 
-			IGenericExpression<T> result = context.CompileGeneric<T>(v);
-			return new ParsedData<T> { Line = v, Variables = new Dictionary<string, object>(variables), Exp = result, Value = result.Evaluate };
+			IDynamicExpression result = context.CompileDynamic(v);
+			return new ParsedData { Line = v, Variables = new Dictionary<string, object>(variables), Exp = result, Value = result.Evaluate };
 		}
 	}
 }

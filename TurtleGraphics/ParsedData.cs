@@ -6,7 +6,7 @@ using Flee.PublicTypes;
 
 namespace TurtleGraphics {
 
-	public class ForwardParseData : ParsedData<double> {
+	public class ForwardParseData : ParsedData {
 
 		private readonly MainWindow _window;
 
@@ -18,7 +18,7 @@ namespace TurtleGraphics {
 
 		public override ParsedData Clone() {
 			return new ForwardParseData(_window) {
-				Distance = Exp.Evaluate(),
+				Distance = Convert.ToDouble(Exp.Evaluate()),
 				Variables = new Dictionary<string, object>(this.Variables),
 				Line = this.Line,
 				Value = this.Value,
@@ -31,7 +31,16 @@ namespace TurtleGraphics {
 		}
 	}
 
-	public class RotateParseData : ParsedData<double> {
+	public class PointParsedData : ParsedData {
+
+		Point Point { get; set; }
+
+		public override ParsedData Clone() {
+			throw new NotImplementedException();
+		}
+	}
+
+	public class RotateParseData : ParsedData {
 
 		private readonly MainWindow _window;
 
@@ -43,7 +52,7 @@ namespace TurtleGraphics {
 
 		public override ParsedData Clone() {
 			return new RotateParseData(_window) {
-				Angle = Exp.Evaluate(),
+				Angle = Convert.ToDouble(Exp.Evaluate()),
 				Variables = new Dictionary<string, object>(this.Variables),
 				Line = this.Line,
 				Value = this.Value,
@@ -57,7 +66,7 @@ namespace TurtleGraphics {
 		}
 	}
 
-	public class MoveParseData : ParsedData<Point> {
+	public class MoveParseData : ParsedData {
 
 		private readonly MainWindow _window;
 
@@ -82,29 +91,8 @@ namespace TurtleGraphics {
 		}
 	}
 
-
-	public class ParsedData<T> : ParsedData {
-
-		public IGenericExpression<T> Exp { get; set; }
-
-		public Func<T> Value { get; set; }
-
-		public override ParsedData Clone() {
-			return new ParsedData<T> { Value = this.Value, Variables = new Dictionary<string, object>(this.Variables), Exp = this.Exp, Line = this.Line };
-		}
-
-		public override Task Execute() {
-			if (Exp == null) {
-				return Task.Run(Value);
-			}
-			else {
-				return Task.Run(Exp.Evaluate);
-			}
-		}
-	}
-
-	public abstract class ParsedData {
-		public virtual IGenericExpression<object> Exp { get; set; }
+	public class ParsedData {
+		public virtual IDynamicExpression Exp { get; set; }
 
 		public string Line { get; set; }
 
@@ -114,6 +102,6 @@ namespace TurtleGraphics {
 
 		public virtual Task Execute() => Task.Run(Value);
 
-		public abstract ParsedData Clone();
+		public virtual ParsedData Clone() => throw new NotImplementedException();
 	}
 }
