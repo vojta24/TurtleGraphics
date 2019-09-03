@@ -1,0 +1,7 @@
+.vs
+Library
+obj
+bin
+Logs
+packages/Flee*
+packages/System.*
