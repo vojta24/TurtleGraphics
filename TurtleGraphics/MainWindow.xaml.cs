@@ -56,29 +56,6 @@ fwd 40
 			Loaded += (s, e) => { MainWindow_Loaded(s, e); };
 			DataContext = this;
 
-			//Dictionary<string, object> variables = new Dictionary<string, object>();
-			//variables.Add("Height", 50);
-			//variables.Add("Width", 100);
-
-			//System.Diagnostics.Stopwatch st = new System.Diagnostics.Stopwatch();
-			//ExpressionContext context = new ExpressionContext();
-
-			//foreach (KeyValuePair<string, object> item in variables) {
-			//	context.Variables.Add(item.Key, item.Value);
-			//}
-			//st.Start();
-			//IGenericExpression<double> eGeneric = context.CompileGeneric<double>("Height * Width");
-			//st.Stop();
-			//Console.WriteLine("GENERATE: " + st.Elapsed);
-			//st.Restart();
-			//double val = eGeneric.Evaluate();
-			//st.Stop();
-			//Console.WriteLine("EVALUATE: " + st.Elapsed + "Val: " + val);
-
-			//st.Restart();
-			//eGeneric.Context.Variables["Height"] = 900;
-			//val = eGeneric.Evaluate();
-			//Console.WriteLine("REEVALUATE: " + st.Elapsed + "Val: " + val);
 		}
 
 		public double DrawWidth;
@@ -110,21 +87,24 @@ fwd 40
 		}
 
 		public async Task Draw(Point to) {
-			LineSegment l = new LineSegment();
-			l.IsStroked = true;
-			l.Point = new Point(X, Y);
-			X = to.X;
-			Y = to.Y;
-			l.IsSmoothJoin = true;
-			Segments.Add(l);
+			await Dispatcher.Invoke(async () => {
+				LineSegment l = new LineSegment();
+				l.IsStroked = true;
+				l.Point = new Point(X, Y);
+				X = to.X;
+				Y = to.Y;
+				l.IsSmoothJoin = true;
 
-			await Displace(to);
+				Segments.Add(l);
+
+				await Displace(to);
+			});
 		}
 
 
 		internal void Rotate(double angle) {
 			Angle += Math.PI * angle / 180.0;
-			if(Angle == 2 * Math.PI) {
+			if (Angle == 2 * Math.PI) {
 				Angle = 0;
 			}
 		}
@@ -160,10 +140,10 @@ fwd 40
 			StartPoint = new Point(X, Y);
 			Angle = 0;
 
-			Queue<Func<Task>> tasks = await CommandParser.Parse(Commands, this);
+			Queue<ParsedData> tasks = await CommandParser.Parse(Commands, this);
 
 			foreach (var item in tasks) {
-				await item();
+				await item.Execute();
 			}
 		}
 	}

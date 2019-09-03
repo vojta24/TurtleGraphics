@@ -10,21 +10,21 @@ namespace TurtleGraphics {
 
 		private static MainWindow win;
 
-		internal static async Task<Queue<Func<Task>>> Parse(string commands, MainWindow window) {
+		internal static async Task<Queue<ParsedData>> Parse(string commands, MainWindow window) {
 			string[] split = commands.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
 			win = window;
 
-			Queue<Func<Task>> ret = new Queue<Func<Task>>();
+			Queue<ParsedData> ret = new Queue<ParsedData>();
 			StringReader reader = new StringReader(commands);
 			Dictionary<string, object> vars = new Dictionary<string, object>() {
 				{ "Width", win.DrawWidth },
 				{ "Height", win.DrawHeight }
 			};
 			while (reader.Peek() != -1) {
-				Func<Task> func = await ParseLine(reader.ReadLine(), reader, vars);
-				if (func != null) {
-					ret.Enqueue(func);
+				ParsedData data = await ParseLine(reader.ReadLine(), reader, vars);
+				if (data != null) {
+					ret.Enqueue(data);
 				}
 			}
 
@@ -32,7 +32,7 @@ namespace TurtleGraphics {
 		}
 
 
-		private static async Task<Func<Task>> ParseLine(string line, StringReader reader, Dictionary<string, object> variables) {
+		private static async Task<ParsedData> ParseLine(string line, StringReader reader, Dictionary<string, object> variables) {
 			if (string.IsNullOrWhiteSpace(line)) {
 				return null;
 			}
@@ -40,28 +40,40 @@ namespace TurtleGraphics {
 
 			switch (split[0]) {
 				case "move": {
-					Point p = await ParsePoint(split[1], variables);
-					return async () => { await win.Draw(p); };
+					ParsedData<Point> point = ParsePoint(split[1], variables);
+					return new MoveParseData(win) {
+						Exp = point.Exp,
+						MoveTo = point.Value(),
+						Value = point.Value,
+						Variables = new Dictionary<string, object>(variables)
+					};
 				}
 				case "for": {
 					ForLoopData data = await ParseForLoop(split[1], reader, variables);
-					return async () => {
-						for (int i = data.From; i < data.To; i++) {
-							Func<Task> t = data.Queue.Dequeue();
-							await t();
-							data.Queue.Enqueue(t);
-						}
-					};
+					data.Line = line;
+					return data;
 				}
 
 				case "rotate": {
-					double angle = ParseAngle(split[1], variables);
-					return async () => win.Rotate(angle);
+					ParsedData<double> data = ParseExpression<double>(split[1], variables);
+					return new RotateParseData(win) {
+						Angle = data.Value(),
+						Variables = new Dictionary<string, object>(variables),
+						Exp = data.Exp,
+						Line = line,
+						Value = data.Value
+					};
 				}
 
 				case "fwd": {
-					double distance = ParseDistance(split[1], variables);
-					return async () => await win.Forward(distance);
+					ParsedData<double> data = ParseExpression<double>(split[1], variables);
+					return new ForwardParseData(win) {
+						Distance = data.Value(),
+						Variables = new Dictionary<string, object>(variables),
+						Exp = data.Exp,
+						Line = line,
+						Value = data.Value
+					};
 				}
 
 				default: {
@@ -70,19 +82,6 @@ namespace TurtleGraphics {
 			}
 		}
 
-		private static double ParseDistance(string v, Dictionary<string, object> variables) {
-			foreach (var item in variables) {
-				v = v.Replace(item.Key, item.Value.ToString());
-			}
-			return ParseDoubleExpression(v, variables);
-		}
-
-		private static double ParseAngle(string v, Dictionary<string, object> variables) {
-			foreach (var item in variables) {
-				v = v.Replace(item.Key, item.Value.ToString());
-			}
-			return ParseDoubleExpression(v, variables);
-		}
 
 		private static async Task<ForLoopData> ParseForLoop(string v, StringReader reader, Dictionary<string, object> variables) {
 			string[] split = v.Split();
@@ -96,51 +95,52 @@ namespace TurtleGraphics {
 
 			int to = int.Parse(range[1]);
 			string next = reader.ReadLine();
-			List<string> lines = new List<string>();
-			Queue<Func<Task>> inner = new Queue<Func<Task>>();
+			List<ParsedData> data = new List<ParsedData>();
+
 			while (!next.StartsWith("}")) {
-				Func<Task> t = await ParseLine(next, reader, variables);
-				inner.Enqueue(t);
-				lines.Add(next);
+				ParsedData d = await ParseLine(next, reader, variables);
+				data.Add(d);
 				next = reader.ReadLine();
 			}
+
+			Queue<ParsedData> inner = new Queue<ParsedData>();
+
 			for (int i = from + 1; i < to; i++) {
 				variables[variable] = i;
-				foreach (string _line in lines) {
-					Func<Task> t = await ParseLine(_line, reader, variables);
-					inner.Enqueue(t);
+				foreach (ParsedData dat in data) {
+					ParsedData d = dat.Clone();
+					d.Variables[variable] = i;
+					inner.Enqueue(d);
 				}
 			}
 			variables.Remove(variable);
 			return new ForLoopData() { From = from, To = to, Var = variable, Queue = inner };
 		}
 
-		private static async Task<Point> ParsePoint(string v, Dictionary<string, object> variables) {
+		private static ParsedData<Point> ParsePoint(string v, Dictionary<string, object> variables) {
 			string[] split = v.Split(',');
 			if (v.StartsWith("(") && v.EndsWith(")")) {
 				split[0] = split[0].Replace("(", "");
 				split[1] = split[1].Replace(")", "");
 			}
 
-			double X = ParseDoubleExpression(split[0], variables);
+			ParsedData<double> X = ParseExpression<double>(split[0], variables);
 
-			double Y = ParseDoubleExpression(split[1], variables);
+			ParsedData<double> Y = ParseExpression<double>(split[1], variables);
 
-			return new Point(X, Y);
+			return new ParsedData<Point> { Line = v, Variables = new Dictionary<string, object>(variables), Value = () => new Point(X.Exp.Evaluate(), Y.Exp.Evaluate()) };
+
 		}
 
-		private static double ParseDoubleExpression(string v, Dictionary<string, object> variables) {
+		private static ParsedData<T> ParseExpression<T>(string v, Dictionary<string, object> variables) {
 			ExpressionContext context = new ExpressionContext();
 
 			foreach (KeyValuePair<string, object> item in variables) {
 				context.Variables.Add(item.Key, item.Value);
 			}
 
-			IGenericExpression<double> eGeneric = context.CompileGeneric<double>(v);
-
-			double result = eGeneric.Evaluate();
-
-			return result;
+			IGenericExpression<T> result = context.CompileGeneric<T>(v);
+			return new ParsedData<T> { Line = v, Variables = new Dictionary<string, object>(variables), Exp = result, Value = result.Evaluate };
 		}
 	}
 }
