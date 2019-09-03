@@ -114,7 +114,7 @@ namespace TurtleGraphics {
 				}
 			}
 			variables.Remove(variable);
-			return new ForLoopData() { From = from, To = to, Var = variable, Queue = inner };
+			return new ForLoopData() { From = from, To = to, Var = variable, Queue = inner,Variables = new Dictionary<string, object>(variables) };
 		}
 
 		private static ParsedData ParsePoint(string v, Dictionary<string, object> variables) {

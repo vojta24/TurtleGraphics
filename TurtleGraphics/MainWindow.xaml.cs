@@ -43,6 +43,13 @@ for i in 0..50{
 rotate 5
 fwd 20
 }
+
+for i in 0..2{
+for j in 0..50{
+rotate 5 + j
+fwd 20 * i
+}
+}
 */
 
 		#region Notifications

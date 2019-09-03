@@ -24,11 +24,9 @@ namespace TurtleGraphics {
 
 		public override Task Execute() {
 			return Task.Run(async () => {
-				for (int i = From; i < To; i++) {
+				while(Queue.Count > 0) { 
 					ParsedData data = Queue.Dequeue();
-					data.Exp.Evaluate();
 					await data.Execute();
-					Queue.Enqueue(data);
 				}
 			});
 		}
