@@ -11,8 +11,11 @@ namespace TurtleGraphics {
 		}
 
 		public double Angle { get; set; }
-
 		public override Task Execute() {
+			if (double.IsNaN(Angle)) {
+				_window.Rotate(Angle);
+				return Task.CompletedTask;
+			}
 			Angle = Convert.ToDouble(Exp.Evaluate());
 			_window.Rotate(Angle);
 			return Task.CompletedTask;

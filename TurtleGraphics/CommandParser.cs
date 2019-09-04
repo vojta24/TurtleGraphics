@@ -50,12 +50,27 @@ namespace TurtleGraphics {
 				}
 
 				case "r": {
-					ParsedData data = ParseExpression(split[1], variables);
-					return new RotateParseData(win) {
-						Angle = Convert.ToDouble(data.Exp.Evaluate()),
-						Exp = data.Exp,
-						Line = line,
-					};
+					double val;
+
+					try {
+						ParsedData data = ParseExpression(split[1], variables);
+						val = Convert.ToDouble(data.Exp.Evaluate());
+						return new RotateParseData(win) {
+							Angle = val,
+							Exp = data.Exp,
+							Line = line,
+						};
+					}
+					catch {
+						if (split[1] == "origin") {
+							val = double.NaN;
+							return new RotateParseData(win) {
+								Angle = val,
+								Line = line,
+							};
+						}
+						throw;
+					}
 				}
 
 				case "f": {
@@ -77,6 +92,10 @@ namespace TurtleGraphics {
 
 				case "c": {
 					return new ColorData(win, split[1]);
+				}
+
+				case "goto": {
+					return new MoveData(win, split[1],variables);
 				}
 
 				default: {

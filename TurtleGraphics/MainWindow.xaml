@@ -21,7 +21,7 @@
 				<RowDefinition Height="auto"/>
 				<RowDefinition Height="auto"/>
 			</Grid.RowDefinitions>
-			<TextBox Text="{Binding Commands, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" AcceptsTab="True"/>
+			<TextBox Text="{Binding Commands, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" AcceptsTab="True" FontWeight="DemiBold" FontSize="16"/>
 			<StackPanel Grid.Row="1">
 				<TextBlock>
 					<Run Text="Angle:"/>
@@ -37,10 +37,6 @@
 				</TextBlock>
 				<Slider Value="{Binding Delay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="50" TickFrequency="1" Ticks="5"/>
 				<Slider Value="{Binding IterationCount, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="100" TickFrequency="1" />
-				<RichTextBox>
-
-				</RichTextBox>
-				<TextBox></TextBox>
 			</StackPanel>
 			<Button Grid.Row="2" Content="Run" Command="{Binding RunCommand}"/>
 		</Grid>

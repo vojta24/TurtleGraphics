@@ -129,6 +129,10 @@ namespace TurtleGraphics {
 		}
 
 		internal void Rotate(double angle) {
+			if (double.IsNaN(angle)) {
+				Angle = 0;
+				return;
+			}
 			Angle += Math.PI * angle / 180.0;
 			if (Angle > 2 * Math.PI) {
 				Angle -= 2 * Math.PI;
