@@ -66,30 +66,30 @@ namespace TurtleGraphics {
 		}
 	}
 
-	public class MoveParseData : ParsedData {
+	//public class MoveParseData : ParsedData {
 
-		private readonly MainWindow _window;
+	//	private readonly MainWindow _window;
 
-		public MoveParseData(MainWindow w) {
-			_window = w;
-		}
+	//	public MoveParseData(MainWindow w) {
+	//		_window = w;
+	//	}
 
-		public Point MoveTo { get; set; }
+	//	public Point MoveTo { get; set; }
 
-		public override ParsedData Clone() {
-			return new MoveParseData(_window) {
-				MoveTo = this.MoveTo,
-				Variables = new Dictionary<string, object>(this.Variables),
-				Line = this.Line,
-				Value = this.Value,
-				Exp = this.Exp
-			};
-		}
+	//	public override ParsedData Clone() {
+	//		return new MoveParseData(_window) {
+	//			MoveTo = this.MoveTo,
+	//			Variables = new Dictionary<string, object>(this.Variables),
+	//			Line = this.Line,
+	//			Value = this.Value,
+	//			Exp = this.Exp
+	//		};
+	//	}
 
-		public override async Task Execute() {
-			await _window.Draw(MoveTo);
-		}
-	}
+	//	public override async Task Execute() {
+	//		await _window.Draw(MoveTo);
+	//	}
+	//}
 
 	public class ParsedData {
 		public virtual IDynamicExpression Exp { get; set; }

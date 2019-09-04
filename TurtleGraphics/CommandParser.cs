@@ -39,15 +39,15 @@ namespace TurtleGraphics {
 			string[] split = line.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
 
 			switch (split[0]) {
-				case "move": {
-					ParsedData point = ParsePoint(split[1], variables);
-					return new MoveParseData(win) {
-						Exp = point.Exp,
-						MoveTo = (Point)point.Value(),
-						Value = point.Value,
-						Variables = new Dictionary<string, object>(variables)
-					};
-				}
+				//case "move": {
+				//	ParsedData point = ParsePoint(split[1], variables);
+				//	return new MoveParseData(win) {
+				//		Exp = point.Exp,
+				//		MoveTo = (Point)point.Value(),
+				//		Value = point.Value,
+				//		Variables = new Dictionary<string, object>(variables)
+				//	};
+				//}
 				case "for": {
 					ForLoopData data = await ParseForLoop(split[1], reader, variables);
 					data.Line = line;
@@ -117,20 +117,20 @@ namespace TurtleGraphics {
 			return new ForLoopData() { From = from, To = to, Var = variable, Queue = inner,Variables = new Dictionary<string, object>(variables) };
 		}
 
-		private static ParsedData ParsePoint(string v, Dictionary<string, object> variables) {
-			string[] split = v.Split(',');
-			if (v.StartsWith("(") && v.EndsWith(")")) {
-				split[0] = split[0].Replace("(", "");
-				split[1] = split[1].Replace(")", "");
-			}
+		//private static ParsedData ParsePoint(string v, Dictionary<string, object> variables) {
+		//	string[] split = v.Split(',');
+		//	if (v.StartsWith("(") && v.EndsWith(")")) {
+		//		split[0] = split[0].Replace("(", "");
+		//		split[1] = split[1].Replace(")", "");
+		//	}
 
-			ParsedData X = ParseExpression(split[0], variables);
+		//	ParsedData X = ParseExpression(split[0], variables);
 
-			ParsedData Y = ParseExpression(split[1], variables);
+		//	ParsedData Y = ParseExpression(split[1], variables);
 
-			return new PointParsedData { Line = v, Variables = new Dictionary<string, object>(variables), Value = () => new Point(Convert.ToDouble(X.Exp.Evaluate()), Convert.ToDouble(Y.Exp.Evaluate())) };
+		//	return new PointParsedData { Line = v, Variables = new Dictionary<string, object>(variables), Value = () => new Point(Convert.ToDouble(X.Exp.Evaluate()), Convert.ToDouble(Y.Exp.Evaluate())) };
 
-		}
+		//}
 
 		private static ParsedData ParseExpression(string v, Dictionary<string, object> variables) {
 			ExpressionContext context = new ExpressionContext();

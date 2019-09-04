@@ -155,7 +155,7 @@ fwd 20 * i
 			X = 600;
 			Y = 400;
 			StartPoint = new Point(X, Y);
-			Angle = 0;
+			Angle = 270;
 
 			Queue<ParsedData> tasks = await CommandParser.Parse(Commands, this);
 
