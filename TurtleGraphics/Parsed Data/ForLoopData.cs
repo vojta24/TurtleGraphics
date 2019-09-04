@@ -40,11 +40,11 @@ namespace TurtleGraphics {
 		}
 
 		public Dictionary<string, object> Join(Dictionary<string, object> a, Dictionary<string, object> b) {
-			Dictionary<string, object> newD = new Dictionary<string, object>(a);
+			Dictionary<string, object> join = new Dictionary<string, object>(a);
 			foreach (var item in b) {
-				newD[item.Key] = item.Value;
+				join[item.Key] = item.Value;
 			}
-			return newD;
+			return join;
 		}
 	}
 }

@@ -31,35 +31,27 @@ namespace TurtleGraphics {
 		public MainWindow() {
 			InitializeComponent();
 			RunCommand = new AsyncCommand(RunCommandAction);
-			Top = 0;
-			Left = 0;
-			X = 600;
-			Y = 400;
-			StartPoint = new Point(X, Y);
-			Loaded += (s, e) => { MainWindow_Loaded(s, e); };
+			Init();
+			Loaded += MainWindow_Loaded;
 			DataContext = this;
 		}
 
+		private Path _currentPath;
+		private PathFigure _currentFigure;
+		private string _lastColor;
+		private bool _lastPenDown;
 
-		private Path currentPath;
-		private PathFigure currentFigure;
-		public double DrawWidth;
-		public double DrawHeight;
-
-		private string last_color = "";
-		private bool lastPenDown = true;
-
-		private string _color = "Blue";
-		private double _brushSize = 5;
+		private string _color;
+		private double _brushSize;
 		private Point _startPoint;
 		private ICommand _runCommand;
 		private string _commands;
 		private double _angle;
 		private double _x;
 		private double _y;
-		private int _delay = 5;
-		private bool _penDown = true;
-		private int _iterationCount = 10;
+		private int _delay;
+		private bool _penDown;
+		private int _iterationCount;
 
 		public int IterationCount { get => _iterationCount; set { _iterationCount = value; Notify(nameof(IterationCount)); } }
 		public bool PenDown { get => _penDown; set { _penDown = value; Notify(nameof(PenDown)); } }
@@ -73,69 +65,73 @@ namespace TurtleGraphics {
 		public double BrushSize { get => _brushSize; set { _brushSize = value; Notify(nameof(BrushSize)); } }
 		public string Color { get => _color; set { _color = value; Notify(nameof(Color)); } }
 
+		public double DrawWidth { get; set; }
+		public double DrawHeight { get; set; }
+
 		private void MainWindow_Loaded(object sender, RoutedEventArgs e) {
 			DrawWidth = DrawAreaX.ActualWidth;
 			DrawHeight = DrawAreaY.ActualHeight;
+			Loaded -= MainWindow_Loaded;
 		}
 
 		public async Task Draw(Point to) {
 			await Dispatcher.Invoke(async () => {
 				LineSegment l = new LineSegment {
 					IsStroked = true,
-					Point = new Point(X, Y)
+					Point = new Point(X, Y),
+					IsSmoothJoin = true
 				};
 
-
-				l.IsSmoothJoin = true;
-				if (currentPath == null) {
+				if (_currentPath == null) {
 					NewPath();
 				}
 
-				if (lastPenDown != PenDown) {
+				if (_lastPenDown != PenDown) {
 					NewPath();
-					lastPenDown = PenDown;
+					_lastPenDown = PenDown;
 				}
 
-				if (last_color != Color) {
+				if (_lastColor != Color) {
 					NewPath();
-					last_color = Color;
+					_lastColor = Color;
 				}
 
 				X = to.X;
 				Y = to.Y;
 
-				currentFigure.Segments.Add(l);
+				_currentFigure.Segments.Add(l);
 
 				await Displace(to);
 			});
 		}
 
 		internal void NewPath() {
-			currentPath = new Path();
+			_currentPath = new Path();
+
 			if (!PenDown) {
-				currentPath.Stroke = Brushes.Transparent;
+				_currentPath.Stroke = Brushes.Transparent;
 			}
 			else {
-				currentPath.Stroke = (Brush)new BrushConverter().ConvertFromString(Color);
+				_currentPath.Stroke = (Brush)new BrushConverter().ConvertFromString(Color);
 			}
-			currentPath.StrokeThickness = BrushSize;
-			currentPath.StrokeEndLineCap = PenLineCap.Round;
-			currentPath.StrokeStartLineCap = PenLineCap.Round;
+			_currentPath.StrokeThickness = BrushSize;
+			_currentPath.StrokeEndLineCap = PenLineCap.Round;
+			_currentPath.StrokeStartLineCap = PenLineCap.Round;
 
-			currentPath.Data = new PathGeometry();
-			(currentPath.Data as PathGeometry).Figures = new PathFigureCollection();
-			currentFigure = new PathFigure();
-			currentFigure.StartPoint = new Point(X, Y);
-			currentFigure.Segments = new PathSegmentCollection();
-			(currentPath.Data as PathGeometry).Figures.Add(currentFigure);
-			Paths.Children.Add(currentPath);
-			Grid.SetColumn(currentPath, 1);
+			_currentPath.Data = new PathGeometry();
+			(_currentPath.Data as PathGeometry).Figures = new PathFigureCollection();
+			_currentFigure = new PathFigure();
+			_currentFigure.StartPoint = new Point(X, Y);
+			_currentFigure.Segments = new PathSegmentCollection();
+			(_currentPath.Data as PathGeometry).Figures.Add(_currentFigure);
+			Paths.Children.Add(_currentPath);
+			Grid.SetColumn(_currentPath, 1);
 		}
 
 		internal void Rotate(double angle) {
 			Angle += Math.PI * angle / 180.0;
-			if (Angle == 2 * Math.PI) {
-				Angle = 0;
+			if (Angle > 2 * Math.PI) {
+				Angle -= 2 * Math.PI;
 			}
 		}
 
@@ -143,8 +139,7 @@ namespace TurtleGraphics {
 			PenDown = value;
 		}
 
-
-		public async Task Forward(double length) {
+		internal async Task Forward(double length) {
 			double targetX = X + Math.Cos(Angle) * length;
 			double targetY = Y + Math.Sin(Angle) * length;
 
@@ -152,21 +147,32 @@ namespace TurtleGraphics {
 		}
 
 		public async Task Displace(Point to) {
-			int last = currentFigure.Segments.Count - 1;
-			LineSegment l = (LineSegment)currentFigure.Segments[last];
+			int last = _currentFigure.Segments.Count - 1;
+			LineSegment l = (LineSegment)_currentFigure.Segments[last];
 			Point origin = l.Point;
-			double inc = 1d / IterationCount;
-			double curr = 0;
+			double increment = 1d / IterationCount;
+
+			double currentInterpolation = 0;
 			for (int i = 0; i <= IterationCount; i++) {
-				l.Point = new Point(Lerp(origin.X, to.X, curr), Lerp(origin.Y, to.Y, curr));
-				currentFigure.Segments[last] = l;
+				l.Point = new Point(Lerp(origin.X, to.X, currentInterpolation), Lerp(origin.Y, to.Y, currentInterpolation));
+				_currentFigure.Segments[last] = l;
+				currentInterpolation += increment;
 				await Task.Delay(Delay);
-				curr += inc;
 			}
 			l.Freeze();
 		}
 
 		private async Task RunCommandAction() {
+			Init();
+
+			Queue<ParsedData> tasks = CommandParser.Parse(Commands, this);
+
+			foreach (var item in tasks) {
+				await item.Execute();
+			}
+		}
+
+		public void Init() {
 			List<UIElement> toRemove = new List<UIElement>();
 			foreach (UIElement child in Paths.Children) {
 				if (child.GetType() == typeof(Path)) {
@@ -177,22 +183,20 @@ namespace TurtleGraphics {
 			foreach (var item in toRemove) {
 				Paths.Children.Remove(item);
 			}
-			currentFigure = null;
-			currentPath = null;
+			_currentFigure = null;
+			_currentPath = null;
 
-			last_color = "";
+			_lastColor = "";
+			_lastPenDown = true;
 			Color = "Blue";
 			PenDown = true;
 			X = 600;
 			Y = 400;
 			StartPoint = new Point(X, Y);
 			Angle = 0;
-
-			Queue<ParsedData> tasks = CommandParser.Parse(Commands, this);
-
-			foreach (var item in tasks) {
-				await item.Execute();
-			}
+			BrushSize = 5;
+			IterationCount = 10;
+			Delay = 5;
 		}
 	}
 }

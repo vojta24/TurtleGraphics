@@ -3,14 +3,14 @@ using System.Threading.Tasks;
 
 namespace TurtleGraphics {
 	internal class ActionData : ParsedData {
-		private Func<bool> p;
+		private readonly Action _toExecute;
 
-		public ActionData(Func<bool> p) {
-			this.p = p;
+		public ActionData(Action action) {
+			_toExecute = action;
 		}
 
 		public override Task Execute() {
-			p();
+			_toExecute();
 			return Task.CompletedTask;
 		}
 	}

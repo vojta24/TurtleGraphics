@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
-using System.Windows;
 using Flee.PublicTypes;
 
 namespace TurtleGraphics {
@@ -11,45 +9,43 @@ namespace TurtleGraphics {
 		internal static MainWindow win;
 
 		internal static Queue<ParsedData> Parse(string commands, MainWindow window, Dictionary<string, object> additionalVars = null) {
-			string[] split = commands.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
 			win = window;
-
-			Queue<ParsedData> ret = new Queue<ParsedData>();
-			StringReader reader = new StringReader(commands);
 			Dictionary<string, object> vars = new Dictionary<string, object>() {
 				{ "Width", win.DrawWidth },
 				{ "Height", win.DrawHeight }
 			};
 
-			if(additionalVars != null) {
-				foreach (var item in additionalVars) {
-					vars[item.Key] = item.Value;
-				}
-			}
+			Queue<ParsedData> ret = new Queue<ParsedData>();
+			using (StringReader reader = new StringReader(commands)) {
 
-			while (reader.Peek() != -1) {
-				ParsedData data = ParseLine(reader.ReadLine(), reader, vars);
-				if (data != null) {
-					ret.Enqueue(data);
+				if (additionalVars != null) {
+					foreach (var item in additionalVars) {
+						vars[item.Key] = item.Value;
+					}
 				}
-			}
 
-			return ret;
+				while (reader.Peek() != -1) {
+					ParsedData data = ParseLine(reader.ReadLine(), reader, vars);
+					if (data != null) {
+						ret.Enqueue(data);
+					}
+				}
+				return ret;
+			}
 		}
 
 
 		private static ParsedData ParseLine(string line, StringReader reader, Dictionary<string, object> variables) {
-			if (string.IsNullOrWhiteSpace(line)) {
+			if (string.IsNullOrWhiteSpace(line)) 
 				return null;
-			}
+			
 			string[] split = line.Trim().Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
 
 			switch (split[0]) {
 				case "for": {
 					ForLoopData data = ParseForLoop(split[1], reader, variables);
 					data.Line = line;
-
 					return data;
 				}
 
@@ -87,14 +83,14 @@ namespace TurtleGraphics {
 					if(split[0] == "}") {
 						return null;
 					}
-					throw new InvalidOperationException();
+					throw new NotImplementedException($"Unexpected squence: {split[0]}");
 				}
 			}
 		}
 
 
-		private static ForLoopData ParseForLoop(string v, StringReader reader, Dictionary<string, object> inherited) {
-			string[] split = v.Split();
+		private static ForLoopData ParseForLoop(string line, StringReader reader, Dictionary<string, object> inherited) {
+			string[] split = line.Split();
 			string[] range = split[2].Split(new[] { ".." }, StringSplitOptions.None);
 			if (range[1].EndsWith("{")) {
 				range[1] = range[1].Remove(range[1].Length - 1, 1);
@@ -114,7 +110,7 @@ namespace TurtleGraphics {
 				openBarckets--;
 				if (openBarckets == 0) {
 					lines.Add(next);
-					return new ForLoopData() { From = from, To = to, LoopVariable = variable, InheritedVariables = inherited, Exp = null, Line = v, Lines = lines };
+					return new ForLoopData() { From = from, To = to, LoopVariable = variable, InheritedVariables = inherited, Exp = null, Line = line, Lines = lines };
 				}
 			}
 			do {
@@ -133,18 +129,18 @@ namespace TurtleGraphics {
 			}
 			while (next != null);
 
-			return new ForLoopData() { From = from, To = to, LoopVariable = variable, InheritedVariables = inherited, Exp = null, Line = v, Lines = lines };
+			return new ForLoopData() { From = from, To = to, LoopVariable = variable, InheritedVariables = inherited, Exp = null, Line = line, Lines = lines };
 		}
 
-		private static ParsedData ParseExpression(string v, Dictionary<string, object> variables) {
+		private static ParsedData ParseExpression(string line, Dictionary<string, object> variables) {
 			ExpressionContext context = new ExpressionContext();
 
 			foreach (KeyValuePair<string, object> item in variables) {
 				context.Variables.Add(item.Key, item.Value);
 			}
 
-			IDynamicExpression result = context.CompileDynamic(v);
-			return new ParsedData { Line = v, Exp = result };
+			IDynamicExpression result = context.CompileDynamic(line);
+			return new ParsedData { Line = line, Exp = result };
 		}
 	}
 }
