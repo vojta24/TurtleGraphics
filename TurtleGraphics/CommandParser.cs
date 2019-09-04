@@ -105,7 +105,7 @@ namespace TurtleGraphics {
 
 			Queue<ParsedData> inner = new Queue<ParsedData>();
 
-			for (int i = from + 1; i < to; i++) {
+			for (int i = from; i < to; i++) {
 				variables[variable] = i;
 				foreach (ParsedData dat in data) {
 					ParsedData d = dat.Clone();
