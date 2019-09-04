@@ -50,6 +50,23 @@ rotate 5 + j
 fwd 20 * i
 }
 }
+
+for i in 0..60{
+r 1
+f 1 + i/360
+r -6 + i
+f 2
+}
+
+for j in 0..6{
+for i in 0..60{
+r 1
+f 1 + i/360
+r -6 + i
+f 2
+}
+r 360/6
+}
 */
 
 		#region Notifications
@@ -155,7 +172,7 @@ fwd 20 * i
 			X = 600;
 			Y = 400;
 			StartPoint = new Point(X, Y);
-			Angle = 270;
+			Angle = 0;
 
 			Queue<ParsedData> tasks = await CommandParser.Parse(Commands, this);
 

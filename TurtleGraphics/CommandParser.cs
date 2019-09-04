@@ -8,9 +8,9 @@ using Flee.PublicTypes;
 namespace TurtleGraphics {
 	public class CommandParser {
 
-		private static MainWindow win;
+		internal static MainWindow win;
 
-		internal static async Task<Queue<ParsedData>> Parse(string commands, MainWindow window) {
+		internal static async Task<Queue<ParsedData>> Parse(string commands, MainWindow window, Dictionary<string, object> additionalVars = null) {
 			string[] split = commands.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
 			win = window;
@@ -21,6 +21,13 @@ namespace TurtleGraphics {
 				{ "Width", win.DrawWidth },
 				{ "Height", win.DrawHeight }
 			};
+
+			if(additionalVars != null) {
+				foreach (var item in additionalVars) {
+					vars.Add(item.Key, item.Value);
+				}
+			}
+
 			while (reader.Peek() != -1) {
 				ParsedData data = await ParseLine(reader.ReadLine(), reader, vars);
 				if (data != null) {
@@ -39,98 +46,83 @@ namespace TurtleGraphics {
 			string[] split = line.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
 
 			switch (split[0]) {
-				//case "move": {
-				//	ParsedData point = ParsePoint(split[1], variables);
-				//	return new MoveParseData(win) {
-				//		Exp = point.Exp,
-				//		MoveTo = (Point)point.Value(),
-				//		Value = point.Value,
-				//		Variables = new Dictionary<string, object>(variables)
-				//	};
-				//}
 				case "for": {
 					ForLoopData data = await ParseForLoop(split[1], reader, variables);
 					data.Line = line;
+
 					return data;
 				}
 
-				case "rotate": {
+				case "r": {
 					ParsedData data = ParseExpression(split[1], variables);
 					return new RotateParseData(win) {
-						Angle = Convert.ToDouble(data.Value()),
-						Variables = new Dictionary<string, object>(variables),
+						Angle = Convert.ToDouble(data.Exp.Evaluate()),
 						Exp = data.Exp,
 						Line = line,
-						Value = data.Value
 					};
 				}
 
-				case "fwd": {
+				case "f": {
 					ParsedData data = ParseExpression(split[1], variables);
 					return new ForwardParseData(win) {
-						Distance = Convert.ToDouble(data.Value()),
-						Variables = new Dictionary<string, object>(variables),
+						Distance = Convert.ToDouble(data.Exp.Evaluate()),
 						Exp = data.Exp,
 						Line = line,
-						Value = data.Value
 					};
 				}
 
 				default: {
+					if(split[0] == "}") {
+						return null;
+					}
 					throw new InvalidOperationException();
 				}
 			}
 		}
 
 
-		private static async Task<ForLoopData> ParseForLoop(string v, StringReader reader, Dictionary<string, object> variables) {
+		private static async Task<ForLoopData> ParseForLoop(string v, StringReader reader, Dictionary<string, object> inherited) {
 			string[] split = v.Split();
-			string variable = split[0];
 			string[] range = split[2].Split(new[] { ".." }, StringSplitOptions.None);
-			int from = int.Parse(range[0]);
 			if (range[1].EndsWith("{")) {
 				range[1] = range[1].Remove(range[1].Length - 1, 1);
 			}
-			variables.Add(variable, from);
 
+			string variable = split[0];
+			int from = int.Parse(range[0]);
 			int to = int.Parse(range[1]);
+			List<string> lines = new List<string>();
 			string next = reader.ReadLine();
-			List<ParsedData> data = new List<ParsedData>();
+			int openBarckets = 1;
 
-			while (!next.StartsWith("}")) {
-				ParsedData d = await ParseLine(next, reader, variables);
-				data.Add(d);
-				next = reader.ReadLine();
+			if (next.Contains("{")) {
+				openBarckets++;
 			}
-
-			Queue<ParsedData> inner = new Queue<ParsedData>();
-
-			for (int i = from; i < to; i++) {
-				variables[variable] = i;
-				foreach (ParsedData dat in data) {
-					ParsedData d = dat.Clone();
-					d.Variables[variable] = i;
-					inner.Enqueue(d);
+			if (next.Contains("}")) {
+				openBarckets--;
+				if (openBarckets == 0) {
+					lines.Add(next);
+					return new ForLoopData() { From = from, To = to, LoopVariable = variable, InheritedVariables = inherited, Exp = null, Line = v, Lines = lines };
 				}
 			}
-			variables.Remove(variable);
-			return new ForLoopData() { From = from, To = to, Var = variable, Queue = inner,Variables = new Dictionary<string, object>(variables) };
+			do {
+				lines.Add(next);
+				next = reader.ReadLine();
+				if (next.Contains("{")) {
+					openBarckets++;
+				}
+				if (next.Contains("}")) {
+					openBarckets--;
+					if(openBarckets == 0) {
+						lines.Add(next);
+						break;
+					}
+				}
+			}
+			while (next != null);
+
+			return new ForLoopData() { From = from, To = to, LoopVariable = variable, InheritedVariables = inherited, Exp = null, Line = v, Lines = lines };
 		}
-
-		//private static ParsedData ParsePoint(string v, Dictionary<string, object> variables) {
-		//	string[] split = v.Split(',');
-		//	if (v.StartsWith("(") && v.EndsWith(")")) {
-		//		split[0] = split[0].Replace("(", "");
-		//		split[1] = split[1].Replace(")", "");
-		//	}
-
-		//	ParsedData X = ParseExpression(split[0], variables);
-
-		//	ParsedData Y = ParseExpression(split[1], variables);
-
-		//	return new PointParsedData { Line = v, Variables = new Dictionary<string, object>(variables), Value = () => new Point(Convert.ToDouble(X.Exp.Evaluate()), Convert.ToDouble(Y.Exp.Evaluate())) };
-
-		//}
 
 		private static ParsedData ParseExpression(string v, Dictionary<string, object> variables) {
 			ExpressionContext context = new ExpressionContext();
@@ -140,7 +132,7 @@ namespace TurtleGraphics {
 			}
 
 			IDynamicExpression result = context.CompileDynamic(v);
-			return new ParsedData { Line = v, Variables = new Dictionary<string, object>(variables), Exp = result, Value = result.Evaluate };
+			return new ParsedData { Line = v, Exp = result };
 		}
 	}
 }
