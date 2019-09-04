@@ -14,6 +14,7 @@ namespace TurtleGraphics {
 
 		public MoveData(MainWindow win, string input, Dictionary<string, object> variables) {
 			_window = win;
+			Variables = variables;
 
 			foreach (var item in variables) {
 				expression.Variables[item.Key] = item.Value;
@@ -24,9 +25,10 @@ namespace TurtleGraphics {
 			y = expression.CompileDynamic(split[1]);
 		}
 
-		public override IDynamicExpression Exp { get => base.Exp; set => base.Exp = value; }
-
 		public override Task Execute() {
+			UpdateVars(x);
+			UpdateVars(y);
+
 			double x_ = Convert.ToDouble(x.Evaluate());
 			double y_ = Convert.ToDouble(y.Evaluate());
 

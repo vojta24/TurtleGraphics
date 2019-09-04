@@ -76,6 +76,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Condition.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Parsed Data\MoveData.cs" />
     <Compile Include="Operator.cs" />
     <Compile Include="Parsed Data\ColorData.cs" />

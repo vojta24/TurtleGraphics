@@ -53,11 +53,12 @@ namespace TurtleGraphics {
 					double val;
 
 					try {
-						ParsedData data = ParseExpression(split[1], variables);
-						val = Convert.ToDouble(data.Exp.Evaluate());
+						IDynamicExpression data = ParseExpression(split[1], variables);
+						val = Convert.ToDouble(data.Evaluate());
 						return new RotateParseData(win) {
 							Angle = val,
-							Exp = data.Exp,
+							Variables = variables.Copy(),
+							Exp = data,
 							Line = line,
 						};
 					}
@@ -67,6 +68,7 @@ namespace TurtleGraphics {
 							return new RotateParseData(win) {
 								Angle = val,
 								Line = line,
+								Variables = variables.Copy()
 							};
 						}
 						throw;
@@ -74,10 +76,10 @@ namespace TurtleGraphics {
 				}
 
 				case "f": {
-					ParsedData data = ParseExpression(split[1], variables);
+					IDynamicExpression data = ParseExpression(split[1], variables);
 					return new ForwardParseData(win) {
-						Distance = Convert.ToDouble(data.Exp.Evaluate()),
-						Exp = data.Exp,
+						Variables = variables.Copy(),
+						Exp = data,
 						Line = line,
 					};
 				}
@@ -95,7 +97,7 @@ namespace TurtleGraphics {
 				}
 
 				case "goto": {
-					return new MoveData(win, split[1],variables);
+					return new MoveData(win, split[1], variables.Copy());
 				}
 
 				default: {
@@ -216,7 +218,7 @@ namespace TurtleGraphics {
 						Change = change,
 						Condition = condition,
 						Operator = _operator,
-						InheritedVariables = inherited,
+						Variables = inherited.Copy(),
 						Exp = null,
 						Line = line,
 						Lines = lines
@@ -246,7 +248,7 @@ namespace TurtleGraphics {
 				Change = change,
 				Condition = condition,
 				Operator = _operator,
-				InheritedVariables = inherited,
+				Variables = inherited.Copy(),
 				Exp = null,
 				Line = line,
 				Lines = lines
@@ -270,15 +272,16 @@ namespace TurtleGraphics {
 			throw new NotImplementedException($"{str} is not a valid Condition");
 		}
 
-		private static ParsedData ParseExpression(string line, Dictionary<string, object> variables) {
+		private static IDynamicExpression ParseExpression(string line, Dictionary<string, object> variables) {
 			ExpressionContext context = new ExpressionContext();
 
 			foreach (KeyValuePair<string, object> item in variables) {
 				context.Variables.Add(item.Key, item.Value);
 			}
+			return context.CompileDynamic(line);
 
-			IDynamicExpression result = context.CompileDynamic(line);
-			return new ParsedData { Line = line, Exp = result };
+			//IDynamicExpression result = context.CompileDynamic(line);
+			//return new ParsedData { Line = line, Exp = result };
 		}
 	}
 }

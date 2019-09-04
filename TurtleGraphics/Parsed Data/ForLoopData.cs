@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Flee.PublicTypes;
-using System.Linq.Expressions;
 
 namespace TurtleGraphics {
 	public class ForLoopData : ParsedData {
@@ -13,7 +12,6 @@ namespace TurtleGraphics {
 		internal OperatorType Operator { get; set; }
 		internal ConditionType Condition { get; set; }
 
-		public Dictionary<string, object> InheritedVariables { get; set; }
 		public List<string> Lines { get; set; }
 
 		public override async Task Execute() {
@@ -21,9 +19,7 @@ namespace TurtleGraphics {
 
 			async Task Exec(int i) {
 				foreach (ParsedData data in loopContents) {
-					if (data.Exp != null) {
-						data.Exp.Context.Variables[LoopVariable] = i;
-					}
+					data.Variables[LoopVariable] = i;
 					await data.Execute();
 				}
 			}
@@ -137,13 +133,13 @@ namespace TurtleGraphics {
 		private List<ParsedData> CompileLoop() {
 			ExpressionContext c = new ExpressionContext();
 			c.Variables.Add(LoopVariable, From);
-			foreach (string key in InheritedVariables.Keys) {
-				c.Variables.Add(key, InheritedVariables[key]);
+			foreach (string key in Variables.Keys) {
+				c.Variables.Add(key, Variables[key]);
 			}
 
 			List<ParsedData> singleIteration = new List<ParsedData>();
 
-			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, Lines), CommandParser.win, Join(InheritedVariables, new Dictionary<string, object> { { LoopVariable, 0 } }));
+			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, Lines), CommandParser.win, Join(Variables, new Dictionary<string, object> { { LoopVariable, 0 } }));
 			singleIteration.AddRange(data);
 
 			return singleIteration;

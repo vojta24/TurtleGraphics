@@ -16,6 +16,7 @@ namespace TurtleGraphics {
 				_window.Rotate(Angle);
 				return Task.CompletedTask;
 			}
+			UpdateVars(Exp);
 			Angle = Convert.ToDouble(Exp.Evaluate());
 			_window.Rotate(Angle);
 			return Task.CompletedTask;

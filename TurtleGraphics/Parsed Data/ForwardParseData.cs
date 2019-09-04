@@ -13,6 +13,7 @@ namespace TurtleGraphics {
 		public double Distance { get; set; }
 
 		public override async Task Execute() {
+			UpdateVars(Exp);
 			Distance = Convert.ToDouble(Exp.Evaluate());
 			await _window.Forward(Distance);
 		}
