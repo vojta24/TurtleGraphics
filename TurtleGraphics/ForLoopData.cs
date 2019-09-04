@@ -33,7 +33,7 @@ namespace TurtleGraphics {
 
 			List<ParsedData> singleIteration = new List<ParsedData>();
 
-			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, Lines), CommandParser.win, Join(InheritedVariables, new Dictionary<string, object> { { LoopVariable, 0 } })).Result;
+			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, Lines), CommandParser.win, Join(InheritedVariables, new Dictionary<string, object> { { LoopVariable, 0 } }));
 			singleIteration.AddRange(data);
 
 			return singleIteration;

@@ -36,22 +36,13 @@
 					<Run Text="{Binding Y}"/>
 				</TextBlock>
 				<Slider Value="{Binding Delay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="50" TickFrequency="1" Ticks="5"/>
+				<Slider Value="{Binding IterationCount, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="100" TickFrequency="1" />
+				<RichTextBox>
+
+				</RichTextBox>
+				<TextBox></TextBox>
 			</StackPanel>
 			<Button Grid.Row="2" Content="Run" Command="{Binding RunCommand}"/>
 		</Grid>
-
-		<Path Grid.Column="1" StrokeStartLineCap="Round" Stroke="{Binding Color}" StrokeEndLineCap="Round" StrokeThickness="{Binding BrushSize}" x:Name="Path">
-			<Path.Data>
-				<PathGeometry x:Name="Geometry">
-					<!--<PathGeometry.Figures>
-						<PathFigure StartPoint="{Binding StartPoint}">
-							<PathFigure.Segments>
-								<PathSegmentCollection x:Name="Segments"/>
-							</PathFigure.Segments>
-						</PathFigure>
-					</PathGeometry.Figures>-->
-				</PathGeometry>
-			</Path.Data>
-		</Path>
 	</Grid>
 </Window>

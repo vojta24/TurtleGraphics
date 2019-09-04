@@ -1,0 +1,53 @@
+﻿for i in 0..60{
+r 1
+f 1 + i/360
+r -6 + i
+f 2
+}
+
+for j in 0..6{
+for i in 0..60{
+r 1
+f 1 + i/360
+r -6 + i
+f 2
+}
+r 360/6
+}
+
+for j in 0..6{
+for i in 0..30{
+r 1
+f 1 + i/360
+r -6 + i
+f 2
+}
+r 360/6
+}
+
+
+for k in 0..12{
+for j in 0..2{
+for i in 0..2{
+c random
+f 50
+}
+r 90
+f 2
+r 90
+}
+r 30
+}
+
+for i in 0..8{
+for j in 0..4{
+r 90
+f 50
+}
+r 45
+f 50
+r 90
+f 2
+r 90
+f 50
+}

@@ -18,35 +18,6 @@ namespace TurtleGraphics {
 	/// </summary>
 	public partial class MainWindow : Window, INotifyPropertyChanged {
 
-		/*
-		for i in 0..60{
-		r 1
-		f 1 + i/360
-		r -6 + i
-		f 2
-		}
-
-		for j in 0..6{
-		for i in 0..60{
-		r 1
-		f 1 + i/360
-		r -6 + i
-		f 2
-		}
-		r 360/6
-		}
-
-		for j in 0..6{
-		for i in 0..30{
-		r 1
-		f 1 + i/360
-		r -6 + i
-		f 2
-		}
-		r 360/6
-		}
-		*/
-
 		#region Notifications
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -88,7 +59,9 @@ namespace TurtleGraphics {
 		private double _y;
 		private int _delay = 5;
 		private bool _penDown = true;
+		private int _iterationCount = 10;
 
+		public int IterationCount { get => _iterationCount; set { _iterationCount = value; Notify(nameof(IterationCount)); } }
 		public bool PenDown { get => _penDown; set { _penDown = value; Notify(nameof(PenDown)); } }
 		public int Delay { get => _delay; set { _delay = value; Notify(nameof(Delay)); } }
 		public double Y { get => _y; set { _y = value; Notify(nameof(Y)); } }
@@ -128,7 +101,7 @@ namespace TurtleGraphics {
 					last_color = Color;
 				}
 
-					X = to.X;
+				X = to.X;
 				Y = to.Y;
 
 				currentFigure.Segments.Add(l);
@@ -182,14 +155,13 @@ namespace TurtleGraphics {
 			int last = currentFigure.Segments.Count - 1;
 			LineSegment l = (LineSegment)currentFigure.Segments[last];
 			Point origin = l.Point;
-			const double INTERATION = 2;
-			const double INCREMENT = 1d / INTERATION;
+			double inc = 1d / IterationCount;
 			double curr = 0;
-			for (int i = 0; i <= INTERATION; i++) {
+			for (int i = 0; i <= IterationCount; i++) {
 				l.Point = new Point(Lerp(origin.X, to.X, curr), Lerp(origin.Y, to.Y, curr));
 				currentFigure.Segments[last] = l;
 				await Task.Delay(Delay);
-				curr += INCREMENT;
+				curr += inc;
 			}
 			l.Freeze();
 		}
@@ -216,7 +188,7 @@ namespace TurtleGraphics {
 			StartPoint = new Point(X, Y);
 			Angle = 0;
 
-			Queue<ParsedData> tasks = await CommandParser.Parse(Commands, this);
+			Queue<ParsedData> tasks = CommandParser.Parse(Commands, this);
 
 			foreach (var item in tasks) {
 				await item.Execute();

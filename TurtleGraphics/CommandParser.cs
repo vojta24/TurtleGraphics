@@ -10,7 +10,7 @@ namespace TurtleGraphics {
 
 		internal static MainWindow win;
 
-		internal static async Task<Queue<ParsedData>> Parse(string commands, MainWindow window, Dictionary<string, object> additionalVars = null) {
+		internal static Queue<ParsedData> Parse(string commands, MainWindow window, Dictionary<string, object> additionalVars = null) {
 			string[] split = commands.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
 			win = window;
@@ -29,7 +29,7 @@ namespace TurtleGraphics {
 			}
 
 			while (reader.Peek() != -1) {
-				ParsedData data = await ParseLine(reader.ReadLine(), reader, vars);
+				ParsedData data = ParseLine(reader.ReadLine(), reader, vars);
 				if (data != null) {
 					ret.Enqueue(data);
 				}
@@ -39,15 +39,15 @@ namespace TurtleGraphics {
 		}
 
 
-		private static async Task<ParsedData> ParseLine(string line, StringReader reader, Dictionary<string, object> variables) {
+		private static ParsedData ParseLine(string line, StringReader reader, Dictionary<string, object> variables) {
 			if (string.IsNullOrWhiteSpace(line)) {
 				return null;
 			}
-			string[] split = line.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
+			string[] split = line.Trim().Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
 
 			switch (split[0]) {
 				case "for": {
-					ForLoopData data = await ParseForLoop(split[1], reader, variables);
+					ForLoopData data = ParseForLoop(split[1], reader, variables);
 					data.Line = line;
 
 					return data;
@@ -80,7 +80,7 @@ namespace TurtleGraphics {
 				}
 
 				case "c": {
-					return new StringData(win,split[1]);
+					return new ColorData(win,split[1]);
 				}
 
 				default: {
@@ -93,7 +93,7 @@ namespace TurtleGraphics {
 		}
 
 
-		private static async Task<ForLoopData> ParseForLoop(string v, StringReader reader, Dictionary<string, object> inherited) {
+		private static ForLoopData ParseForLoop(string v, StringReader reader, Dictionary<string, object> inherited) {
 			string[] split = v.Split();
 			string[] range = split[2].Split(new[] { ".." }, StringSplitOptions.None);
 			if (range[1].EndsWith("{")) {
