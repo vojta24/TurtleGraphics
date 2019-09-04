@@ -75,6 +75,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Condition.cs" />
+    <Compile Include="Operator.cs" />
     <Compile Include="Parsed Data\ColorData.cs" />
     <Compile Include="Parsed Data\ForwardParseData.cs" />
     <Compile Include="Parsed Data\RotateParseData.cs" />

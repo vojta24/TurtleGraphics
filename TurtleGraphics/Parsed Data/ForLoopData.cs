@@ -2,19 +2,24 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Flee.PublicTypes;
+using System.Linq.Expressions;
 
 namespace TurtleGraphics {
 	public class ForLoopData : ParsedData {
 		public int From { get; set; }
 		public int To { get; set; }
 		public string LoopVariable { get; set; }
+		public int Change { get; set; }
+		internal OperatorType Operator { get; set; }
+		internal ConditionType Condition { get; set; }
+
 		public Dictionary<string, object> InheritedVariables { get; set; }
 		public List<string> Lines { get; set; }
 
 		public override async Task Execute() {
 			List<ParsedData> loopContents = CompileLoop();
 
-			for (int i = From; i < To; i++) {
+			async Task Exec(int i) {
 				foreach (ParsedData data in loopContents) {
 					if (data.Exp != null) {
 						data.Exp.Context.Variables[LoopVariable] = i;
@@ -22,6 +27,111 @@ namespace TurtleGraphics {
 					await data.Execute();
 				}
 			}
+
+			switch (Condition) {
+				case ConditionType.Greater: {
+					if (Operator == OperatorType.PlusPlus) {
+						for (int i = From; i > To; i++) {
+							await Exec(i);
+						}
+					}
+					if (Operator == OperatorType.PlusEquals) {
+						for (int i = From; i > To; i += Change) {
+							await Exec(i);
+						}
+					}
+					if (Operator == OperatorType.MinMin) {
+						for (int i = From; i > To; i--) {
+							await Exec(i);
+						}
+					}
+					if (Operator == OperatorType.MinusEquals) {
+						for (int i = From; i > To; i -= Change) {
+							await Exec(i);
+						}
+					}
+					break;
+				}
+				case ConditionType.Less: {
+					if (Operator == OperatorType.PlusPlus) {
+						for (int i = From; i < To; i++) {
+							await Exec(i);
+						}
+					}
+					if (Operator == OperatorType.PlusEquals) {
+						for (int i = From; i < To; i += Change) {
+							await Exec(i);
+						}
+					}
+					if (Operator == OperatorType.MinMin) {
+						for (int i = From; i < To; i--) {
+							await Exec(i);
+						}
+					}
+					if (Operator == OperatorType.MinusEquals) {
+						for (int i = From; i < To; i -= Change) {
+							await Exec(i);
+						}
+					}
+					break;
+				}
+				case ConditionType.GreaterOrEqual: {
+					if (Operator == OperatorType.PlusPlus) {
+						for (int i = From; i >= To; i++) {
+							await Exec(i);
+						}
+					}
+					if (Operator == OperatorType.PlusEquals) {
+						for (int i = From; i >= To; i += Change) {
+							await Exec(i);
+						}
+					}
+					if (Operator == OperatorType.MinMin) {
+						for (int i = From; i >= To; i--) {
+							await Exec(i);
+						}
+					}
+					if (Operator == OperatorType.MinusEquals) {
+						for (int i = From; i >= To; i -= Change) {
+							await Exec(i);
+						}
+					}
+					break;
+				}
+				case ConditionType.LessOrEqual: {
+					if (Operator == OperatorType.PlusPlus) {
+						for (int i = From; i <= To; i++) {
+							await Exec(i);
+						}
+					}
+					if (Operator == OperatorType.PlusEquals) {
+						for (int i = From; i <= To; i += Change) {
+							await Exec(i);
+						}
+					}
+					if (Operator == OperatorType.MinMin) {
+						for (int i = From; i <= To; i--) {
+							await Exec(i);
+						}
+					}
+					if (Operator == OperatorType.MinusEquals) {
+						for (int i = From; i <= To; i -= Change) {
+							await Exec(i);
+						}
+					}
+					break;
+				}
+			}
+
+
+			//for (int i = From; i < To; i++) {
+			//	foreach (ParsedData data in loopContents) {
+			//		if (data.Exp != null) {
+			//			data.Exp.Context.Variables[LoopVariable] = i;
+			//		}
+			//		await data.Execute();
+			//	}
+			//}
 		}
 
 		private List<ParsedData> CompileLoop() {
