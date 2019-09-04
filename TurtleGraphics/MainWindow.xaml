@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:TurtleGraphics"
         mc:Ignorable="d"
         Title="MainWindow" WindowStyle="None" WindowState="Maximized" SizeToContent="Manual">
-	<Grid>
+	<Grid x:Name="Paths">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="*"/>
 			<ColumnDefinition Width="4*" x:Name="DrawAreaX"/>
@@ -42,14 +42,14 @@
 
 		<Path Grid.Column="1" StrokeStartLineCap="Round" Stroke="{Binding Color}" StrokeEndLineCap="Round" StrokeThickness="{Binding BrushSize}" x:Name="Path">
 			<Path.Data>
-				<PathGeometry>
-					<PathGeometry.Figures>
+				<PathGeometry x:Name="Geometry">
+					<!--<PathGeometry.Figures>
 						<PathFigure StartPoint="{Binding StartPoint}">
 							<PathFigure.Segments>
 								<PathSegmentCollection x:Name="Segments"/>
 							</PathFigure.Segments>
 						</PathFigure>
-					</PathGeometry.Figures>
+					</PathGeometry.Figures>-->
 				</PathGeometry>
 			</Path.Data>
 		</Path>

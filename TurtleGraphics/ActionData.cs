@@ -10,7 +10,8 @@ namespace TurtleGraphics {
 		}
 
 		public override Task Execute() {
-			return Task.Run(p);
+			p();
+			return Task.CompletedTask;
 		}
 	}
 }

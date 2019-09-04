@@ -9,6 +9,8 @@ using Igor.Models;
 using static TurtleGraphics.Helpers;
 using System.Linq.Expressions;
 using Flee.PublicTypes;
+using System.Windows.Shapes;
+using System.Windows.Controls;
 
 namespace TurtleGraphics {
 	/// <summary>
@@ -17,57 +19,33 @@ namespace TurtleGraphics {
 	public partial class MainWindow : Window, INotifyPropertyChanged {
 
 		/*
-move Width,100
-move 50,200
-move 150,500
-move 30,800
-move 300,320
-move 20,100
+		for i in 0..60{
+		r 1
+		f 1 + i/360
+		r -6 + i
+		f 2
+		}
 
+		for j in 0..6{
+		for i in 0..60{
+		r 1
+		f 1 + i/360
+		r -6 + i
+		f 2
+		}
+		r 360/6
+		}
 
-for i in 0..50{
-move i,50
-}
-
-for i in 0..8{
-rotate i*45
-fwd 40
-}
-
-
-
-move 20,20
-rotate 20
-fwd 20
-for i in 0..50{
-rotate 5
-fwd 20
-}
-
-for i in 0..2{
-for j in 0..50{
-rotate 5 + j
-fwd 20 * i
-}
-}
-
-for i in 0..60{
-r 1
-f 1 + i/360
-r -6 + i
-f 2
-}
-
-for j in 0..6{
-for i in 0..60{
-r 1
-f 1 + i/360
-r -6 + i
-f 2
-}
-r 360/6
-}
-*/
+		for j in 0..6{
+		for i in 0..30{
+		r 1
+		f 1 + i/360
+		r -6 + i
+		f 2
+		}
+		r 360/6
+		}
+		*/
 
 		#region Notifications
 
@@ -89,11 +67,16 @@ r 360/6
 			StartPoint = new Point(X, Y);
 			Loaded += (s, e) => { MainWindow_Loaded(s, e); };
 			DataContext = this;
-
 		}
 
+
+		private Path currentPath;
+		private PathFigure currentFigure;
 		public double DrawWidth;
 		public double DrawHeight;
+
+		private string last_color = "";
+		private bool lastPenDown = true;
 
 		private string _color = "Blue";
 		private double _brushSize = 5;
@@ -104,7 +87,9 @@ r 360/6
 		private double _x;
 		private double _y;
 		private int _delay = 5;
+		private bool _penDown = true;
 
+		public bool PenDown { get => _penDown; set { _penDown = value; Notify(nameof(PenDown)); } }
 		public int Delay { get => _delay; set { _delay = value; Notify(nameof(Delay)); } }
 		public double Y { get => _y; set { _y = value; Notify(nameof(Y)); } }
 		public double X { get => _x; set { _x = value; Notify(nameof(X)); } }
@@ -122,25 +107,67 @@ r 360/6
 
 		public async Task Draw(Point to) {
 			await Dispatcher.Invoke(async () => {
-				LineSegment l = new LineSegment();
-				l.IsStroked = true;
-				l.Point = new Point(X, Y);
-				X = to.X;
-				Y = to.Y;
-				l.IsSmoothJoin = true;
+				LineSegment l = new LineSegment {
+					IsStroked = true,
+					Point = new Point(X, Y)
+				};
 
-				Segments.Add(l);
+
+				l.IsSmoothJoin = true;
+				if (currentPath == null) {
+					NewPath();
+				}
+
+				if (lastPenDown != PenDown) {
+					NewPath();
+					lastPenDown = PenDown;
+				}
+
+				if (last_color != Color) {
+					NewPath();
+					last_color = Color;
+				}
+
+					X = to.X;
+				Y = to.Y;
+
+				currentFigure.Segments.Add(l);
 
 				await Displace(to);
 			});
 		}
 
+		internal void NewPath() {
+			currentPath = new Path();
+			if (!PenDown) {
+				currentPath.Stroke = Brushes.Transparent;
+			}
+			else {
+				currentPath.Stroke = (Brush)new BrushConverter().ConvertFromString(Color);
+			}
+			currentPath.StrokeThickness = BrushSize;
+			currentPath.StrokeEndLineCap = PenLineCap.Round;
+			currentPath.StrokeStartLineCap = PenLineCap.Round;
+
+			currentPath.Data = new PathGeometry();
+			(currentPath.Data as PathGeometry).Figures = new PathFigureCollection();
+			currentFigure = new PathFigure();
+			currentFigure.StartPoint = new Point(X, Y);
+			currentFigure.Segments = new PathSegmentCollection();
+			(currentPath.Data as PathGeometry).Figures.Add(currentFigure);
+			Paths.Children.Add(currentPath);
+			Grid.SetColumn(currentPath, 1);
+		}
 
 		internal void Rotate(double angle) {
 			Angle += Math.PI * angle / 180.0;
 			if (Angle == 2 * Math.PI) {
 				Angle = 0;
 			}
+		}
+
+		internal void SetPenDown(bool value) {
+			PenDown = value;
 		}
 
 
@@ -152,15 +179,15 @@ r 360/6
 		}
 
 		public async Task Displace(Point to) {
-			int last = Segments.Count - 1;
-			LineSegment l = (LineSegment)Segments[last];
+			int last = currentFigure.Segments.Count - 1;
+			LineSegment l = (LineSegment)currentFigure.Segments[last];
 			Point origin = l.Point;
 			const double INTERATION = 2;
 			const double INCREMENT = 1d / INTERATION;
 			double curr = 0;
 			for (int i = 0; i <= INTERATION; i++) {
 				l.Point = new Point(Lerp(origin.X, to.X, curr), Lerp(origin.Y, to.Y, curr));
-				Segments[last] = l;
+				currentFigure.Segments[last] = l;
 				await Task.Delay(Delay);
 				curr += INCREMENT;
 			}
@@ -168,7 +195,22 @@ r 360/6
 		}
 
 		private async Task RunCommandAction() {
-			Segments.Clear();
+			List<UIElement> toRemove = new List<UIElement>();
+			foreach (UIElement child in Paths.Children) {
+				if (child.GetType() == typeof(Path)) {
+					toRemove.Add(child);
+				}
+			}
+
+			foreach (var item in toRemove) {
+				Paths.Children.Remove(item);
+			}
+			currentFigure = null;
+			currentPath = null;
+
+			last_color = "";
+			Color = "Blue";
+			PenDown = true;
 			X = 600;
 			Y = 400;
 			StartPoint = new Point(X, Y);

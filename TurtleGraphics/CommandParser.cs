@@ -79,6 +79,10 @@ namespace TurtleGraphics {
 					return new ActionData(() => win.PenDown = true);
 				}
 
+				case "c": {
+					return new StringData(win,split[1]);
+				}
+
 				default: {
 					if(split[0] == "}") {
 						return null;
