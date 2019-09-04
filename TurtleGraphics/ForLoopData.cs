@@ -33,11 +33,18 @@ namespace TurtleGraphics {
 
 			List<ParsedData> singleIteration = new List<ParsedData>();
 
-			foreach (string line in Lines) {
-				Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine,Lines), CommandParser.win, new Dictionary<string, object> { { LoopVariable, 0 } }).Result;
-				singleIteration.AddRange(data);
-			}
+			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, Lines), CommandParser.win, Join(InheritedVariables, new Dictionary<string, object> { { LoopVariable, 0 } })).Result;
+			singleIteration.AddRange(data);
+
 			return singleIteration;
+		}
+
+		public Dictionary<string, object> Join(Dictionary<string, object> a, Dictionary<string, object> b) {
+			Dictionary<string, object> newD = new Dictionary<string, object>(a);
+			foreach (var item in b) {
+				newD[item.Key] = item.Value;
+			}
+			return newD;
 		}
 	}
 }

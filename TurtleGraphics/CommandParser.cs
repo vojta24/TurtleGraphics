@@ -24,7 +24,7 @@ namespace TurtleGraphics {
 
 			if(additionalVars != null) {
 				foreach (var item in additionalVars) {
-					vars.Add(item.Key, item.Value);
+					vars[item.Key] = item.Value;
 				}
 			}
 
@@ -69,6 +69,14 @@ namespace TurtleGraphics {
 						Exp = data.Exp,
 						Line = line,
 					};
+				}
+
+				case "u": {
+					return new ActionData(() => win.PenDown = false);
+				}
+
+				case "d": {
+					return new ActionData(() => win.PenDown = true);
 				}
 
 				default: {
