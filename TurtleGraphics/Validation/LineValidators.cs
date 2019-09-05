@@ -57,5 +57,10 @@ namespace TurtleGraphics.Validation {
 			string[] split = line.Split('(', ')');
 			return split.Length == 3 && split[0].Trim() == "for";
 		}
+
+		internal static bool IsConditional(string line) {
+			string[] split = line.Split('(', ')');
+			return split.Length == 3 && (split[0].Trim() == "if" || split[0].Trim() == "else if" || split[0].Trim() == "else");
+		}
 	}
 }

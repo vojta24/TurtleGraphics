@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Flee.PublicTypes;
 
 namespace TurtleGraphics {
-	public class MoveData : StringData {
+	public class MoveData : ParsedData {
 		private readonly MainWindow _window;
 
 		private readonly ExpressionContext expression = new ExpressionContext();

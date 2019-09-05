@@ -3,7 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace TurtleGraphics {
-	public class ColorData : StringData {
+	public class ColorData : ParsedData {
 
 		private readonly char[] HEX = new[] { '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 		private readonly Random _random;

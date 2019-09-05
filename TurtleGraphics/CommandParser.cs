@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Flee.PublicTypes;
 using TurtleGraphics.Parsers;
 using TurtleGraphics.Validation;
@@ -112,73 +113,69 @@ namespace TurtleGraphics {
 				return data;
 			}
 
-			//string[] split = line.Trim().Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
-
-			//switch (split[0]) {
-			//	//case "for": {
-			//	//	ForLoopData data = ForLoopParser.ParseForLoop(split[1].Trim(), reader, variables);
-			//	//	data.Line = line;
-			//	//	return data;
-			//	//}
-
-			//	case "r": {
-			//		double val;
-
-			//		try {
-			//			IDynamicExpression data = ParseExpression(split[1], variables);
-			//			val = Convert.ToDouble(data.Evaluate());
-			//			return new RotateParseData(win) {
-			//				Angle = val,
-			//				Variables = variables.Copy(),
-			//				Exp = data,
-			//				Line = line,
-			//			};
-			//		}
-			//		catch {
-			//			if (split[1] == "origin") {
-			//				val = double.NaN;
-			//				return new RotateParseData(win) {
-			//					Angle = val,
-			//					Line = line,
-			//					Variables = variables.Copy()
-			//				};
-			//			}
-			//			throw;
-			//		}
-			//	}
-
-			//	case "f": {
-			//		IDynamicExpression data = ParseExpression(split[1], variables);
-			//		return new ForwardParseData(win) {
-			//			Variables = variables.Copy(),
-			//			Exp = data,
-			//			Line = line,
-			//		};
-			//	}
-
-			//	case "u": {
-			//		return new ActionData(() => win.PenDown = false) { Variables = variables.Copy() };
-			//	}
-
-			//	case "d": {
-			//		return new ActionData(() => win.PenDown = true) { Variables = variables.Copy() };
-			//	}
-
-			//	case "c": {
-			//		return new ColorData(win, split[1]);
-			//	}
-
-			//	case "goto": {
-			//		return new MoveData(win, split[1].Split(','), variables.Copy());
-			//	}
-
-			//	default: {
-			//		if (split[0] == "}") {
-			//			return null;
-			//		}
-			//	}
-			//}
+			if (LineValidators.IsConditional(line)) {
+				if (line.Contains("if")) {
+					ConditionalData data = ParseIfBlock(line, reader, variables.Copy());
+					return data;
+				}
+			}
 			throw new NotImplementedException($"Unexpected squence: {line}");
+		}
+
+		private static ConditionalData ParseIfBlock(string line, StringReader reader, Dictionary<string, object> variables) {
+
+			//if (i > 50) {
+			//if (i <= 50) {
+			//if(i > 50) {
+			//if (i > 50){
+
+			string mod = line.Remove(0, 2).TrimStart();
+
+			//(i > 50) {
+			//(i <= 50) {
+			//(i > 50) {
+			//(i > 50){
+
+			IGenericExpression<bool> ifCondition = null;
+			Func<Task> ifAction = null;
+
+
+
+			List<string> lines = new List<string>();
+			string next = reader.ReadLine();
+			int openBarckets = 1;
+
+			if (next.Contains("{")) {
+				openBarckets++;
+			}
+			if (next.Contains("}")) {
+				openBarckets--;
+				if (openBarckets == 0) {
+					lines.Add(next);
+					return new ConditionalData(line, ifCondition, ifAction) {
+						Variables = variables.Copy(),
+					};
+				}
+			}
+			do {
+				lines.Add(next);
+				next = reader.ReadLine();
+				if (next.Contains("{")) {
+					openBarckets++;
+				}
+				if (next.Contains("}")) {
+					openBarckets--;
+					if (openBarckets == 0) {
+						lines.Add(next);
+						break;
+					}
+				}
+			}
+			while (next != null);
+
+			return new ConditionalData(line, ifCondition, ifAction) {
+				Variables = variables.Copy(),
+			};
 
 		}
 
