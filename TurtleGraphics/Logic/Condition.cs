@@ -15,9 +15,5 @@
 		public const string GREATER_OR_EQUAL = ">=";
 		public const string LESS_OR_EQUAL = "<=";
 		public const string EQUAL = "==";
-
-
-
 	}
-
 }

@@ -3,25 +3,23 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace TurtleGraphics {
-	internal class ColorData : ParsedData {
+	internal class ColorData : StringData {
 
 		private readonly char[] HEX = new[] { '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 		private readonly Random _random;
-		private readonly string _color;
 		private readonly MainWindow _window;
 
-		public ColorData(MainWindow window, string inputColor) {
+		public ColorData(MainWindow window, string inputColor) : base(inputColor.Trim()) {
 			_random = new Random((int)DateTime.Now.Ticks);
-			_color = inputColor.Trim().ToLower();
 			_window = window;
 		}
 
 		public override Task Execute() {
-			if (_color == "random" || _color == "rand") {
+			if (Arg1 == "random" || Arg1 == "rand") {
 				_window.Color = RandColor();
 			}
 			else {
-				_window.Color = _color;
+				_window.Color = Arg1;
 			}
 			return Task.CompletedTask;
 		}

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Flee.PublicTypes;
 
 namespace TurtleGraphics {
-	internal class MoveData : ParsedData {
+	internal class MoveData : StringData {
 		private readonly MainWindow _window;
 
 		private readonly ExpressionContext expression = new ExpressionContext();
@@ -12,7 +12,7 @@ namespace TurtleGraphics {
 		private readonly IDynamicExpression x;
 		private readonly IDynamicExpression y;
 
-		public MoveData(MainWindow win, string input, Dictionary<string, object> variables) {
+		public MoveData(MainWindow win, string input, Dictionary<string, object> variables) : base(input) {
 			_window = win;
 			Variables = variables;
 

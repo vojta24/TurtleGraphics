@@ -38,22 +38,22 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Flee.Net45, Version=1.0.0.0, Culture=neutral, PublicKeyToken=951a102ce2413032, processorArchitecture=MSIL">
-      <HintPath>..\Playground\packages\Flee.1.2.2\lib\net45\Flee.Net45.dll</HintPath>
+      <HintPath>..\packages\Flee.1.2.2\lib\net45\Flee.Net45.dll</HintPath>
     </Reference>
     <Reference Include="Igor.Controls">
-      <HintPath>Igor.WPF\Igor.Controls.dll</HintPath>
+      <HintPath>..\packages\Igor.WPF\Igor.Controls.dll</HintPath>
     </Reference>
     <Reference Include="Igor.Localization">
-      <HintPath>Igor.WPF\Igor.Localization.dll</HintPath>
+      <HintPath>..\packages\Igor.WPF\Igor.Localization.dll</HintPath>
     </Reference>
     <Reference Include="Igor.Models">
-      <HintPath>Igor.WPF\Igor.Models.dll</HintPath>
+      <HintPath>..\packages\Igor.WPF\Igor.Models.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Reflection, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\Playground\packages\System.Reflection.4.3.0\lib\net462\System.Reflection.dll</HintPath>
+      <HintPath>..\packages\System.Reflection.4.3.0\lib\net462\System.Reflection.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
@@ -75,10 +75,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Condition.cs" />
+    <Compile Include="Logic\AssignmentInfo.cs" />
+    <Compile Include="Logic\Condition.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Parsed Data\Base\StringData.cs" />
     <Compile Include="Parsed Data\MoveData.cs" />
-    <Compile Include="Operator.cs" />
+    <Compile Include="Logic\Operator.cs" />
     <Compile Include="Parsed Data\ColorData.cs" />
     <Compile Include="Parsed Data\ForwardParseData.cs" />
     <Compile Include="Parsed Data\RotateParseData.cs" />
@@ -101,6 +103,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Parsed Data\Base\ParsedData.cs" />
+    <Compile Include="Parsers\ForLoopParser.cs" />
+    <Compile Include="Parsers\LogicParsers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
