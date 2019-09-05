@@ -167,6 +167,8 @@ namespace TurtleGraphics {
 		}
 
 		private async Task RunCommandAction() {
+			//await Task.Delay(5000);
+
 			Init();
 
 			Queue<ParsedData> tasks = CommandParser.Parse(Commands, this);

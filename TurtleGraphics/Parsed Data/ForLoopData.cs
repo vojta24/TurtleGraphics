@@ -131,26 +131,12 @@ namespace TurtleGraphics {
 		}
 
 		private List<ParsedData> CompileLoop() {
-			ExpressionContext c = new ExpressionContext();
-			c.Variables.Add(LoopVariable, From);
-			foreach (string key in Variables.Keys) {
-				c.Variables.Add(key, Variables[key]);
-			}
-
 			List<ParsedData> singleIteration = new List<ParsedData>();
 
-			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, Lines), CommandParser.win, Join(Variables, new Dictionary<string, object> { { LoopVariable, 0 } }));
+			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, Lines), CommandParser.win, Helpers.Join(Variables, new Dictionary<string, object> { { LoopVariable, 0 } }));
 			singleIteration.AddRange(data);
 
 			return singleIteration;
-		}
-
-		public Dictionary<string, object> Join(Dictionary<string, object> a, Dictionary<string, object> b) {
-			Dictionary<string, object> join = new Dictionary<string, object>(a);
-			foreach (var item in b) {
-				join[item.Key] = item.Value;
-			}
-			return join;
 		}
 	}
 }

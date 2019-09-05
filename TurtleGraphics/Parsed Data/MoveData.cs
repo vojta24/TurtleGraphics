@@ -16,6 +16,10 @@ namespace TurtleGraphics {
 			_window = win;
 			Variables = variables;
 
+			expression.Imports.AddType(typeof(Math));
+			expression.Imports.AddType(typeof(ContextExtensions));
+
+
 			foreach (var item in variables) {
 				expression.Variables[item.Key] = item.Value;
 			}

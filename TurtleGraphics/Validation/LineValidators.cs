@@ -38,17 +38,15 @@ namespace TurtleGraphics.Validation {
 
 		public static bool IsFunctionCall(string line, out FunctionCallInfo info) {
 			info = null;
-			string[] split = line.Split(new[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries);
-			if (split.Length != 3)
-				return false;
-			if (split[2].TrimStart() == "{")
+			string[] split = line.Split(new[] { '(' }, 2, StringSplitOptions.RemoveEmptyEntries);
+			if (split[split.Length - 1].TrimStart() == "{")
 				return false;
 			if (IsType(split[1].Split()[0], out _))
 				return false;
 			FunctionCallInfo i = new FunctionCallInfo();
 			i.FunctionName = split[0].TrimEnd();
 			//TODO this can be a string!
-			i.Arguments = split[1].Split(',');
+			i.Arguments = split[1].Replace(";","").TrimEnd().Remove(split[1].LastIndexOf(')'),1).Split(',');
 			info = i;
 			return true;
 		}

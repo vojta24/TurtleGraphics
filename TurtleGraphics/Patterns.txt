@@ -48,6 +48,23 @@ r -45
 f 10
 }
 
+for (int k = 0; k < 8; k++){
+ for (int j = 0; j < 24; j++){
+  for (int i = 0; i < 60; i++){
+    r (1);
+    f (1 + i/360);
+    r (-6 + i);
+    f (2);
+   }
+  r (45);
+  c (Blue);
+  f (200);
+  c (Red);
+ }
+r (-45);
+f (10);
+}
+
 for j in 0..6{
 for i in 0..60{
 r 1
@@ -157,4 +174,103 @@ for(int i = 0; i < 15; i++){
   f(20); 
  }
  c(rand);
+}
+
+
+for(int i = 0; i <10; i++){
+ if(i < 5){
+  c(rand); 
+ }
+ f(50);
+ r(15);
+}
+
+for(int i = 0; i <10; i++){
+ if(i < 5){
+  c(rand); 
+  r(i*20);
+ }
+ f(50);
+ r(15);
+}
+
+
+for (int k = 0; k < 8; k++){
+ for (int j = 0; j < 24; j++){
+  for (int i = 0; i < 60; i++){
+    r (1);
+    f (1);
+    r (-6 + i);
+    f (2);
+    if(i == 45){
+     c(Green);
+    }
+   }
+  r (45);
+  c (Blue);
+  f (200);
+  c (Red);
+ }
+r (-45);
+f (10);
+}
+
+
+for (int k = 0; k < 8; k++){
+ for (int j = 0; j < 24; j++){
+  for (int i = 0; i < 60; i++){
+    r (1);
+    f (1);
+    r (-6 + i);
+    f (2);
+    if(i == 24){
+     c(Green);
+    }
+   }
+  r (45);
+  if (k < 4){
+   c (Blue);
+  }
+  if(k >= 4){
+  c (Yellow);
+  }
+  f (200);
+  c (Red);
+ }
+r (-45);
+f (10);
+}
+
+c(Red);
+for (int k = 0; k < 8; k++){
+ for (int j = 0; j < 24; j++){
+  for (int i = 0; i < 60; i++){
+    r (1);
+    f (1);
+    r (-6 + i);
+    f (2);
+    if(i == 24){
+     c(Green);
+    }
+   }
+  r (45);
+  c(Transparent);
+  f(12);
+  if (k < 4){
+   c (Blue);
+  }
+  if(k >= 4){
+  c (Yellow);
+  }
+  f (188);
+  c (Red);
+ }
+r (-45);
+f (10);
+}
+
+
+for(int i = 0; i < 360; i+=10){
+r(Sin(AsRad(i));
+f(1);
 }

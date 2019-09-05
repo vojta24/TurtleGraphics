@@ -134,12 +134,26 @@ namespace TurtleGraphics {
 			//(i > 50) {
 			//(i <= 50) {
 			//(i > 50) {
-			//(i > 50){
+			//(i == 50){
 
-			IGenericExpression<bool> ifCondition = null;
-			Func<Task> ifAction = null;
+			mod = mod.Replace("{", "").Trim();
 
 
+			mod = mod.Trim('(', ')');
+
+			//Dumb
+			mod = mod.Replace("==", "=");
+
+			ExpressionContext context = new ExpressionContext();
+			context.Imports.AddType(typeof(Math));
+			context.Imports.AddType(typeof(ContextExtensions));
+
+
+			foreach (var item in variables) {
+				context.Variables[item.Key] = item.Value;
+			}
+
+			IGenericExpression<bool> ifCondition = context.CompileGeneric<bool>(mod);
 
 			List<string> lines = new List<string>();
 			string next = reader.ReadLine();
@@ -152,7 +166,7 @@ namespace TurtleGraphics {
 				openBarckets--;
 				if (openBarckets == 0) {
 					lines.Add(next);
-					return new ConditionalData(line, ifCondition, ifAction) {
+					return new ConditionalData(line, ifCondition, new Queue<ParsedData>()) {
 						Variables = variables.Copy(),
 					};
 				}
@@ -173,7 +187,12 @@ namespace TurtleGraphics {
 			}
 			while (next != null);
 
-			return new ConditionalData(line, ifCondition, ifAction) {
+			List<ParsedData> singleIteration = new List<ParsedData>();
+
+			Queue<ParsedData> data = Parse(string.Join(Environment.NewLine, lines), win, variables);
+			singleIteration.AddRange(data);
+
+			return new ConditionalData(line, ifCondition, data) {
 				Variables = variables.Copy(),
 			};
 
@@ -181,6 +200,10 @@ namespace TurtleGraphics {
 
 		private static IDynamicExpression ParseExpression(string line, Dictionary<string, object> variables) {
 			ExpressionContext context = new ExpressionContext();
+
+			context.Imports.AddType(typeof(Math));
+			context.Imports.AddType(typeof(ContextExtensions));
+
 
 			foreach (KeyValuePair<string, object> item in variables) {
 				context.Variables.Add(item.Key, item.Value);
