@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 
 namespace TurtleGraphics {
-	internal class ActionData : ParsedData {
+	public class ActionData : ParsedData {
 		private readonly Action _toExecute;
 
 		public ActionData(Action action) {

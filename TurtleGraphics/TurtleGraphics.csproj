@@ -84,6 +84,8 @@
     <Compile Include="Parsed Data\ColorData.cs" />
     <Compile Include="Parsed Data\ForwardParseData.cs" />
     <Compile Include="Parsed Data\RotateParseData.cs" />
+    <Compile Include="Logic\FunctionCallInfo.cs" />
+    <Compile Include="Validation\LineValidators.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

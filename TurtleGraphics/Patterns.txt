@@ -134,3 +134,27 @@ for (int i = 0; i < 50; i++){
   f 5
  }
 }
+
+for(int i = 0; i < 50; i++){
+ r(20);
+ c(rand); 
+ f (20);
+ for (int j = 0; j < 4; j++){
+  r (-90);
+  c(Azure);
+  f(20);
+  c(rand);
+ }
+}
+
+for(int i = 0; i < 15; i++){
+ r(20);
+ c(rand); 
+ f (20);
+ for (int j = 0; j < 4; j++){
+  r (-90);
+  c(Blue);
+  f(20); 
+ }
+ c(rand);
+}

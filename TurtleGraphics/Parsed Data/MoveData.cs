@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Flee.PublicTypes;
 
 namespace TurtleGraphics {
-	internal class MoveData : StringData {
+	public class MoveData : StringData {
 		private readonly MainWindow _window;
 
 		private readonly ExpressionContext expression = new ExpressionContext();
@@ -12,7 +12,7 @@ namespace TurtleGraphics {
 		private readonly IDynamicExpression x;
 		private readonly IDynamicExpression y;
 
-		public MoveData(MainWindow win, string input, Dictionary<string, object> variables) : base(input) {
+		public MoveData(MainWindow win, string[] args, Dictionary<string, object> variables) : base(args) {
 			_window = win;
 			Variables = variables;
 
@@ -20,9 +20,8 @@ namespace TurtleGraphics {
 				expression.Variables[item.Key] = item.Value;
 			}
 
-			string[] split = input.Split(',');
-			x = expression.CompileDynamic(split[0]);
-			y = expression.CompileDynamic(split[1]);
+			x = expression.CompileDynamic(args[0]);
+			y = expression.CompileDynamic(args[1]);
 		}
 
 		public override Task Execute() {

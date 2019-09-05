@@ -1,6 +1,6 @@
 ﻿namespace TurtleGraphics {
 
-	internal enum ConditionType {
+	public enum ConditionType {
 		Greater,
 		Less,
 		GreaterOrEqual,
@@ -8,7 +8,7 @@
 		Equal
 	}
 
-	internal class Condition {
+	public class Condition {
 
 		public const string LESS = "<";
 		public const string GREATER = ">";

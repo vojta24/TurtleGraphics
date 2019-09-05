@@ -105,7 +105,7 @@ namespace TurtleGraphics {
 			});
 		}
 
-		internal void NewPath() {
+		public void NewPath() {
 			_currentPath = new Path();
 
 			if (!PenDown) {
@@ -128,7 +128,7 @@ namespace TurtleGraphics {
 			Grid.SetColumn(_currentPath, 1);
 		}
 
-		internal void Rotate(double angle) {
+		public void Rotate(double angle) {
 			if (double.IsNaN(angle)) {
 				Angle = 0;
 				return;
@@ -139,11 +139,11 @@ namespace TurtleGraphics {
 			}
 		}
 
-		internal void SetPenDown(bool value) {
+		public void SetPenDown(bool value) {
 			PenDown = value;
 		}
 
-		internal async Task Forward(double length) {
+		public async Task Forward(double length) {
 			double targetX = X + Math.Cos(Angle) * length;
 			double targetY = Y + Math.Sin(Angle) * length;
 

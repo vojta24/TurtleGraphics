@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows;
 using Flee.PublicTypes;
 using TurtleGraphics.Parsers;
+using TurtleGraphics.Validation;
 
 namespace TurtleGraphics {
 	public class CommandParser {
 
-		internal static MainWindow win;
+		public static MainWindow win;
 
-		internal static readonly Dictionary<string, Type> typeDict = new Dictionary<string, Type> {
-			{ "int", typeof(int) },
-			{ "long", typeof(long) },
-			{ "Point", typeof(Point) },
-		};
-
-		internal static Queue<ParsedData> Parse(string commands, MainWindow window, Dictionary<string, object> additionalVars = null) {
+		public static Queue<ParsedData> Parse(string commands, MainWindow window, Dictionary<string, object> additionalVars = null) {
 
 			win = window;
 			Dictionary<string, object> globalVars = new Dictionary<string, object>() {
@@ -45,109 +39,147 @@ namespace TurtleGraphics {
 
 
 		private static ParsedData ParseLine(string line, StringReader reader, Dictionary<string, object> variables) {
-			if (string.IsNullOrWhiteSpace(line))
+			if (string.IsNullOrWhiteSpace(line) || line.Trim() == "}")
 				return null;
+			line = line.Trim();
 
-			string[] split = line.Trim().Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
+			if (LineValidators.IsFunctionCall(line, out FunctionCallInfo info)) {
+				switch (info.FunctionName) {
+					case "r": {
+						double val;
 
-			switch (split[0]) {
-				case "for": {
-					ForLoopData data = ForLoopParser.ParseForLoop(split[1], reader, variables);
-					data.Line = line;
-					return data;
-				}
+						try {
+							IDynamicExpression data = ParseExpression(info.Arguments[0], variables);
+							val = Convert.ToDouble(data.Evaluate());
+							return new RotateParseData(win) {
+								Angle = val,
+								Variables = variables.Copy(),
+								Exp = data,
+								Line = line,
+							};
+						}
+						catch {
+							if (info.Arguments[0] == "origin") {
+								val = double.NaN;
+								return new RotateParseData(win) {
+									Angle = val,
+									Line = line,
+									Variables = variables.Copy()
+								};
+							}
+							throw;
+						}
+					}
 
-				case "r": {
-					double val;
-
-					try {
-						IDynamicExpression data = ParseExpression(split[1], variables);
-						val = Convert.ToDouble(data.Evaluate());
-						return new RotateParseData(win) {
-							Angle = val,
+					case "f": {
+						IDynamicExpression data = ParseExpression(info.Arguments[0], variables);
+						return new ForwardParseData(win) {
 							Variables = variables.Copy(),
 							Exp = data,
 							Line = line,
 						};
 					}
-					catch {
-						if (split[1] == "origin") {
-							val = double.NaN;
-							return new RotateParseData(win) {
-								Angle = val,
-								Line = line,
-								Variables = variables.Copy()
-							};
+
+					case "u": {
+						return new ActionData(() => win.PenDown = false) { Variables = variables.Copy() };
+					}
+
+					case "d": {
+						return new ActionData(() => win.PenDown = true) { Variables = variables.Copy() };
+					}
+
+					case "c": {
+						return new ColorData(win, info.Arguments[0]) { Variables = variables.Copy() };
+					}
+
+					case "goto": {
+						return new MoveData(win, info.Arguments, variables.Copy());
+					}
+
+					default: {
+						if (line == "}") {
+							return null;
 						}
-						throw;
+						throw new NotImplementedException($"Unexpected squence: {line}");
 					}
 				}
 
-				case "f": {
-					IDynamicExpression data = ParseExpression(split[1], variables);
-					return new ForwardParseData(win) {
-						Variables = variables.Copy(),
-						Exp = data,
-						Line = line,
-					};
-				}
-
-				case "u": {
-					return new ActionData(() => win.PenDown = false) { Variables = variables.Copy() };
-				}
-
-				case "d": {
-					return new ActionData(() => win.PenDown = true) { Variables = variables.Copy() };
-				}
-
-				case "c": {
-					return new ColorData(win, split[1]);
-				}
-
-				case "goto": {
-					return new MoveData(win, split[1], variables.Copy());
-				}
-
-				default: {
-					if (split[0] == "}") {
-						return null;
-					}
-					throw new NotImplementedException($"Unexpected squence: {split[0]}");
-				}
 			}
-		}
 
-		private static bool IsAssignment(string line, out AssignmentInfo assignment) {
-			assignment = null;
-
-			string[] split = line.Split(new[] { ' ' }, 2);
-			string[] type_name = split[0].Trim().Split();
-
-			AssignmentInfo i = new AssignmentInfo();
-			if (!IsType(type_name[0], out Type t)) {
-				return false;
+			if (LineValidators.IsForLoop(line)) {
+				ForLoopData data = ForLoopParser.ParseForLoop(line, reader, variables);
+				data.Line = line;
+				return data;
 			}
-			i.Type = t;
-			i.VariableName = type_name[1];
-			i.Value = split[1].TrimEnd(';');
-			assignment = i;
-			return true;
-		}
 
-		private static bool IsType(string line, out Type t) {
-			t = null;
-			if (typeDict.ContainsKey(line)) {
-				t = typeDict[line];
-				return true;
-			}
-			return false;
-		}
+			//string[] split = line.Trim().Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
 
-		private static bool IsFunctionCall(string line) {
-			string[] split = line.Split('(');
-			string functionName = split[0].Trim();
-			string[] parameters = split[1].TrimEnd(new[] { ';', ')' }).Split(',');
-			return true;
+			//switch (split[0]) {
+			//	//case "for": {
+			//	//	ForLoopData data = ForLoopParser.ParseForLoop(split[1].Trim(), reader, variables);
+			//	//	data.Line = line;
+			//	//	return data;
+			//	//}
+
+			//	case "r": {
+			//		double val;
+
+			//		try {
+			//			IDynamicExpression data = ParseExpression(split[1], variables);
+			//			val = Convert.ToDouble(data.Evaluate());
+			//			return new RotateParseData(win) {
+			//				Angle = val,
+			//				Variables = variables.Copy(),
+			//				Exp = data,
+			//				Line = line,
+			//			};
+			//		}
+			//		catch {
+			//			if (split[1] == "origin") {
+			//				val = double.NaN;
+			//				return new RotateParseData(win) {
+			//					Angle = val,
+			//					Line = line,
+			//					Variables = variables.Copy()
+			//				};
+			//			}
+			//			throw;
+			//		}
+			//	}
+
+			//	case "f": {
+			//		IDynamicExpression data = ParseExpression(split[1], variables);
+			//		return new ForwardParseData(win) {
+			//			Variables = variables.Copy(),
+			//			Exp = data,
+			//			Line = line,
+			//		};
+			//	}
+
+			//	case "u": {
+			//		return new ActionData(() => win.PenDown = false) { Variables = variables.Copy() };
+			//	}
+
+			//	case "d": {
+			//		return new ActionData(() => win.PenDown = true) { Variables = variables.Copy() };
+			//	}
+
+			//	case "c": {
+			//		return new ColorData(win, split[1]);
+			//	}
+
+			//	case "goto": {
+			//		return new MoveData(win, split[1].Split(','), variables.Copy());
+			//	}
+
+			//	default: {
+			//		if (split[0] == "}") {
+			//			return null;
+			//		}
+			//	}
+			//}
+			throw new NotImplementedException($"Unexpected squence: {line}");
+
 		}
 
 		private static IDynamicExpression ParseExpression(string line, Dictionary<string, object> variables) {

@@ -1,12 +1,12 @@
 ﻿namespace TurtleGraphics {
-	internal enum OperatorType {
+	public enum OperatorType {
 		PlusPlus,
 		MinMin,
 		PlusEquals,
 		MinusEquals,
 	}
 
-	internal class Operator {
+	public class Operator {
 		public const string PLUSPLUS = "++";
 		public const string MINMIN = "--";
 		public const string PLUS_EQUALS = "+=";

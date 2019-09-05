@@ -5,6 +5,12 @@ using System.IO;
 namespace TurtleGraphics.Parsers {
 	public class ForLoopParser {
 		public static ForLoopData ParseForLoop(string line, StringReader reader, Dictionary<string, object> inherited) {
+
+			// for(int i = 0; i < 50; i++) {
+			// for (int i=0;i<20;i++){
+			line = line.Remove(0, 3).Trim();
+
+
 			// (int i = 0; i < 50; i++) {
 			// (int i=0;i<20;i++){
 			// (long val=1; val <50; val+=2){

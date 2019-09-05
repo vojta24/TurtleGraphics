@@ -9,8 +9,8 @@ namespace TurtleGraphics {
 		public int To { get; set; }
 		public string LoopVariable { get; set; }
 		public int Change { get; set; }
-		internal OperatorType Operator { get; set; }
-		internal ConditionType Condition { get; set; }
+		public OperatorType Operator { get; set; }
+		public ConditionType Condition { get; set; }
 
 		public List<string> Lines { get; set; }
 
