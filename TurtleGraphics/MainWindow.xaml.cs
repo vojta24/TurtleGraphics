@@ -128,12 +128,17 @@ namespace TurtleGraphics {
 			Grid.SetColumn(_currentPath, 1);
 		}
 
-		public void Rotate(double angle) {
+		public void Rotate(double angle, bool setRotation) {
 			if (double.IsNaN(angle)) {
 				Angle = 0;
 				return;
 			}
-			Angle += Math.PI * angle / 180.0;
+			if (setRotation) {
+				Angle = ContextExtensions.AsRad(angle);
+			}
+			else {
+				Angle += ContextExtensions.AsRad(angle);
+			}
 			if (Angle > 2 * Math.PI) {
 				Angle -= 2 * Math.PI;
 			}

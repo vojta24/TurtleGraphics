@@ -133,7 +133,7 @@ namespace TurtleGraphics {
 		private List<ParsedData> CompileLoop() {
 			List<ParsedData> singleIteration = new List<ParsedData>();
 
-			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, Lines), CommandParser.win, Helpers.Join(Variables, new Dictionary<string, object> { { LoopVariable, 0 } }));
+			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, Lines), CommandParser.Window, Helpers.Join(Variables, new Dictionary<string, object> { { LoopVariable, 0 } }));
 			singleIteration.AddRange(data);
 
 			return singleIteration;

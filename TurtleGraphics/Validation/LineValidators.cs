@@ -39,7 +39,7 @@ namespace TurtleGraphics.Validation {
 		public static bool IsFunctionCall(string line, out FunctionCallInfo info) {
 			info = null;
 			string[] split = line.Split(new[] { '(' }, 2, StringSplitOptions.RemoveEmptyEntries);
-			if (split[split.Length - 1].TrimStart() == "{")
+			if (split[split.Length - 1].TrimStart().EndsWith("{"))
 				return false;
 			if (IsType(split[1].Split()[0], out _))
 				return false;
@@ -58,7 +58,10 @@ namespace TurtleGraphics.Validation {
 
 		internal static bool IsConditional(string line) {
 			string[] split = line.Split('(', ')');
-			return split.Length == 3 && (split[0].Trim() == "if" || split[0].Trim() == "else if" || split[0].Trim() == "else");
+			bool isIf = split.Length == 3 && (split[0].Trim() == "if");
+			bool isElseIf = split.Length == 3 && (split[0].Trim() == "else if");
+			bool isElse = split.Length == 1 && split[0].TrimEnd(' ', '{') == "else";
+			return isIf || isElseIf || isElse;
 		}
 	}
 }

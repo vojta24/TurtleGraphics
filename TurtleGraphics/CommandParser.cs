@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using Flee.PublicTypes;
 using TurtleGraphics.Parsers;
 using TurtleGraphics.Validation;
@@ -9,14 +8,15 @@ using TurtleGraphics.Validation;
 namespace TurtleGraphics {
 	public class CommandParser {
 
-		public static MainWindow win;
+		public static MainWindow Window { get; set; }
 
 		public static Queue<ParsedData> Parse(string commands, MainWindow window, Dictionary<string, object> additionalVars = null) {
 
-			win = window;
+			Window = window;
+			conditionals.Clear();
 			Dictionary<string, object> globalVars = new Dictionary<string, object>() {
-				{ "Width", win.DrawWidth },
-				{ "Height", win.DrawHeight }
+				{ "Width", Window.DrawWidth },
+				{ "Height", Window.DrawHeight }
 			};
 
 			Queue<ParsedData> ret = new Queue<ParsedData>();
@@ -39,12 +39,17 @@ namespace TurtleGraphics {
 		}
 
 
+		private static Stack<ConditionalData> conditionals = new Stack<ConditionalData>();
+
 		private static ParsedData ParseLine(string line, StringReader reader, Dictionary<string, object> variables) {
 			if (string.IsNullOrWhiteSpace(line) || line.Trim() == "}")
 				return null;
 			line = line.Trim();
 
 			if (LineValidators.IsFunctionCall(line, out FunctionCallInfo info)) {
+				if (conditionals.Count > 0) {
+					conditionals.Peek().IsModifiable = false;
+				}
 				switch (info.FunctionName) {
 					case "r": {
 						double val;
@@ -52,8 +57,12 @@ namespace TurtleGraphics {
 						try {
 							IDynamicExpression data = ParseExpression(info.Arguments[0], variables);
 							val = Convert.ToDouble(data.Evaluate());
-							return new RotateParseData(win) {
-								Angle = val,
+							bool hardAngle = false;
+
+							if (info.Arguments.Length == 2) {
+								hardAngle = bool.Parse(info.Arguments[1]);
+							}
+							return new RotateParseData(Window, val, hardAngle) {
 								Variables = variables.Copy(),
 								Exp = data,
 								Line = line,
@@ -62,8 +71,7 @@ namespace TurtleGraphics {
 						catch {
 							if (info.Arguments[0] == "origin") {
 								val = double.NaN;
-								return new RotateParseData(win) {
-									Angle = val,
+								return new RotateParseData(Window, val, bool.Parse(info.Arguments[1])) {
 									Line = line,
 									Variables = variables.Copy()
 								};
@@ -74,7 +82,7 @@ namespace TurtleGraphics {
 
 					case "f": {
 						IDynamicExpression data = ParseExpression(info.Arguments[0], variables);
-						return new ForwardParseData(win) {
+						return new ForwardParseData(Window) {
 							Variables = variables.Copy(),
 							Exp = data,
 							Line = line,
@@ -82,32 +90,35 @@ namespace TurtleGraphics {
 					}
 
 					case "u": {
-						return new ActionData(() => win.PenDown = false) { Variables = variables.Copy() };
+						return new ActionData(() => Window.PenDown = false) { Variables = variables.Copy() };
 					}
 
 					case "d": {
-						return new ActionData(() => win.PenDown = true) { Variables = variables.Copy() };
+						return new ActionData(() => Window.PenDown = true) { Variables = variables.Copy() };
 					}
 
 					case "c": {
-						return new ColorData(win, info.Arguments[0]) { Variables = variables.Copy() };
+						return new ColorData(Window, info.Arguments[0]) { Variables = variables.Copy() };
 					}
 
 					case "goto": {
-						return new MoveData(win, info.Arguments, variables.Copy());
+						return new MoveData(Window, info.Arguments, variables.Copy());
 					}
 
 					default: {
 						if (line == "}") {
 							return null;
 						}
-						throw new NotImplementedException($"Unexpected squence: {line}");
+						throw new NotImplementedException($"Unexpected squence function call: {line}");
 					}
 				}
 
 			}
 
 			if (LineValidators.IsForLoop(line)) {
+				if (conditionals.Count > 0) {
+					conditionals.Peek().IsModifiable = false;
+				}
 				ForLoopData data = ForLoopParser.ParseForLoop(line, reader, variables);
 				data.Line = line;
 				return data;
@@ -116,10 +127,20 @@ namespace TurtleGraphics {
 			if (LineValidators.IsConditional(line)) {
 				if (line.Contains("if")) {
 					ConditionalData data = ParseIfBlock(line, reader, variables.Copy());
+					conditionals.Push(data);
 					return data;
 				}
+				//if (line.Contains("else if")) {
+
+				//}
+				if (line.Contains("else")) {
+					ConditionalData latest = conditionals.Peek();
+					latest.AddElse(line, reader);
+					latest.IsModifiable = false;
+					return null;
+				}
 			}
-			throw new NotImplementedException($"Unexpected squence: {line}");
+			throw new NotImplementedException($"Unexpected squence no category: {line}");
 		}
 
 		private static ConditionalData ParseIfBlock(string line, StringReader reader, Dictionary<string, object> variables) {
@@ -177,7 +198,7 @@ namespace TurtleGraphics {
 				if (next.Contains("{")) {
 					openBarckets++;
 				}
-				if (next.Contains("}")) {
+				if (next.Trim() == "}") {
 					openBarckets--;
 					if (openBarckets == 0) {
 						lines.Add(next);
@@ -187,9 +208,11 @@ namespace TurtleGraphics {
 			}
 			while (next != null);
 
+			char c = (char)reader.Peek();
+
 			List<ParsedData> singleIteration = new List<ParsedData>();
 
-			Queue<ParsedData> data = Parse(string.Join(Environment.NewLine, lines), win, variables);
+			Queue<ParsedData> data = Parse(string.Join(Environment.NewLine, lines), Window, variables);
 			singleIteration.AddRange(data);
 
 			return new ConditionalData(line, ifCondition, data) {
