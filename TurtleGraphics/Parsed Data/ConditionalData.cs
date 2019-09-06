@@ -10,12 +10,12 @@ namespace TurtleGraphics {
 		public IGenericExpression<bool> IfCondition { get; set; }
 		public Queue<ParsedData> IfData { get; set; }
 		public Queue<ParsedData> ElseData { get; set; } = null;
-		public IList<(IGenericExpression<bool>, Func<Task>)> ElseIfs { get; set; }
+		public IList<(IGenericExpression<bool>, Queue<ParsedData>)> ElseIfs { get; set; }
 		public bool IsModifiable { get; set; } = true;
 
 		public ConditionalData(string line,
 			IGenericExpression<bool> ifCondition, Queue<ParsedData> data,
-			IList<(IGenericExpression<bool>, Func<Task>)> elseIfs = null) : base(line) {
+			IList<(IGenericExpression<bool>, Queue<ParsedData>)> elseIfs = null) : base(line) {
 			IfCondition = ifCondition;
 			IfData = data;
 			ElseIfs = elseIfs;
@@ -28,10 +28,10 @@ namespace TurtleGraphics {
 			}
 			else {
 				if (ElseIfs != null) {
-					foreach ((IGenericExpression<bool> exp, Func<Task> act) in ElseIfs) {
+					foreach ((IGenericExpression<bool> exp, Queue<ParsedData> data) in ElseIfs) {
 						UpdateVars(exp);
 						if (exp.Evaluate()) {
-							await act();
+							await ExecuteQueue(data);
 							return;
 						}
 					}
@@ -59,36 +59,7 @@ namespace TurtleGraphics {
 		}
 
 		public void AddElse(string line, StringReader reader) {
-			List<string> lines = new List<string>();
-			string next = reader.ReadLine();
-			int openBarckets = 1;
-
-			if (next.Contains("{")) {
-				openBarckets++;
-			}
-			if (next.Contains("}")) {
-				openBarckets--;
-				if (openBarckets == 0) {
-					lines.Add(next);
-					return;
-				}
-			}
-			do {
-				lines.Add(next);
-				next = reader.ReadLine();
-				if (next.Contains("{")) {
-					openBarckets++;
-				}
-				if (next.Trim() == "}") {
-					openBarckets--;
-					if (openBarckets == 0) {
-						lines.Add(next);
-						break;
-					}
-				}
-			}
-			while (next != null);
-
+			List<string> lines = BlockParser.ParseBlock(reader);
 
 			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), CommandParser.Window, Variables);
 			ElseData = data;

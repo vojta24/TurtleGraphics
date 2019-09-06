@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using Igor.Models;
 using static TurtleGraphics.Helpers;
-using System.Linq.Expressions;
-using Flee.PublicTypes;
-using System.Windows.Shapes;
-using System.Windows.Controls;
 
 namespace TurtleGraphics {
 	/// <summary>
