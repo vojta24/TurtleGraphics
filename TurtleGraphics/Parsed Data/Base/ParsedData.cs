@@ -12,8 +12,6 @@ namespace TurtleGraphics {
 			Parameters = parameters;
 		}
 
-		public virtual IDynamicExpression Exp { get; set; }
-
 		public string Line { get; set; }
 
 		public Dictionary<string,object> Variables { get; set; }

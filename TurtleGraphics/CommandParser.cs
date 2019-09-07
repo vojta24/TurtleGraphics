@@ -55,24 +55,21 @@ namespace TurtleGraphics {
 						double val;
 
 						try {
-							IDynamicExpression data = ParseExpression(info.Arguments[0], variables);
-							val = Convert.ToDouble(data.Evaluate());
 							bool hardAngle = false;
-
 							if (info.Arguments.Length == 2) {
 								hardAngle = bool.Parse(info.Arguments[1]);
 							}
-							return new RotateParseData(Window, val, hardAngle) {
+							return new RotateParseData(Window, ParseGenericExpression<double>(info.Arguments[0], variables), hardAngle) {
 								Variables = variables.Copy(),
-								Exp = data,
 								Line = line,
 							};
 						}
 						catch {
 							if (info.Arguments[0] == "origin") {
 								val = double.NaN;
-								return new RotateParseData(Window, val, bool.Parse(info.Arguments[1])) {
+								return new RotateParseData(Window, null, bool.Parse(info.Arguments[1])) {
 									Line = line,
+									Angle = double.NaN,
 									Variables = variables.Copy()
 								};
 							}
@@ -81,10 +78,8 @@ namespace TurtleGraphics {
 					}
 
 					case "f": {
-						IDynamicExpression data = ParseExpression(info.Arguments[0], variables);
-						return new ForwardParseData(Window) {
+						return new ForwardParseData(Window,ParseGenericExpression<double>(info.Arguments[0], variables)) {
 							Variables = variables.Copy(),
-							Exp = data,
 							Line = line,
 						};
 					}

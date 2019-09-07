@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Flee.PublicTypes;
 
 namespace TurtleGraphics {
 	public class RotateParseData : ParsedData {
 
 		private readonly MainWindow _window;
+		private readonly IGenericExpression<double> _expression;
 
-		public RotateParseData(MainWindow w, double val, bool hardAngle) {
+		public RotateParseData(MainWindow w, IGenericExpression<double> expression, bool hardAngle) {
 			_window = w;
-			Angle = val;
+			_expression = expression;
 			SetRotation = hardAngle;
 		}
 
@@ -20,12 +22,14 @@ namespace TurtleGraphics {
 			if (token.IsCancellationRequested) {
 				return Task.CompletedTask;
 			}
+
 			if (double.IsNaN(Angle)) {
-				_window.Rotate(Angle, SetRotation);
+				_window.Rotate(0, SetRotation);
 				return Task.CompletedTask;
 			}
-			UpdateVars(Exp);
-			Angle = Convert.ToDouble(Exp.Evaluate());
+
+			UpdateVars(_expression);
+			Angle = _expression.Evaluate();
 			_window.Rotate(Angle, SetRotation);
 			return Task.CompletedTask;
 		}
