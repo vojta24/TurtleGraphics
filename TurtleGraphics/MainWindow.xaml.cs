@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Flee.PublicTypes;
 using Igor.Models;
 using static TurtleGraphics.Helpers;
 
@@ -36,9 +37,33 @@ namespace TurtleGraphics {
 				ButtonText = "Run";
 			});
 			ButtonCommand = RunCommand;
+			ToggleFullScreenCommand = new Command(ToggleFullScreenAction);
+			ButtonFullSizeCommand = new Command(async () => {
+				if(ButtonCommand == RunCommand) {
+					ControlArea.Width = new GridLength(0, GridUnitType.Pixel);
+					await Task.Delay(1);
+					DrawWidth = DrawAreaX.ActualWidth;
+					ButtonCommand.Execute(null);
+					await Task.Delay(1);
+					IterationCount = 1;
+					Delay = 1;
+					PreviewKeyDown += MainWindow_KeyDown;
+				}
+			});
 			Init();
 			Loaded += MainWindow_Loaded;
 			DataContext = this;
+		}
+
+		private async void MainWindow_KeyDown(object sender, KeyEventArgs e) {
+			if(e.Key == Key.Escape) {
+				ControlArea.Width = new GridLength(1, GridUnitType.Star);
+				await Task.Delay(1);
+				DrawWidth = DrawAreaX.ActualWidth;
+				PreviewKeyDown -= MainWindow_KeyDown;
+				Delay = 5;
+				IterationCount = 10;
+			}
 		}
 
 		private Path _currentPath;
@@ -60,7 +85,15 @@ namespace TurtleGraphics {
 		private ICommand _buttonCommand;
 		private ICommand _stopCommand;
 		private string _buttonText = "Run";
+		private ICommand _toggleFullScreenCommand;
+		private bool _toggleFullscreenEnabled = true;
+		private string _buttonTextFullSize = "Run on fullsize canvas";
+		private ICommand _buttonFullSizeCommand;
 
+		public ICommand ButtonFullSizeCommand { get => _buttonFullSizeCommand; set { _buttonFullSizeCommand = value; Notify(nameof(ButtonFullSizeCommand)); } }
+		public string ButtonTextFullSize { get => _buttonTextFullSize; set { _buttonTextFullSize = value; Notify(nameof(ButtonTextFullSize)); } }
+		public bool ToggleFullscreenEnabled { get => _toggleFullscreenEnabled; set { _toggleFullscreenEnabled = value; Notify(nameof(ToggleFullscreenEnabled)); } }
+		public ICommand ToggleFullScreenCommand { get => _toggleFullScreenCommand; set { _toggleFullScreenCommand = value; Notify(nameof(ToggleFullScreenAction)); } }
 		public string ButtonText { get => _buttonText; set { _buttonText = value; Notify(nameof(ButtonText)); } }
 		public ICommand StopCommand { get => _stopCommand; set { _stopCommand = value; Notify(nameof(StopCommand)); } }
 		public ICommand ButtonCommand { get => _buttonCommand; set { _buttonCommand = value; Notify(nameof(ButtonCommand)); } }
@@ -86,41 +119,60 @@ namespace TurtleGraphics {
 			Loaded -= MainWindow_Loaded;
 		}
 
+		
+
+		bool alter = false;
+		SweepDirection alterDir = SweepDirection.Clockwise;
 		public async Task Draw(Point to) {
-			await Dispatcher.Invoke(async () => {
-				LineSegment l = new LineSegment {
-					IsStroked = true,
-					Point = new Point(X, Y),
-					IsSmoothJoin = true
-				};
+			LineSegment l = new LineSegment(new Point(X, Y), true) {
+				IsSmoothJoin = true
+			};
 
-				if (cancellationTokenSource.IsCancellationRequested) {
-					return;
-				}
+			//ArcSegment l = new ArcSegment(new Point(X, Y), new Size(5, 5), 0, alter, alterDir, true) { IsSmoothJoin = true };
+			//alter ^= true;
+			//alterDir = alter ? SweepDirection.Clockwise : SweepDirection.Counterclockwise;
 
-				if (_currentPath == null) {
-					NewPath();
-				}
+			if (cancellationTokenSource.IsCancellationRequested) {
+				return;
+			}
 
-				if (_lastPenDown != PenDown) {
-					NewPath();
-					_lastPenDown = PenDown;
-				}
+			if (_currentPath == null) {
+				NewPath();
+			}
 
-				if (_lastColor != Color) {
-					NewPath();
-					_lastColor = Color;
-				}
+			if (_lastPenDown != PenDown) {
+				NewPath();
+				_lastPenDown = PenDown;
+			}
 
-				X = to.X;
-				Y = to.Y;
+			if (_lastColor != Color) {
+				NewPath();
+				_lastColor = Color;
+			}
 
-				_currentFigure.Segments.Add(l);
-				await Displace(to);
-			});
+			X = to.X;
+			Y = to.Y;
+
+			_currentFigure.Segments.Add(l);
+			await Displace(to);
+		}
+
+		public void ToggleFullScreenAction() {
+			if (WindowStyle == WindowStyle.SingleBorderWindow) {
+				WindowStyle = WindowStyle.None;
+				WindowState = WindowState.Maximized;
+			}
+			else {
+				WindowStyle = WindowStyle.SingleBorderWindow;
+				WindowState = WindowState.Normal;
+			}
 		}
 
 		public void NewPath() {
+			if (_currentPath != null) {
+				_currentPath.Data.Freeze();
+			}
+
 			_currentPath = new Path();
 
 			if (!PenDown) {
@@ -173,6 +225,8 @@ namespace TurtleGraphics {
 		public async Task Displace(Point to) {
 			int last = _currentFigure.Segments.Count - 1;
 			LineSegment lastSegment = (LineSegment)_currentFigure.Segments[last];
+			//ArcSegment lastSegment = (ArcSegment)_currentFigure.Segments[last];
+
 			Point origin = lastSegment.Point;
 
 			double increment = 1d / IterationCount;
@@ -193,6 +247,7 @@ namespace TurtleGraphics {
 		private CancellationTokenSource cancellationTokenSource;
 
 		private async Task RunCommandAction() {
+			ToggleFullscreenEnabled = false;
 			Init();
 			cancellationTokenSource = new CancellationTokenSource();
 			ButtonCommand = StopCommand;
@@ -201,9 +256,13 @@ namespace TurtleGraphics {
 
 			foreach (var item in tasks) {
 				await item.Execute(cancellationTokenSource.Token);
+				if (cancellationTokenSource.Token.IsCancellationRequested) {
+					break;
+				}
 			}
 			ButtonCommand = RunCommand;
 			ButtonText = "Run";
+			ToggleFullscreenEnabled = true;
 		}
 
 		public void Init() {

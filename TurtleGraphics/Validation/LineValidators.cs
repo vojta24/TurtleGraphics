@@ -47,6 +47,10 @@ namespace TurtleGraphics.Validation {
 			//test 20);
 			//teset ToDeg(Sin(PI))); 
 
+			if(split.Length < 2)
+				return false;
+			
+
 			if (split[1].EndsWith("{"))
 				return false;
 

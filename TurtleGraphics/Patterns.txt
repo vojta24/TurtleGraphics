@@ -340,3 +340,45 @@ d();
 }
 goto(RandX(),RandY());
 }
+
+
+goto(0,0);
+for(int i = 0; i < 131; i++){
+u()
+f(10 + i*20);
+d()
+r(90+45);
+if(i % 3 == 0){
+c(Red)
+}
+if(i % 3 == 1){
+c(Green)
+}
+if(i % 3 == 2){
+c(Blue)
+}
+f(Sqrt((10 + i*20)^2 + (10 + i*20)^2) - 3);
+r(0,true);
+goto(0,0);
+}
+goto(Width,0);
+r(180,true);
+c(Blue);
+for(int i = 0; i < 131; i++){
+u()
+f(10 + i*20);
+d()
+r(-90-45);
+if(i % 3 == 0){
+c(Red)
+}
+if(i % 3 == 1){
+c(Green)
+}
+if(i % 3 == 2){
+c(Blue)
+}
+f(Sqrt((10 + i*20)^2 + (10 + i*20)^2) - 3);
+r(180,true);
+goto(Width,0);
+}

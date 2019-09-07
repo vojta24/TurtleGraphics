@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TurtleGraphics"
         mc:Ignorable="d"
-        Title="MainWindow" WindowStyle="None" WindowState="Maximized" SizeToContent="Manual">
+        Title="MainWindow">
 	<Grid x:Name="Paths">
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="*" x:Name="ControlArea"/>
 			<ColumnDefinition Width="4*" x:Name="DrawAreaX"/>
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
@@ -38,7 +38,11 @@
 				<Slider Value="{Binding Delay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="50" TickFrequency="1" Ticks="5"/>
 				<Slider Value="{Binding IterationCount, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="100" TickFrequency="1" />
 			</StackPanel>
-			<Button Grid.Row="2" Content="{Binding ButtonText}" Command="{Binding ButtonCommand}"/>
+			<StackPanel Grid.Row="2">
+				<Button Content="{Binding ButtonText}" Command="{Binding ButtonCommand}"/>
+				<Button Content="{Binding ButtonTextFullSize}" Command="{Binding ButtonFullSizeCommand}"/>
+				<Button Content="Toggle Fullscreen" Command="{Binding ToggleFullScreenCommand}" IsEnabled="{Binding ToggleFullscreenEnabled}"/>
+			</StackPanel>
 		</Grid>
 	</Grid>
 </Window>
