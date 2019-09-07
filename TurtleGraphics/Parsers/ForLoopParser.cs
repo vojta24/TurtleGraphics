@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Flee.PublicTypes;
 
 namespace TurtleGraphics.Parsers {
 	public class ForLoopParser {
 		public static ForLoopData ParseForLoop(string line, StringReader reader, Dictionary<string, object> inherited) {
+
+			ExpressionContext context = new ExpressionContext();
+			context.Imports.AddType(typeof(Math));
+			context.Imports.AddType(typeof(ContextExtensions));
+
+			context.Variables.AddRange(inherited);
 
 			// for(int i = 0; i < 50; i++) {
 			// for (int i=0;i<20;i++){
@@ -34,7 +41,9 @@ namespace TurtleGraphics.Parsers {
 			// 0 ;i<20;i++){
 			// 1; val <50; val+=2){
 
-			int startValue = int.Parse(line.Split(';')[0].Trim());
+			//int startValue = int.Parse(line.Split(';')[0].Trim());
+			IGenericExpression<int> startValueExp = context.CompileGeneric<int>(line.Split(';')[0].Trim());
+
 			line = line.Remove(0, line.IndexOf(";") + 1).Trim();
 
 			// i < 50; i++) {
@@ -60,7 +69,9 @@ namespace TurtleGraphics.Parsers {
 
 			string[] endValAndChange = line.Split(';');
 
-			int endValue = int.Parse(endValAndChange[0].Trim());
+			//int endValue = int.Parse(endValAndChange[0].Trim());
+			IGenericExpression<int> endValueExp = context.CompileGeneric<int>(endValAndChange[0].Trim());
+
 			line = endValAndChange[1].Trim();
 
 			// i++) {
@@ -81,11 +92,13 @@ namespace TurtleGraphics.Parsers {
 			// ){
 			// 2){
 
-			int change = 1;
+			IGenericExpression<int> changeValueExp = null;
+
 
 			if (_operator == OperatorType.PlusEquals || _operator == OperatorType.MinusEquals) {
 				string[] changeSplit = line.Split(')');
-				change = int.Parse(changeSplit[0]);
+				//change = int.Parse(changeSplit[0]);
+				changeValueExp = context.CompileGeneric<int>(changeSplit[0]);
 				line = changeSplit[1].Trim();
 			}
 
@@ -103,10 +116,10 @@ namespace TurtleGraphics.Parsers {
 			List<string> lines = BlockParser.ParseBlock(reader);
 
 			return new ForLoopData() {
-				From = startValue,
-				To = endValue,
+				From = startValueExp,
+				To = endValueExp,
 				LoopVariable = variableName,
-				Change = change,
+				Change = changeValueExp,
 				Condition = condition,
 				Operator = _operator,
 				Variables = inherited.Copy(),

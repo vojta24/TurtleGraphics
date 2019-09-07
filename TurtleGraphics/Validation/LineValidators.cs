@@ -37,14 +37,36 @@ namespace TurtleGraphics.Validation {
 		}
 
 		public static bool IsFunctionCall(string line, out FunctionCallInfo info) {
+
+			//test (20);
+			//teset(ToDeg(Sin(PI))); 
+
 			info = null;
-			string[] split = line.Split(new[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries);
-			if (split[split.Length - 1].TrimStart().EndsWith("{"))
+			string[] split = line.Split(new[] { '(' }, 2, StringSplitOptions.RemoveEmptyEntries);
+
+			//test 20);
+			//teset ToDeg(Sin(PI))); 
+
+			if (split[1].EndsWith("{"))
 				return false;
+
+			split[1] = split[1].TrimEnd(';', ' ');
+
+			//test 20)
+			//teset ToDeg(Sin(PI)))
+
+			split[1] = split[1].Remove(split[1].Length - 1, 1);
+
+			//test 20
+			//teset ToDeg(Sin(PI))
+
+
 			if (IsType(split[1].Split()[0], out _))
 				return false;
+
 			FunctionCallInfo i = new FunctionCallInfo();
 			i.FunctionName = split[0].TrimEnd();
+
 			//TODO this can be a string!
 			i.Arguments = split[1].TrimEnd().Split(',');
 			info = i;

@@ -271,7 +271,7 @@ f (10);
 
 
 for(int i = 0; i < 360; i+=10){
-r(Sin(AsRad(i));
+r(Sin(AsRad(i)),true);
 f(1);
 }
 

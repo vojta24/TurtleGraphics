@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Flee.PublicTypes;
 
 namespace TurtleGraphics {
 	public static class Helpers {
@@ -12,6 +13,13 @@ namespace TurtleGraphics {
 				join[item.Key] = item.Value;
 			}
 			return join;
+		}
+
+
+		public static void AddRange(this VariableCollection a, Dictionary<string, object> b) {
+			foreach (var item in b) {
+				a[item.Key] = item.Value;
+			}
 		}
 	}
 }

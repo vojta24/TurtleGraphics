@@ -5,10 +5,10 @@ using Flee.PublicTypes;
 
 namespace TurtleGraphics {
 	public class ForLoopData : ParsedData {
-		public int From { get; set; }
-		public int To { get; set; }
+		public IGenericExpression<int> From { get; set; }
+		public IGenericExpression<int> To { get; set; }
 		public string LoopVariable { get; set; }
-		public int Change { get; set; }
+		public IGenericExpression<int> Change { get; set; }
 		public OperatorType Operator { get; set; }
 		public ConditionType Condition { get; set; }
 
@@ -24,25 +24,37 @@ namespace TurtleGraphics {
 				}
 			}
 
+			UpdateVars(From);
+			UpdateVars(To);
+
+			int FromInt = From.Evaluate();
+			int ToInt = To.Evaluate();
+			int ChangeInt = 1;
+			if (Operator == OperatorType.MinusEquals || Operator == OperatorType.PlusEquals) {
+				UpdateVars(Change);
+				ChangeInt = Change.Evaluate();
+			}
+
+
 			switch (Condition) {
 				case ConditionType.Greater: {
 					if (Operator == OperatorType.PlusPlus) {
-						for (int i = From; i > To; i++) {
+						for (int i = FromInt; i > ToInt; i++) {
 							await Exec(i);
 						}
 					}
 					if (Operator == OperatorType.PlusEquals) {
-						for (int i = From; i > To; i += Change) {
+						for (int i = FromInt; i > ToInt; i += ChangeInt) {
 							await Exec(i);
 						}
 					}
 					if (Operator == OperatorType.MinMin) {
-						for (int i = From; i > To; i--) {
+						for (int i = FromInt; i > ToInt; i--) {
 							await Exec(i);
 						}
 					}
 					if (Operator == OperatorType.MinusEquals) {
-						for (int i = From; i > To; i -= Change) {
+						for (int i = FromInt; i > ToInt; i -= ChangeInt) {
 							await Exec(i);
 						}
 					}
@@ -50,22 +62,22 @@ namespace TurtleGraphics {
 				}
 				case ConditionType.Less: {
 					if (Operator == OperatorType.PlusPlus) {
-						for (int i = From; i < To; i++) {
+						for (int i = FromInt; i < ToInt; i++) {
 							await Exec(i);
 						}
 					}
 					if (Operator == OperatorType.PlusEquals) {
-						for (int i = From; i < To; i += Change) {
+						for (int i = FromInt; i < ToInt; i += ChangeInt) {
 							await Exec(i);
 						}
 					}
 					if (Operator == OperatorType.MinMin) {
-						for (int i = From; i < To; i--) {
+						for (int i = FromInt; i < ToInt; i--) {
 							await Exec(i);
 						}
 					}
 					if (Operator == OperatorType.MinusEquals) {
-						for (int i = From; i < To; i -= Change) {
+						for (int i = FromInt; i < ToInt; i -= ChangeInt) {
 							await Exec(i);
 						}
 					}
@@ -73,22 +85,22 @@ namespace TurtleGraphics {
 				}
 				case ConditionType.GreaterOrEqual: {
 					if (Operator == OperatorType.PlusPlus) {
-						for (int i = From; i >= To; i++) {
+						for (int i = FromInt; i >= ToInt; i++) {
 							await Exec(i);
 						}
 					}
 					if (Operator == OperatorType.PlusEquals) {
-						for (int i = From; i >= To; i += Change) {
+						for (int i = FromInt; i >= ToInt; i += ChangeInt) {
 							await Exec(i);
 						}
 					}
 					if (Operator == OperatorType.MinMin) {
-						for (int i = From; i >= To; i--) {
+						for (int i = FromInt; i >= ToInt; i--) {
 							await Exec(i);
 						}
 					}
 					if (Operator == OperatorType.MinusEquals) {
-						for (int i = From; i >= To; i -= Change) {
+						for (int i = FromInt; i >= ToInt; i -= ChangeInt) {
 							await Exec(i);
 						}
 					}
@@ -96,22 +108,22 @@ namespace TurtleGraphics {
 				}
 				case ConditionType.LessOrEqual: {
 					if (Operator == OperatorType.PlusPlus) {
-						for (int i = From; i <= To; i++) {
+						for (int i = FromInt; i <= ToInt; i++) {
 							await Exec(i);
 						}
 					}
 					if (Operator == OperatorType.PlusEquals) {
-						for (int i = From; i <= To; i += Change) {
+						for (int i = FromInt; i <= ToInt; i += ChangeInt) {
 							await Exec(i);
 						}
 					}
 					if (Operator == OperatorType.MinMin) {
-						for (int i = From; i <= To; i--) {
+						for (int i = FromInt; i <= ToInt; i--) {
 							await Exec(i);
 						}
 					}
 					if (Operator == OperatorType.MinusEquals) {
-						for (int i = From; i <= To; i -= Change) {
+						for (int i = FromInt; i <= ToInt; i -= ChangeInt) {
 							await Exec(i);
 						}
 					}
