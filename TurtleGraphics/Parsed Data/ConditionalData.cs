@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Flee.PublicTypes;
 
@@ -8,50 +9,60 @@ namespace TurtleGraphics {
 
 		public IGenericExpression<bool> IfCondition { get; set; }
 		public Queue<ParsedData> IfData { get; set; }
-		public IList<(IGenericExpression<bool>, Func<Task>)> ElseIfs { get; set; }
-		public Func<Task> ElseAction { get; set; }
+		public Queue<ParsedData> ElseData { get; set; } = null;
+		public IList<(IGenericExpression<bool>, Queue<ParsedData>)> ElseIfs { get; set; }
+		public bool IsModifiable { get; set; } = true;
 
 		public ConditionalData(string line,
 			IGenericExpression<bool> ifCondition, Queue<ParsedData> data,
-			IList<(IGenericExpression<bool>, Func<Task>)> elseIfs = null,
-			Func<Task> else_ = null) : base(line) {
+			IList<(IGenericExpression<bool>, Queue<ParsedData>)> elseIfs = null) : base(line) {
 			IfCondition = ifCondition;
 			IfData = data;
 			ElseIfs = elseIfs;
-			ElseAction = else_;
 		}
 
 		public override async Task Execute() {
 			UpdateVars(IfCondition);
 			if (IfCondition.Evaluate()) {
-				int counter = 0;
-				while (IfData.Count > 0) {
-					ParsedData data = IfData.Dequeue();
-					data.Variables = Variables;
-					await data.Execute();
-					IfData.Enqueue(data);
-					counter++;
-					if (counter == IfData.Count) {
-						return;
-					}
-				}
+				await ExecuteQueue(IfData);
 			}
 			else {
 				if (ElseIfs != null) {
-					foreach ((IGenericExpression<bool> exp, Func<Task> act) in ElseIfs) {
+					foreach ((IGenericExpression<bool> exp, Queue<ParsedData> data) in ElseIfs) {
 						UpdateVars(exp);
 						if (exp.Evaluate()) {
-							await act();
+							await ExecuteQueue(data);
 							return;
 						}
 					}
 				}
-				if (ElseAction != null) {
-					await ElseAction();
+				if (ElseData != null) {
+					await ExecuteQueue(ElseData);
 				}
 				return;
 			}
 			return;
+		}
+
+		private async Task ExecuteQueue(Queue<ParsedData> parsedData) {
+			int counter = 0;
+			while (parsedData.Count > 0) {
+				ParsedData data = parsedData.Dequeue();
+				data.Variables = Variables;
+				await data.Execute();
+				parsedData.Enqueue(data);
+				counter++;
+				if (counter == parsedData.Count) {
+					return;
+				}
+			}
+		}
+
+		public void AddElse(string line, StringReader reader) {
+			List<string> lines = BlockParser.ParseBlock(reader);
+
+			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), CommandParser.Window, Variables);
+			ElseData = data;
 		}
 	}
 }

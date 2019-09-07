@@ -97,49 +97,10 @@ namespace TurtleGraphics.Parsers {
 			line = line.Replace("{", "");
 
 			if (!string.IsNullOrWhiteSpace(line)) {
-				throw new Exception("What?");
+				throw new Exception("Follow the syntax pls?");
 			}
 
-			List<string> lines = new List<string>();
-			string next = reader.ReadLine();
-			int openBarckets = 1;
-
-			if (next.Contains("{")) {
-				openBarckets++;
-			}
-			if (next.Contains("}")) {
-				openBarckets--;
-				if (openBarckets == 0) {
-					lines.Add(next);
-					return new ForLoopData() {
-						From = startValue,
-						To = endValue,
-						LoopVariable = variableName,
-						Change = change,
-						Condition = condition,
-						Operator = _operator,
-						Variables = inherited.Copy(),
-						Exp = null,
-						Line = line,
-						Lines = lines
-					};
-				}
-			}
-			do {
-				lines.Add(next);
-				next = reader.ReadLine();
-				if (next.Contains("{")) {
-					openBarckets++;
-				}
-				if (next.Contains("}")) {
-					openBarckets--;
-					if (openBarckets == 0) {
-						lines.Add(next);
-						break;
-					}
-				}
-			}
-			while (next != null);
+			List<string> lines = BlockParser.ParseBlock(reader);
 
 			return new ForLoopData() {
 				From = startValue,
