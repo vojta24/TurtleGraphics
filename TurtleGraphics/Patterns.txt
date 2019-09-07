@@ -325,3 +325,18 @@ r (-45);
 f (10);
 }
 
+
+for(int streamsCount = 0; streamsCount < 50; streamscount++){
+for(int stream = 0; stream < 3; stream++){
+for(int bead = 0; bead < 30; bead++){
+f(1);
+r(360/30)
+} 
+u();
+r(90,true);
+f(10);
+r(0,true);
+d();
+}
+goto(RandX(),RandY());
+}

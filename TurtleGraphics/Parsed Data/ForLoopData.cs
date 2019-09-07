@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Flee.PublicTypes;
 
@@ -14,13 +15,19 @@ namespace TurtleGraphics {
 
 		public List<string> Lines { get; set; }
 
-		public override async Task Execute() {
+		public override async Task Execute(CancellationToken token) {
 			List<ParsedData> loopContents = CompileLoop();
 
+			if (token.IsCancellationRequested) {
+				return;
+			}
 			async Task Exec(int i) {
 				foreach (ParsedData data in loopContents) {
 					data.Variables[LoopVariable] = i;
-					await data.Execute();
+					await data.Execute(token);
+					if (token.IsCancellationRequested) {
+						return;
+					}
 				}
 			}
 

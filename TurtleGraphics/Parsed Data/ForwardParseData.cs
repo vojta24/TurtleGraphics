@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TurtleGraphics {
@@ -12,7 +13,10 @@ namespace TurtleGraphics {
 
 		public double Distance { get; set; }
 
-		public override async Task Execute() {
+		public override async Task Execute(CancellationToken token) {
+			if (token.IsCancellationRequested) {
+				return;
+			}
 			UpdateVars(Exp);
 			Distance = Convert.ToDouble(Exp.Evaluate());
 			await _window.Forward(Distance);

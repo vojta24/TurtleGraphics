@@ -38,7 +38,7 @@
 				<Slider Value="{Binding Delay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="50" TickFrequency="1" Ticks="5"/>
 				<Slider Value="{Binding IterationCount, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="100" TickFrequency="1" />
 			</StackPanel>
-			<Button Grid.Row="2" Content="Run" Command="{Binding RunCommand}"/>
+			<Button Grid.Row="2" Content="{Binding ButtonText}" Command="{Binding ButtonCommand}"/>
 		</Grid>
 	</Grid>
 </Window>

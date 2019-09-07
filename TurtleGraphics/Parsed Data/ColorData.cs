@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TurtleGraphics {
@@ -14,7 +15,10 @@ namespace TurtleGraphics {
 			_window = window;
 		}
 
-		public override Task Execute() {
+		public override Task Execute(CancellationToken token) {
+			if (token.IsCancellationRequested) {
+				return Task.CompletedTask;
+			}
 			if (Arg1 == "random" || Arg1 == "rand") {
 				_window.Color = RandColor();
 			}

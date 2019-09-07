@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Flee.PublicTypes;
 
@@ -28,7 +29,10 @@ namespace TurtleGraphics {
 			y = expression.CompileDynamic(args[1]);
 		}
 
-		public override Task Execute() {
+		public override Task Execute(CancellationToken token) {
+			if (token.IsCancellationRequested) {
+				return Task.CompletedTask;
+			}
 			UpdateVars(x);
 			UpdateVars(y);
 

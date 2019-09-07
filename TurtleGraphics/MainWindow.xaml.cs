@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,6 +30,12 @@ namespace TurtleGraphics {
 		public MainWindow() {
 			InitializeComponent();
 			RunCommand = new AsyncCommand(RunCommandAction);
+			StopCommand = new Command(() => {
+				cancellationTokenSource.Cancel();
+				ButtonCommand = RunCommand;
+				ButtonText = "Run";
+			});
+			ButtonCommand = RunCommand;
 			Init();
 			Loaded += MainWindow_Loaded;
 			DataContext = this;
@@ -50,7 +57,13 @@ namespace TurtleGraphics {
 		private int _delay;
 		private bool _penDown;
 		private int _iterationCount;
+		private ICommand _buttonCommand;
+		private ICommand _stopCommand;
+		private string _buttonText = "Run";
 
+		public string ButtonText { get => _buttonText; set { _buttonText = value; Notify(nameof(ButtonText)); } }
+		public ICommand StopCommand { get => _stopCommand; set { _stopCommand = value; Notify(nameof(StopCommand)); } }
+		public ICommand ButtonCommand { get => _buttonCommand; set { _buttonCommand = value; Notify(nameof(ButtonCommand)); } }
 		public int IterationCount { get => _iterationCount; set { _iterationCount = value; Notify(nameof(IterationCount)); } }
 		public bool PenDown { get => _penDown; set { _penDown = value; Notify(nameof(PenDown)); } }
 		public int Delay { get => _delay; set { _delay = value; Notify(nameof(Delay)); } }
@@ -69,6 +82,7 @@ namespace TurtleGraphics {
 		private void MainWindow_Loaded(object sender, RoutedEventArgs e) {
 			DrawWidth = DrawAreaX.ActualWidth;
 			DrawHeight = DrawAreaY.ActualHeight;
+			ContextExtensions.SetWindow(this);
 			Loaded -= MainWindow_Loaded;
 		}
 
@@ -79,6 +93,10 @@ namespace TurtleGraphics {
 					Point = new Point(X, Y),
 					IsSmoothJoin = true
 				};
+
+				if (cancellationTokenSource.IsCancellationRequested) {
+					return;
+				}
 
 				if (_currentPath == null) {
 					NewPath();
@@ -165,20 +183,27 @@ namespace TurtleGraphics {
 				_currentFigure.Segments[last] = lastSegment;
 				currentInterpolation += increment;
 				await Task.Delay(Delay);
+				if (cancellationTokenSource.Token.IsCancellationRequested) {
+					break;
+				}
 			}
 			lastSegment.Freeze();
 		}
 
+		private CancellationTokenSource cancellationTokenSource;
+
 		private async Task RunCommandAction() {
-			//await Task.Delay(5000);
-
 			Init();
-
+			cancellationTokenSource = new CancellationTokenSource();
+			ButtonCommand = StopCommand;
+			ButtonText = "Stop";
 			Queue<ParsedData> tasks = CommandParser.Parse(Commands, this);
 
 			foreach (var item in tasks) {
-				await item.Execute();
+				await item.Execute(cancellationTokenSource.Token);
 			}
+			ButtonCommand = RunCommand;
+			ButtonText = "Run";
 		}
 
 		public void Init() {

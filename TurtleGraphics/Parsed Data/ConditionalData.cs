@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Flee.PublicTypes;
 
@@ -21,35 +22,41 @@ namespace TurtleGraphics {
 			ElseIfs = elseIfs;
 		}
 
-		public override async Task Execute() {
+		public override async Task Execute(CancellationToken token) {
+			if (token.IsCancellationRequested) {
+				return;
+			}
 			UpdateVars(IfCondition);
 			if (IfCondition.Evaluate()) {
-				await ExecuteQueue(IfData);
+				await ExecuteQueue(IfData, token);
 			}
 			else {
 				if (ElseIfs != null) {
 					foreach ((IGenericExpression<bool> exp, Queue<ParsedData> data) in ElseIfs) {
 						UpdateVars(exp);
 						if (exp.Evaluate()) {
-							await ExecuteQueue(data);
+							await ExecuteQueue(data, token);
 							return;
 						}
 					}
 				}
 				if (ElseData != null) {
-					await ExecuteQueue(ElseData);
+					await ExecuteQueue(ElseData, token);
 				}
 				return;
 			}
 			return;
 		}
 
-		private async Task ExecuteQueue(Queue<ParsedData> parsedData) {
+		private async Task ExecuteQueue(Queue<ParsedData> parsedData, CancellationToken token) {
 			int counter = 0;
 			while (parsedData.Count > 0) {
+				if (token.IsCancellationRequested) {
+					return;
+				}
 				ParsedData data = parsedData.Dequeue();
 				data.Variables = Variables;
-				await data.Execute();
+				await data.Execute(token);
 				parsedData.Enqueue(data);
 				counter++;
 				if (counter == parsedData.Count) {

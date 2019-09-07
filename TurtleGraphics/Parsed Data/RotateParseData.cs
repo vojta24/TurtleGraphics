@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TurtleGraphics {
@@ -15,7 +16,10 @@ namespace TurtleGraphics {
 		public double Angle { get; set; }
 		public bool SetRotation { get; set; }
 
-		public override Task Execute() {
+		public override Task Execute(CancellationToken token) {
+			if (token.IsCancellationRequested) {
+				return Task.CompletedTask;
+			}
 			if (double.IsNaN(Angle)) {
 				_window.Rotate(Angle, SetRotation);
 				return Task.CompletedTask;

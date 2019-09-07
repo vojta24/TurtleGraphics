@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Flee.PublicTypes;
 
@@ -21,7 +22,7 @@ namespace TurtleGraphics {
 
 		public string Arg1 => Parameters[0];
 
-		public virtual Task Execute() => throw new NotImplementedException();
+		public virtual Task Execute(CancellationToken token) => throw new NotImplementedException();
 
 		protected void UpdateVars(IDynamicExpression exp) {
 			foreach (var item in Variables) {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TurtleGraphics {
@@ -9,7 +10,10 @@ namespace TurtleGraphics {
 			_toExecute = action;
 		}
 
-		public override Task Execute() {
+		public override Task Execute(CancellationToken token) {
+			if (token.IsCancellationRequested) {
+				return Task.CompletedTask;
+			}
 			_toExecute();
 			return Task.CompletedTask;
 		}

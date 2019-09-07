@@ -12,10 +12,10 @@ namespace TurtleGraphics.Parsers {
 		}
 
 		public static ConditionType ParseCondition(string str) {
-			if (str.Contains(Condition.GREATER)) { return ConditionType.Greater; }
-			else if (str.Contains(Condition.LESS)) { return ConditionType.Less; }
-			else if (str.Contains(Condition.GREATER_OR_EQUAL)) { return ConditionType.GreaterOrEqual; }
+			if (str.Contains(Condition.GREATER_OR_EQUAL)) { return ConditionType.GreaterOrEqual; }
 			else if (str.Contains(Condition.LESS_OR_EQUAL)) { return ConditionType.LessOrEqual; }
+			else if (str.Contains(Condition.GREATER)) { return ConditionType.Greater; }
+			else if (str.Contains(Condition.LESS)) { return ConditionType.Less; }
 			else if (str.Contains(Condition.EQUAL)) { return ConditionType.Equal; }
 			throw new NotImplementedException($"{str} is not a valid Condition");
 		}
