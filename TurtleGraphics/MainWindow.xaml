@@ -6,7 +6,11 @@
         xmlns:local="clr-namespace:TurtleGraphics"
         mc:Ignorable="d"
         Title="MainWindow">
-	<Grid x:Name="Paths">
+	<Window.Resources>
+		<BooleanToVisibilityConverter x:Key="BoolToVis"/>
+	</Window.Resources>
+	
+	<Grid x:Name="Paths" Background="{Binding ElementName=BackgroundColor, Path=Text}">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="*" x:Name="ControlArea"/>
 			<ColumnDefinition Width="4*" x:Name="DrawAreaX"/>
@@ -35,14 +39,36 @@
 					<Run Text="Y:"/>
 					<Run Text="{Binding Y}"/>
 				</TextBlock>
+				<TextBox Name="BackgroundColor" Text="Transparent"/>
+				<CheckBox Content="Show Turtle" IsChecked="{Binding ShowTurtleCheckBox}"/>
 				<Slider Value="{Binding Delay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="50" TickFrequency="1" Ticks="5"/>
 				<Slider Value="{Binding IterationCount, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="100" TickFrequency="1" />
 			</StackPanel>
 			<StackPanel Grid.Row="2">
-				<Button Content="{Binding ButtonText}" Command="{Binding ButtonCommand}"/>
-				<Button Content="{Binding ButtonTextFullSize}" Command="{Binding ButtonFullSizeCommand}"/>
+				<Button Content="{Binding ButtonText, FallbackValue='Run/Stop'}" Command="{Binding ButtonCommand}"/>
+				<Button Content="{Binding ButtonTextFullSize, FallbackValue='Run Full-size'}" Command="{Binding ButtonFullSizeCommand}"/>
 				<Button Content="Toggle Fullscreen" Command="{Binding ToggleFullScreenCommand}" IsEnabled="{Binding ToggleFullscreenEnabled}"/>
 			</StackPanel>
 		</Grid>
+		
+		<Grid Grid.Column="1" Grid.ColumnSpan="99" Grid.RowSpan="99" Panel.ZIndex="1">
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="auto"/>
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="auto"/>
+			</Grid.RowDefinitions>
+			<Image  Source="Resources/turtle.png" Width="24" Height="24" Margin="-12,-12" Visibility="{Binding ShowTurtleCheckBox, Converter={StaticResource BoolToVis}}">
+				<Image.RenderTransform>
+					<TransformGroup>
+						<RotateTransform x:Name="TurtleRotation" CenterX="12" CenterY="12"/>
+						<ScaleTransform x:Name="TurtleScale" CenterX="12" CenterY="12"/>
+						<TranslateTransform x:Name="TurtleTranslation"/>
+					</TransformGroup>
+				</Image.RenderTransform>
+			</Image>
+		</Grid>
+			
 	</Grid>
 </Window>

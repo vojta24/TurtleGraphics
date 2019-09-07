@@ -89,6 +89,13 @@ namespace TurtleGraphics {
 						};
 					}
 
+					case "SetBrushSize": {
+						return new BrushSizeData(Window, ParseGenericExpression<double>(info.Arguments[0], variables)) {
+							Variables = variables.Copy(),
+							Line = line,
+						};
+					}
+
 					case "u": {
 						return new ActionData(() => Window.PenDown = false) { Variables = variables.Copy() };
 					}
@@ -233,6 +240,20 @@ namespace TurtleGraphics {
 			}
 
 			return context.CompileDynamic(line);
+		}
+
+		private static IGenericExpression<T> ParseGenericExpression<T>(string line, Dictionary<string, object> variables) {
+			ExpressionContext context = new ExpressionContext();
+
+			context.Imports.AddType(typeof(Math));
+			context.Imports.AddType(typeof(ContextExtensions));
+
+
+			foreach (KeyValuePair<string, object> item in variables) {
+				context.Variables.Add(item.Key, item.Value);
+			}
+
+			return context.CompileGeneric<T>(line);
 		}
 	}
 }

@@ -79,6 +79,7 @@
     <Compile Include="Logic\AssignmentInfo.cs" />
     <Compile Include="Logic\Condition.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Parsed Data\BrushSizeData.cs" />
     <Compile Include="Parsed Data\ConditionalData.cs" />
     <Compile Include="Parsed Data\MoveData.cs" />
     <Compile Include="Logic\Operator.cs" />
@@ -137,6 +138,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Patterns.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\turtle.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

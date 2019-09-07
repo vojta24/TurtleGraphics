@@ -382,3 +382,80 @@ f(Sqrt((10 + i*20)^2 + (10 + i*20)^2) - 3);
 r(180,true);
 goto(Width,0);
 }
+
+for(int i = 0; i < 360; i++){
+f(5);
+r(1);
+if(i == 60){
+SetBrushSize(8);
+}
+if(i == 120){
+SetBrushSize(12);
+}
+if(i == 180){
+SetBrushSize(16);
+}
+if(i == 240){
+SetBrushSize(20);
+}
+if(i == 300){
+SetBrushSize(24);
+}
+}
+
+for(int i = 0; i < 60; i++){
+f(5);
+r(1);
+if(i == 10){
+SetBrushSize(8);
+}
+if(i == 20){
+SetBrushSize(12);
+}
+if(i == 30){
+SetBrushSize(16);
+}
+if(i == 40){
+SetBrushSize(20);
+}
+if(i == 50){
+SetBrushSize(24);
+}
+}
+
+
+c(Red);
+for (int k = 0; k < 8; k++){
+ for (int j = 0; j < 24; j++){
+  for (int i = 0; i < 60; i++){
+    r (1);
+    f (1);
+    r (-6 + i);
+    f (2);
+    if(i == 24){
+     c(Green);
+     SetBrushSize(1);
+    }
+   }
+  r (45);
+  c(Transparent);
+  SetBrushSize(4);
+  f(12);
+  if (k < 4){
+   c (Blue);
+  }
+  else {
+   c (Yellow);
+  }
+  f (188);
+  c (Red);
+ }
+r (-45);
+f (10);
+}
+
+SetBrushSize(1);
+for(int i = 360; i > 0; i--){
+f(i);
+r(90 + 31);
+} 
