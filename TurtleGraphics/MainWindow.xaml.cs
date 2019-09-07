@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using Igor.Models;
 using static TurtleGraphics.Helpers;
-using System.Linq.Expressions;
-using Flee.PublicTypes;
-using System.Windows.Shapes;
-using System.Windows.Controls;
 
 namespace TurtleGraphics {
 	/// <summary>
@@ -100,7 +98,6 @@ namespace TurtleGraphics {
 				Y = to.Y;
 
 				_currentFigure.Segments.Add(l);
-
 				await Displace(to);
 			});
 		}
@@ -152,18 +149,19 @@ namespace TurtleGraphics {
 
 		public async Task Displace(Point to) {
 			int last = _currentFigure.Segments.Count - 1;
-			LineSegment l = (LineSegment)_currentFigure.Segments[last];
-			Point origin = l.Point;
-			double increment = 1d / IterationCount;
+			LineSegment lastSegment = (LineSegment)_currentFigure.Segments[last];
+			Point origin = lastSegment.Point;
 
+			double increment = 1d / IterationCount;
 			double currentInterpolation = 0;
+
 			for (int i = 0; i <= IterationCount; i++) {
-				l.Point = new Point(Lerp(origin.X, to.X, currentInterpolation), Lerp(origin.Y, to.Y, currentInterpolation));
-				_currentFigure.Segments[last] = l;
+				lastSegment.Point = new Point(Lerp(origin.X, to.X, currentInterpolation), Lerp(origin.Y, to.Y, currentInterpolation));
+				_currentFigure.Segments[last] = lastSegment;
 				currentInterpolation += increment;
 				await Task.Delay(Delay);
 			}
-			l.Freeze();
+			lastSegment.Freeze();
 		}
 
 		private async Task RunCommandAction() {
