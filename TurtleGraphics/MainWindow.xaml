@@ -64,7 +64,7 @@
 					<TransformGroup>
 						<RotateTransform x:Name="TurtleRotation" CenterX="12" CenterY="12"/>
 						<ScaleTransform x:Name="TurtleScale" CenterX="12" CenterY="12"/>
-						<TranslateTransform x:Name="TurtleTranslation"/>
+						<TranslateTransform x:Name="TurtleTranslation" X="20" Y="20"/>
 					</TransformGroup>
 				</Image.RenderTransform>
 			</Image>

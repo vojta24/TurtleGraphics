@@ -39,7 +39,7 @@ namespace TurtleGraphics {
 		}
 
 
-		private static Stack<ConditionalData> conditionals = new Stack<ConditionalData>();
+		private static readonly Stack<ConditionalData> conditionals = new Stack<ConditionalData>();
 
 		private static ParsedData ParseLine(string line, StringReader reader, Dictionary<string, object> variables) {
 			if (string.IsNullOrWhiteSpace(line) || line.Trim() == "}")
@@ -51,9 +51,7 @@ namespace TurtleGraphics {
 					conditionals.Peek().IsModifiable = false;
 				}
 				switch (info.FunctionName) {
-					case "r": {
-						double val;
-
+					case "Rotate": {
 						try {
 							bool hardAngle = false;
 							if (info.Arguments.Length == 2) {
@@ -66,7 +64,6 @@ namespace TurtleGraphics {
 						}
 						catch {
 							if (info.Arguments[0] == "origin") {
-								val = double.NaN;
 								return new RotateParseData(Window, null, bool.Parse(info.Arguments[1])) {
 									Line = line,
 									Angle = double.NaN,
@@ -77,7 +74,7 @@ namespace TurtleGraphics {
 						}
 					}
 
-					case "f": {
+					case "Forward": {
 						return new ForwardParseData(Window,ParseGenericExpression<double>(info.Arguments[0], variables)) {
 							Variables = variables.Copy(),
 							Line = line,
@@ -91,19 +88,19 @@ namespace TurtleGraphics {
 						};
 					}
 
-					case "u": {
+					case "PenUp": {
 						return new ActionData(() => Window.PenDown = false) { Variables = variables.Copy() };
 					}
 
-					case "d": {
+					case "PenDown": {
 						return new ActionData(() => Window.PenDown = true) { Variables = variables.Copy() };
 					}
 
-					case "c": {
+					case "SetColor": {
 						return new ColorData(Window, info.Arguments[0]) { Variables = variables.Copy() };
 					}
 
-					case "goto": {
+					case "MoveTo": {
 						return new MoveData(Window, info.Arguments, variables.Copy());
 					}
 
