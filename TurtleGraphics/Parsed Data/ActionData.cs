@@ -8,8 +8,9 @@ namespace TurtleGraphics {
 	public class ActionData : ParsedData {
 		private readonly Action _toExecute;
 
-		public ActionData(Action action) {
+		public ActionData(Action action, Dictionary<string, object> variables) {
 			_toExecute = action;
+			Variables = variables;
 		}
 
 		public override Task Execute(CancellationToken token) {

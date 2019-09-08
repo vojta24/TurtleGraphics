@@ -12,9 +12,10 @@ namespace TurtleGraphics {
 		private readonly Random _random;
 		private readonly MainWindow _window;
 
-		public ColorData(MainWindow window, string inputColor) : base(inputColor.Trim()) {
+		public ColorData(MainWindow window, string inputColor, Dictionary<string, object> variables) : base(inputColor.Trim()) {
 			_random = new Random((int)DateTime.Now.Ticks);
 			_window = window;
+			Variables = variables;
 		}
 
 		public override Task Execute(CancellationToken token) {

@@ -52,62 +52,34 @@ namespace TurtleGraphics {
 				}
 				switch (info.FunctionName) {
 					case "Rotate": {
-						try {
-							bool hardAngle = false;
-							if (info.Arguments.Length == 2) {
-								hardAngle = bool.Parse(info.Arguments[1]);
-							}
-							return new RotateParseData(Window, ParseGenericExpression<double>(info.Arguments[0], variables), hardAngle) {
-								Variables = variables.Copy(),
-								Line = line,
-							};
-						}
-						catch {
-							if (info.Arguments[0] == "origin") {
-								return new RotateParseData(Window, null, bool.Parse(info.Arguments[1])) {
-									Line = line,
-									Angle = double.NaN,
-									Variables = variables.Copy()
-								};
-							}
-							throw;
-						}
+						return new RotateParseData(Window, ParseGenericExpression<double>(info.Arguments[0], variables), info, variables.Copy()) { Line = line };
 					}
 
 					case "Forward": {
-						return new ForwardParseData(Window,ParseGenericExpression<double>(info.Arguments[0], variables)) {
-							Variables = variables.Copy(),
-							Line = line,
-						};
+						return new ForwardParseData(Window, ParseGenericExpression<double>(info.Arguments[0], variables), variables.Copy()) { Line = line };
 					}
 
 					case "SetBrushSize": {
-						return new BrushSizeData(Window, ParseGenericExpression<double>(info.Arguments[0], variables)) {
-							Variables = variables.Copy(),
-							Line = line,
-						};
+						return new BrushSizeData(Window, ParseGenericExpression<double>(info.Arguments[0], variables), variables.Copy()) { Line = line };
 					}
 
 					case "PenUp": {
-						return new ActionData(() => Window.PenDown = false) { Variables = variables.Copy() };
+						return new ActionData(() => Window.PenDown = false, variables.Copy()) { Line = line };
 					}
 
 					case "PenDown": {
-						return new ActionData(() => Window.PenDown = true) { Variables = variables.Copy() };
+						return new ActionData(() => Window.PenDown = true, variables.Copy()) { Line = line };
 					}
 
 					case "SetColor": {
-						return new ColorData(Window, info.Arguments[0]) { Variables = variables.Copy() };
+						return new ColorData(Window, info.Arguments[0], variables.Copy()) { Line = line };
 					}
 
 					case "MoveTo": {
-						return new MoveData(Window, info.Arguments, variables.Copy());
+						return new MoveData(Window, info.Arguments, variables.Copy()) { Line = line };
 					}
 
 					default: {
-						if (line == "}") {
-							return null;
-						}
 						throw new NotImplementedException($"Unexpected squence function call: {line}");
 					}
 				}

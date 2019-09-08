@@ -424,34 +424,34 @@ SetBrushSize(24);
 }
 
 
-c(Red);
+SetColor(Red);
 for (int k = 0; k < 8; k++){
  for (int j = 0; j < 24; j++){
   for (int i = 0; i < 60; i++){
-    r (1);
-    f (1);
-    r (-6 + i);
-    f (2);
+    Rotate (1);
+    Forward (1);
+    Rotate (-6 + i);
+    Forward (2);
     if(i == 24){
-     c(Green);
+     SetColor(Green);
      SetBrushSize(1);
     }
    }
-  r (45);
-  c(Transparent);
+  Rotate (45);
+  SetColor(Transparent);
   SetBrushSize(4);
-  f(12);
+  Forward(12);
   if (k < 4){
-   c (Blue);
+   SetColor (Blue);
   }
   else {
-   c (Yellow);
+   SetColor (Yellow);
   }
-  f (188);
-  c (Red);
+  Forward (188);
+  SetColor (Red);
  }
-r (-45);
-f (10);
+Rotate (-45);
+Forward (10);
 }
 
 SetBrushSize(1);
@@ -465,4 +465,30 @@ goto(200,200);
 for(int i = 360; i > 0; i--){
 f(i * 2);
 r(90 + 31);
+}
+
+
+SetColor(Red);
+for (int k = 0; k < 8; k++){
+ for (int j = 0; j < 24; j++){
+  for (int i = 0; i < 60; i++){
+    Rotate (1);
+    Forward (1);
+    Rotate (-6 + i);
+    Forward (2);
+    if(i == 24){
+     SetColor(Green);
+     SetBrushSize(1);
+    }
+   }
+  Rotate (45);
+  SetColor(Transparent);
+  SetBrushSize(4);
+  Forward(12);
+
+  Forward (188);
+  SetColor (Red);
+ }
+Rotate (-45);
+Forward (10);
 }

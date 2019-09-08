@@ -11,9 +11,10 @@ namespace TurtleGraphics {
 		private readonly MainWindow _window;
 		private readonly IGenericExpression<double> _expression;
 
-		public ForwardParseData(MainWindow w, IGenericExpression<double> expression) {
+		public ForwardParseData(MainWindow w, IGenericExpression<double> expression, Dictionary<string, object> variables) {
 			_window = w;
 			_expression = expression;
+			Variables = variables;
 		}
 
 		public double Distance { get; set; }

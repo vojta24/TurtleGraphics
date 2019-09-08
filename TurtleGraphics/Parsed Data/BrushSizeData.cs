@@ -12,9 +12,10 @@ namespace TurtleGraphics {
 
 		public const double BASE_BRUSH_SIZE = 4;
 
-		public BrushSizeData(MainWindow window, IGenericExpression<double> expression) {
+		public BrushSizeData(MainWindow window, IGenericExpression<double> expression, Dictionary<string, object> variables) {
 			_window = window;
 			_expression = expression;
+			Variables = variables;
 		}
 
 		public override Task Execute(CancellationToken token) {
