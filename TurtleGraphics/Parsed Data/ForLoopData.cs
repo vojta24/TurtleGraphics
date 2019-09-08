@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Flee.PublicTypes;
@@ -147,6 +148,10 @@ namespace TurtleGraphics {
 			//		await data.Execute();
 			//	}
 			//}
+		}
+
+		public override ParsedData Parse(string line, StringReader reader, Dictionary<string, object> variables) {
+			return this;
 		}
 
 		private List<ParsedData> CompileLoop() {

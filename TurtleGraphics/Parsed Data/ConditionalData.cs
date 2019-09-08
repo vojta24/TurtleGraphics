@@ -71,5 +71,9 @@ namespace TurtleGraphics {
 			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), CommandParser.Window, Variables);
 			ElseData = data;
 		}
+
+		public override ParsedData Parse(string line, StringReader reader, Dictionary<string, object> variables) {
+			return this;
+		}
 	}
 }

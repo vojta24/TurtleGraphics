@@ -23,7 +23,7 @@ namespace TurtleGraphics {
 
 		public abstract Task Execute(CancellationToken token);
 
-		//public abstract void Parse(string line, StringReader reader, Dictionary<string, object> variables);
+		public abstract ParsedData Parse(string line, StringReader reader, Dictionary<string, object> variables);
 
 		protected void UpdateVars(IDynamicExpression exp) {
 			foreach (var item in Variables) {

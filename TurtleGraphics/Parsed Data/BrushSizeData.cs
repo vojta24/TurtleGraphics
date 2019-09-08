@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Flee.PublicTypes;
 
@@ -25,6 +27,10 @@ namespace TurtleGraphics {
 			double scale = _window.BrushSize / BASE_BRUSH_SIZE;
 			_window.TurtleScale.ScaleX = _window.TurtleScale.ScaleY = scale;
 			return Task.CompletedTask;
+		}
+
+		public override ParsedData Parse(string line, StringReader reader, Dictionary<string, object> variables) {
+			return this;
 		}
 	}
 }

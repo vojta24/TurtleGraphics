@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Flee.PublicTypes;
@@ -44,6 +45,10 @@ namespace TurtleGraphics {
 
 			_window.NewPath();
 			return Task.CompletedTask;
+		}
+
+		public override ParsedData Parse(string line, StringReader reader, Dictionary<string, object> variables) {
+			return this;
 		}
 	}
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Flee.PublicTypes;
@@ -32,6 +34,10 @@ namespace TurtleGraphics {
 			Angle = _expression.Evaluate();
 			_window.Rotate(Angle, SetRotation);
 			return Task.CompletedTask;
+		}
+
+		public override ParsedData Parse(string line, StringReader reader, Dictionary<string, object> variables) {
+			return this;
 		}
 	}
 }

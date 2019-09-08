@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +18,10 @@ namespace TurtleGraphics {
 			}
 			_toExecute();
 			return Task.CompletedTask;
+		}
+
+		public override ParsedData Parse(string line, StringReader reader, Dictionary<string, object> variables) {
+			return this;
 		}
 	}
 }

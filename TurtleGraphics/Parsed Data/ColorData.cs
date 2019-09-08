@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +28,10 @@ namespace TurtleGraphics {
 				_window.Color = Arg1;
 			}
 			return Task.CompletedTask;
+		}
+
+		public override ParsedData Parse(string line, StringReader reader, Dictionary<string, object> variables) {
+			return this;
 		}
 
 		private string RandColor() {

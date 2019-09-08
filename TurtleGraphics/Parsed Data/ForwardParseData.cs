@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Flee.PublicTypes;
@@ -23,6 +25,10 @@ namespace TurtleGraphics {
 			UpdateVars(_expression);
 			Distance = _expression.Evaluate();
 			await _window.Forward(Distance);
+		}
+
+		public override ParsedData Parse(string line, StringReader reader, Dictionary<string, object> variables) {
+			return this;
 		}
 	}
 }
