@@ -80,6 +80,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ContextExtensions.cs" />
+    <Compile Include="InteliCommandsHandler.cs" />
     <Compile Include="Logic\AssignmentInfo.cs" />
     <Compile Include="Logic\Condition.cs" />
     <Compile Include="Extensions.cs" />

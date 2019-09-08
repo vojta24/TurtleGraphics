@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Flee.PublicTypes;
 using Igor.Models;
 using static TurtleGraphics.Helpers;
@@ -50,7 +51,9 @@ namespace TurtleGraphics {
 		private string _buttonTextFullSize = "Run on fullsize canvas";
 		private ICommand _buttonFullSizeCommand;
 		private bool _showTurtleCheckBox = true;
+		private string _inteliCommands;
 
+		public string InteliCommands { get => _inteliCommands; set { _inteliCommands = value; Notify(nameof(InteliCommands)); } }
 		public bool ShowTurtleCheckBox { get => _showTurtleCheckBox; set { _showTurtleCheckBox = value; Notify(nameof(ShowTurtleCheckBox)); } }
 		public ICommand ButtonFullSizeCommand { get => _buttonFullSizeCommand; set { _buttonFullSizeCommand = value; Notify(nameof(ButtonFullSizeCommand)); } }
 		public string ButtonTextFullSize { get => _buttonTextFullSize; set { _buttonTextFullSize = value; Notify(nameof(ButtonTextFullSize)); } }
@@ -65,7 +68,23 @@ namespace TurtleGraphics {
 		public double Y { get => _y; set { _y = value; Notify(nameof(Y)); } }
 		public double X { get => _x; set { _x = value; Notify(nameof(X)); } }
 		public double Angle { get => _angle; set { _angle = value; Notify(nameof(Angle)); } }
-		public string Commands { get => _commands; set { _commands = value; Notify(nameof(Commands)); } }
+		public string Commands {
+			get => _commands; set {
+				if (value.EndsWith("\t") && InteliCommands != Commands && _inteliCommandsEnabled) {
+					_commands = InteliCommands;
+					InteliCommands = Commands;
+					Dispatcher.Invoke(async () => {
+						await Task.Delay(1);
+						CommandsTextInput.CaretIndex = InteliCommandsHandler.GetIndexForCaret(value.TrimEnd('\t'));
+					}, DispatcherPriority.Loaded);
+				}
+				else {
+					_commands = value;
+					InteliCommands = InteliCommandsHandler.GetIntliCommand(value);
+				}
+				Notify(nameof(Commands));
+			}
+		}
 		public ICommand RunCommand { get => _runCommand; set { _runCommand = value; Notify(nameof(RunCommand)); } }
 		public Point StartPoint { get => _startPoint; set { _startPoint = value; Notify(nameof(StartPoint)); } }
 		public double BrushSize { get => _brushSize; set { if (value == _brushSize) return; _brushSize = value; NewPath(); Notify(nameof(BrushSize)); } }
@@ -78,6 +97,7 @@ namespace TurtleGraphics {
 		private Path _currentPath;
 		private PathFigure _currentFigure;
 		private CancellationTokenSource cancellationTokenSource;
+		private bool _inteliCommandsEnabled = true;
 
 
 		public double DrawWidth { get; set; }

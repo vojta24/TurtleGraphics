@@ -9,6 +9,7 @@ namespace TurtleGraphics {
 	public class CommandParser {
 
 		public static MainWindow Window { get; set; }
+		private static readonly Stack<ConditionalData> conditionals = new Stack<ConditionalData>();
 
 		public static Queue<ParsedData> Parse(string commands, MainWindow window, Dictionary<string, object> additionalVars = null) {
 
@@ -39,7 +40,6 @@ namespace TurtleGraphics {
 		}
 
 
-		private static readonly Stack<ConditionalData> conditionals = new Stack<ConditionalData>();
 
 		private static ParsedData ParseLine(string line, StringReader reader, Dictionary<string, object> variables) {
 			if (string.IsNullOrWhiteSpace(line) || line.Trim() == "}")
