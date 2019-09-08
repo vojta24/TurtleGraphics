@@ -16,8 +16,8 @@ namespace TurtleGraphics {
 
 		public static string GetIntliCommand(string value) {
 			foreach (string key in _inteliCommands.Keys) {
-				if (value.EndsWith(key)) {
-					return value + _inteliCommands[key];
+				if (value.Trim() == key) {
+					return value.TrimEnd() + _inteliCommands[key];
 				}
 			}
 			return value;
@@ -25,8 +25,8 @@ namespace TurtleGraphics {
 
 		public static int GetIndexForCaret(string value) {
 			foreach (string key in _inteliCommands.Keys) {
-				if (value.EndsWith(key)) {
-					return value.Length + _inteliCommandsIndexes[key];
+				if (value.Trim() == key) {
+					return value.TrimEnd().Length + _inteliCommandsIndexes[key];
 				}
 			}
 			throw new NotImplementedException();

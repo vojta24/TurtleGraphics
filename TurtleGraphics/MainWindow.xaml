@@ -33,7 +33,7 @@
 			<TextBox Text="{Binding InteliCommands, UpdateSourceTrigger=PropertyChanged}"
 					 FontWeight="DemiBold"
 					 FontSize="16"
-					 IsHitTestVisible="False" Opacity="0.5"/>
+					 IsHitTestVisible="False" Opacity="0.5" Background="Transparent"/>
 			
 			<StackPanel Grid.Row="1">
 				<TextBlock>
