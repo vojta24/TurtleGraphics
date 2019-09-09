@@ -25,12 +25,12 @@
 				<RowDefinition Height="auto"/>
 				<RowDefinition Height="auto"/>
 			</Grid.RowDefinitions>
-			<TextBox Text="{Binding Commands, UpdateSourceTrigger=PropertyChanged}"
+			<TextBox Text="{Binding CommandsText, UpdateSourceTrigger=PropertyChanged}"
 					 AcceptsReturn="True" AcceptsTab="True"
 					 FontWeight="DemiBold" FontSize="16"
 					 x:Name="CommandsTextInput"/>
 			
-			<TextBox Text="{Binding InteliCommands, UpdateSourceTrigger=PropertyChanged}"
+			<TextBox Text="{Binding InteliCommandsText, UpdateSourceTrigger=PropertyChanged}"
 					 FontWeight="DemiBold"
 					 FontSize="16"
 					 IsHitTestVisible="False" Opacity="0.5" Background="Transparent"/>
