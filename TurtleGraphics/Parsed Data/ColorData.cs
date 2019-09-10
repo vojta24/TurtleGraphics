@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace TurtleGraphics {
 	public class ColorData : ParsedData {
@@ -16,6 +17,27 @@ namespace TurtleGraphics {
 			_random = new Random((int)DateTime.Now.Ticks);
 			_window = window;
 			Variables = variables;
+		}
+
+		public override bool IsBlock => false;
+
+		public override ParsedAction Action => ParsedAction.Color;
+
+		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
+			return new TurtleData {
+				Angle = previous.Angle,
+				SetAngle = previous.SetAngle,
+				Brush = (Brush)new BrushConverter().ConvertFromString(Arg1 == "random" ? RandColor() : Arg1),
+				BrushThickness = previous.BrushThickness,
+				MoveTo = previous.MoveTo,
+				PenDown = previous.PenDown,
+				Jump = false,
+				Action = Action,
+			};
+		}
+
+		public override IList<TurtleData> CompileBlock(TurtleData previous, CancellationToken token) {
+			throw new NotImplementedException();
 		}
 
 		public override Task Execute(CancellationToken token) {

@@ -124,7 +124,7 @@ namespace TurtleGraphics {
 			int lastChar = carret - 1;
 
 
-			if (lastChar < 1) {
+			if (lastChar < 0) {
 				return false;
 			}
 

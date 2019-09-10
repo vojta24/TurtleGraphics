@@ -64,11 +64,11 @@ namespace TurtleGraphics {
 					}
 
 					case "PenUp": {
-						return new ActionData(() => Window.PenDown = false, variables.Copy()) { Line = line };
+						return new PenPositionData(false, variables.Copy()) { Line = line };
 					}
 
 					case "PenDown": {
-						return new ActionData(() => Window.PenDown = true, variables.Copy()) { Line = line };
+						return new PenPositionData(true, variables.Copy()) { Line = line };
 					}
 
 					case "SetColor": {

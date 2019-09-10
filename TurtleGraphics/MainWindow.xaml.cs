@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -52,7 +53,9 @@ namespace TurtleGraphics {
 		private string _inteliCommandsText;
 		private ICommand _saveCommand;
 		private ICommand _loadCommand;
+		private int _anotherDelay;
 
+		public int AnotherDelay { get => _anotherDelay; set { _anotherDelay = value; Notify(nameof(AnotherDelay)); } }
 		public ICommand LoadCommand { get => _loadCommand; set { _loadCommand = value; Notify(nameof(LoadCommand)); } }
 		public ICommand SaveCommand { get => _saveCommand; set { _saveCommand = value; Notify(nameof(SaveCommand)); } }
 		public string InteliCommandsText { get => _inteliCommandsText; set { _inteliCommandsText = value; Notify(nameof(InteliCommandsText)); } }
@@ -230,6 +233,7 @@ namespace TurtleGraphics {
 		}
 
 		public void Rotate(double angle, bool setRotation) {
+			Console.WriteLine($"Angle: {angle}, {setRotation}");
 			if (double.IsNaN(angle)) {
 				Angle = 0;
 				TurtleRotation.Angle = 90;
@@ -256,16 +260,25 @@ namespace TurtleGraphics {
 			double targetX = X + Math.Cos(Angle) * length;
 			double targetY = Y + Math.Sin(Angle) * length;
 
-			await Draw(new Point(targetX, targetY));
+			await Draw(new Point(targetX, targetY), true);
 		}
 
 		#region Drawing lines
 
-		public async Task Draw(Point to) {
-			_currentFigure.Segments.Add(new LineSegment(new Point(X, Y), true) { IsSmoothJoin = true });
+		public async Task Draw(Point to, bool displace) {
+			if (displace) {
+				_currentFigure.Segments.Add(new LineSegment(new Point(X, Y), true) { IsSmoothJoin = true });
+			}
+			else {
+				_currentFigure.Segments.Add(new LineSegment(new Point(to.X, to.Y), true) { IsSmoothJoin = true });
+			}
 			X = to.X;
 			Y = to.Y;
-			await Displace(to);
+			if (displace) {
+				await Displace(to);
+			}
+
+			_currentFigure.Segments[_currentFigure.Segments.Count - 1].Freeze();
 		}
 
 
@@ -302,6 +315,18 @@ namespace TurtleGraphics {
 			ButtonCommand = StopCommand;
 			ButtonText = "Stop";
 			Queue<ParsedData> tasks = CommandParser.Parse(CommandsText, this);
+			Stopwatch s = new Stopwatch();
+			s.Start();
+			ButtonText = "START";
+			List<TurtleData> compiledTasks = await CompileTasks(tasks, cancellationTokenSource.Token);
+			s.Stop();
+			ButtonText = "DONE " + s.Elapsed;
+
+			await DrawData(compiledTasks);
+
+			await Task.Delay(1000);
+
+			//tasks = CommandParser.Parse(CommandsText, this);
 
 			foreach (var item in tasks) {
 				await item.Execute(cancellationTokenSource.Token);
@@ -310,10 +335,96 @@ namespace TurtleGraphics {
 				}
 			}
 			ButtonCommand = RunCommand;
-			ButtonText = "Run";
+			//ButtonText = "Run";
 			ToggleFullscreenEnabled = true;
 		}
 
+		private async Task DrawData(List<TurtleData> compiledTasks) {
+			TurtleData prev = compiledTasks[0];
+			Init();
+
+			for (int i = 1; i < compiledTasks.Count; i++) {
+
+				TurtleData data = compiledTasks[i];
+				if(i % AnotherDelay == 0) {
+					await Task.Delay(1);
+				}
+				switch (data.Action) {
+					case ParsedAction.NONE:
+						break;
+					case ParsedAction.Forward:
+						await Forward(data.Distance);
+						break;
+					case ParsedAction.Rotate:
+						Rotate(data.Angle, data.SetAngle);
+						break;
+					case ParsedAction.MoveTo:
+						X = data.MoveTo.X;
+						Y = data.MoveTo.Y;
+						NewPath();
+						break;
+					case ParsedAction.Color:
+						Color = ((SolidColorBrush)data.Brush).Color.ToString();
+						NewPath();
+						break;
+					case ParsedAction.Thickness:
+						BrushSize = data.BrushThickness;
+						NewPath();
+						break;
+					case ParsedAction.PenState:
+						PenDown = data.PenDown;
+						NewPath();
+						break;
+					default:
+						break;
+				}
+				//if(prev.Angle != data.Angle || (prev.Angle == data.Angle && prev.SetAngle != data.SetAngle))
+				//	Rotate(data.Angle, data.SetAngle);
+
+				//X = data.Next.X;
+				//Y = data.Next.Y;
+				//if (prev.BrushThickness != data.BrushThickness) {
+				//	BrushSize = data.BrushThickness;
+				//	NewPath();
+				//}
+				//if (prev.Brush != data.Brush) {
+				//	Color = ((SolidColorBrush)data.Brush).Color.ToString();
+				//	NewPath();
+				//}
+				//if (prev.PenDown != data.PenDown) {
+				//	PenDown = data.PenDown;
+				//	NewPath();
+				//}
+				//if (!data.Jump) {
+				//	await Draw(data.Next, false);
+				//}
+				//else {
+				//	NewPath();
+				//}
+				prev = data;
+			}
+		}
+
+		private Task<List<TurtleData>> CompileTasks(Queue<ParsedData> tasks, CancellationToken token) {
+			return Task.Run(() => {
+				List<TurtleData> ret = new List<TurtleData>(8192);
+
+				TurtleData initial = new TurtleData() { Angle = Angle, Brush = Brushes.Blue, BrushThickness = BrushSize, MoveTo = new Point(X, Y), PenDown = true };
+				ret.Add(initial);
+
+				while (tasks.Count > 0) {
+					ParsedData current = tasks.Dequeue();
+					if (current.IsBlock) {
+						ret.AddRange(current.CompileBlock(initial, token));
+					}
+					else {
+						ret.Add(current.Compile(initial, token));
+					}
+					initial = ret[ret.Count - 1];
+				}
+				return ret;
+			});
+		}
 
 		public void ToggleFullScreenAction() {
 			if (WindowStyle == WindowStyle.SingleBorderWindow) {

@@ -14,6 +14,8 @@ namespace TurtleGraphics {
 
 		public string Line { get; set; }
 
+		public abstract bool IsBlock { get; }
+
 		public Dictionary<string, object> Variables { get; set; }
 
 		public string[] Parameters { get; set; }
@@ -21,7 +23,15 @@ namespace TurtleGraphics {
 		public string Arg1 => Parameters[0];
 		public string Arg2 => Parameters[1];
 
+		public abstract ParsedAction Action { get; }
+
 		public abstract Task Execute(CancellationToken token);
+
+		public abstract TurtleData Compile(TurtleData previous, CancellationToken token);
+
+
+		public abstract IList<TurtleData> CompileBlock(TurtleData previous, CancellationToken token);
+
 
 		public abstract ParsedData Parse(string line, StringReader reader, Dictionary<string, object> variables);
 

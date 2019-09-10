@@ -95,6 +95,7 @@
     <Compile Include="Logic\Operator.cs" />
     <Compile Include="Parsed Data\ColorData.cs" />
     <Compile Include="Parsed Data\ForwardParseData.cs" />
+    <Compile Include="Parsed Data\ParsedAction.cs" />
     <Compile Include="Parsed Data\RotateParseData.cs" />
     <Compile Include="Logic\FunctionCallInfo.cs" />
     <Compile Include="Parsers\BlockParser.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="SaveDialog.xaml.cs">
       <DependentUpon>SaveDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TurtleData.cs" />
     <Compile Include="Validation\LineValidators.cs" />
     <Page Include="LoadSaveDataDialog.xaml">
       <SubType>Designer</SubType>
@@ -111,7 +113,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Parsed Data\ActionData.cs" />
+    <Compile Include="Parsed Data\PenPositionData.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>

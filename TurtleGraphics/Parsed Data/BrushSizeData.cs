@@ -12,6 +12,10 @@ namespace TurtleGraphics {
 
 		public const double BASE_BRUSH_SIZE = 4;
 
+		public override bool IsBlock => false;
+
+		public override ParsedAction Action => ParsedAction.Thickness;
+
 		public BrushSizeData(MainWindow window, IGenericExpression<double> expression, Dictionary<string, object> variables) {
 			_window = window;
 			_expression = expression;
@@ -32,6 +36,24 @@ namespace TurtleGraphics {
 
 		public override ParsedData Parse(string line, StringReader reader, Dictionary<string, object> variables) {
 			return this;
+		}
+
+		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
+			UpdateVars(_expression);
+			return new TurtleData {
+				Angle = previous.Angle,
+				SetAngle = previous.SetAngle,
+				Brush = previous.Brush,
+				BrushThickness = _expression.Evaluate(),
+				MoveTo = previous.MoveTo,
+				PenDown = previous.PenDown,
+				Jump = false,
+				Action = Action,
+			};
+		}
+
+		public override IList<TurtleData> CompileBlock(TurtleData previous, CancellationToken token) {
+			throw new System.NotImplementedException();
 		}
 	}
 }
