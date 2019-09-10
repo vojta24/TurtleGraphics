@@ -39,9 +39,9 @@ namespace TurtleGraphics {
 		private double _angle;
 		private double _x;
 		private double _y;
-		private int _delay;
+		private int _delay = 0;
 		private bool _penDown;
-		private int _iterationCount;
+		private int _iterationCount = 1;
 		private ICommand _buttonCommand;
 		private ICommand _stopCommand;
 		private string _buttonText = "Run";
@@ -53,7 +53,7 @@ namespace TurtleGraphics {
 		private string _inteliCommandsText;
 		private ICommand _saveCommand;
 		private ICommand _loadCommand;
-		private int _anotherDelay;
+		private int _anotherDelay = 1;
 
 		public int AnotherDelay { get => _anotherDelay; set { _anotherDelay = value; Notify(nameof(AnotherDelay)); } }
 		public ICommand LoadCommand { get => _loadCommand; set { _loadCommand = value; Notify(nameof(LoadCommand)); } }
@@ -160,7 +160,7 @@ namespace TurtleGraphics {
 			TurtleScale.ScaleX = 1;
 			TurtleScale.ScaleY = 1;
 			StartPoint = new Point(X, Y);
-			Angle = 0;
+			Angle = Math.PI/2;
 			BrushSize = 4;
 			Delay = 5;
 
@@ -257,8 +257,8 @@ namespace TurtleGraphics {
 		}
 
 		public async Task Forward(double length) {
-			double targetX = X + Math.Cos(Angle) * length;
-			double targetY = Y + Math.Sin(Angle) * length;
+			double targetX = X + Math.Sin(Angle) * length;
+			double targetY = Y + Math.Cos(Angle) * length;
 
 			await Draw(new Point(targetX, targetY), true);
 		}

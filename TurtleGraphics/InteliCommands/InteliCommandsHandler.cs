@@ -78,7 +78,7 @@ namespace TurtleGraphics {
 
 					window.InteliCommandsText = newText.Remove(values.start, values.length).Insert(values.start, commandFull);
 					_ignoreEvent = true;
-					window.CommandsText = newText.Insert(_addedLinesIndex, string.Concat(Enumerable.Repeat(Environment.NewLine, _addedLinesCount / Environment.NewLine.Length)) + lastFullChar);
+					window.CommandsText = newText.Insert(_addedLinesIndex, string.Concat(Enumerable.Repeat(Environment.NewLine, _addedLinesCount / Environment.NewLine.Length)) + (_addedLinesCount > 1 ? lastFullChar.ToString() : ""));
 					_ignoreEvent = true;
 					inputControl.CaretIndex = carret;
 				}
@@ -100,9 +100,9 @@ namespace TurtleGraphics {
 				else {
 					int selectionLen = inputControl.SelectionLength;
 					int selectionIndex = inputControl.SelectionStart;
-					window.InteliCommandsText = newText.Remove(_addedLinesIndex, _addedLinesCount + 1);
+					window.InteliCommandsText = newText.Remove(_addedLinesIndex, _addedLinesCount);
 					_ignoreEvent = true;
-					window.CommandsText = newText.Remove(_addedLinesIndex, _addedLinesCount + 1);
+					window.CommandsText = newText.Remove(_addedLinesIndex, (_addedLinesCount > 1 ? 1 : 0));
 					if (selectionLen != 0) {
 						_ignoreEvent = true;
 						inputControl.SelectionStart = selectionIndex;

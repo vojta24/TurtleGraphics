@@ -52,7 +52,7 @@
 				<CheckBox Content="Show Turtle" IsChecked="{Binding ShowTurtleCheckBox}"/>
 				<Slider Value="{Binding Delay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="50" TickFrequency="1" Ticks="5"/>
 				<Slider Value="{Binding IterationCount, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="100" TickFrequency="1" />
-				<Slider Value="{Binding AnotherDelay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" TickFrequency="1" Name="D"/>
+				<Slider Value="{Binding AnotherDelay, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="100" TickFrequency="1" Name="D"/>
 				<TextBlock Text="{Binding ElementName=D, Path=Value}"/>
 			</StackPanel>
 			<StackPanel Grid.Row="2">
