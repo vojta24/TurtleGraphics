@@ -57,6 +57,8 @@
 				<Button Content="{Binding ButtonText, FallbackValue='Run/Stop'}" Command="{Binding ButtonCommand}"/>
 				<Button Content="{Binding ButtonTextFullSize, FallbackValue='Run Full-size'}" Command="{Binding ButtonFullSizeCommand}"/>
 				<Button Content="Toggle Fullscreen" Command="{Binding ToggleFullScreenCommand}" IsEnabled="{Binding ToggleFullscreenEnabled}"/>
+				<Button Content="Save" Command="{Binding SaveCommand}"/>
+				<Button Content="Load" Command="{Binding LoadCommand}"/>
 			</StackPanel>
 		</Grid>
 		

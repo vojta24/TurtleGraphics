@@ -80,6 +80,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ContextExtensions.cs" />
+    <Compile Include="FileSystemManager.cs" />
     <Compile Include="InteliCommands\InteliCommandsHandler.cs" />
     <Compile Include="InteliCommands\InteliCommandsState.cs" />
     <Compile Include="Logic\AssignmentInfo.cs" />
@@ -94,6 +95,10 @@
     <Compile Include="Parsed Data\RotateParseData.cs" />
     <Compile Include="Logic\FunctionCallInfo.cs" />
     <Compile Include="Parsers\BlockParser.cs" />
+    <Compile Include="SavedData.cs" />
+    <Compile Include="SaveDialog.xaml.cs">
+      <DependentUpon>SaveDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Validation\LineValidators.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -111,6 +116,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="SaveDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Parsed Data\Base\ParsedData.cs" />

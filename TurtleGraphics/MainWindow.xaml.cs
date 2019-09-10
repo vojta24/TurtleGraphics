@@ -8,8 +8,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.Windows.Threading;
-using Flee.PublicTypes;
 using Igor.Models;
 using static TurtleGraphics.Helpers;
 
@@ -52,7 +50,11 @@ namespace TurtleGraphics {
 		private ICommand _buttonFullSizeCommand;
 		private bool _showTurtleCheckBox = true;
 		private string _inteliCommandsText;
+		private ICommand _saveCommand;
+		private ICommand _loadCommand;
 
+		public ICommand LoadCommand { get => _loadCommand; set { _loadCommand = value; Notify(nameof(LoadCommand)); } }
+		public ICommand SaveCommand { get => _saveCommand; set { _saveCommand = value; Notify(nameof(SaveCommand)); } }
 		public string InteliCommandsText { get => _inteliCommandsText; set { _inteliCommandsText = value; Notify(nameof(InteliCommandsText)); } }
 		public bool ShowTurtleCheckBox { get => _showTurtleCheckBox; set { _showTurtleCheckBox = value; Notify(nameof(ShowTurtleCheckBox)); } }
 		public ICommand ButtonFullSizeCommand { get => _buttonFullSizeCommand; set { _buttonFullSizeCommand = value; Notify(nameof(ButtonFullSizeCommand)); } }
@@ -87,6 +89,8 @@ namespace TurtleGraphics {
 
 		public double DrawWidth { get; set; }
 		public double DrawHeight { get; set; }
+		public static MainWindow Instance { get; set; }
+		public FileSystemManager FSSManager { get; set; }
 
 		public MainWindow() {
 			InitializeComponent();
@@ -103,27 +107,31 @@ namespace TurtleGraphics {
 					ControlArea.Width = new GridLength(0, GridUnitType.Pixel);
 					await Task.Delay(1);
 					DrawWidth = DrawAreaX.ActualWidth;
-					ButtonCommand.Execute(null);
-					await Task.Delay(1);
 					IterationCount = 1;
 					Delay = 1;
+					ButtonCommand.Execute(null);
 					PreviewKeyDown += MainWindow_KeyDown;
 				}
 			});
 			Loaded += MainWindow_Loaded;
+			FSSManager = new FileSystemManager();
+			SaveCommand = new Command(() => {
+				SaveDialog d = new SaveDialog();
+				Grid.SetColumnSpan(d, 2);
+				d.VerticalAlignment = VerticalAlignment.Center;
+				d.HorizontalAlignment = HorizontalAlignment.Center;
+				Paths.Children.Add(d);
+			});
+			LoadCommand = new Command(() => {
+				SavedData data = FSSManager.Load();
+				CommandsText = data.Code;
+			});
 			SizeChanged += MainWindow_SizeChanged;
 			CommandsTextInput.SelectionChanged += CommandsTextInput_SelectionChanged;
 			DataContext = this;
+			Instance = this;
 		}
 
-		private void CommandsTextInput_SelectionChanged(object sender, RoutedEventArgs e) {
-			Console.WriteLine("Carret: " + CommandsTextInput.CaretIndex);
-			Console.WriteLine("SelectionStart: " + CommandsTextInput.SelectionStart);
-			Console.WriteLine("Length: " + CommandsTextInput.SelectionLength);
-			_inteliCommands.Handle(this, CommandsTextInput);
-			Notify(nameof(CommandsText));
-			Notify(nameof(InteliCommandsText));
-		}
 
 		public void Init() {
 			List<UIElement> toRemove = new List<UIElement>();
@@ -151,7 +159,6 @@ namespace TurtleGraphics {
 			StartPoint = new Point(X, Y);
 			Angle = 0;
 			BrushSize = 4;
-			IterationCount = 10;
 			Delay = 5;
 
 			NewPath();
@@ -181,6 +188,14 @@ namespace TurtleGraphics {
 				await Task.Delay(1);
 				DrawWidth = DrawAreaX.ActualWidth;
 				PreviewKeyDown -= MainWindow_KeyDown;
+			}
+		}
+
+		private void CommandsTextInput_SelectionChanged(object sender, RoutedEventArgs e) {
+			if (_inteliCommandsEnabled) {
+				_inteliCommands.Handle(this, CommandsTextInput);
+				Notify(nameof(CommandsText));
+				Notify(nameof(InteliCommandsText));
 			}
 		}
 
