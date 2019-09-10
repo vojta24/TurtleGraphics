@@ -12,11 +12,25 @@ namespace TurtleGraphics {
 		private Dictionary<string, string> _inteliCommands = new Dictionary<string, string> {
 			{ "for", " (int i = 0; i < ; i++) {" + Environment.NewLine + Environment.NewLine + "}" },
 			{ "if", " () {" + Environment.NewLine + Environment.NewLine + "}" },
+			{ "R", "otate();" },
+			{ "M", "oveTo();" },
+			{ "F", "orward();" },
+			{ "PenU", "p();" },
+			{ "PenD", "own();" },
+			{ "SetB", "rushSize();" },
+			{ "SetC", "olor();" },
 		};
 
 		private Dictionary<string, int> _inteliCommandsIndexes = new Dictionary<string, int> {
 			{ "for", 17  },
 			{ "if", 2 },
+			{ "R", 6 },
+			{ "M", 6 },
+			{ "F", 7 },
+			{ "PenU", 2 },
+			{ "PenD", 4 },
+			{ "SetB", 9 },
+			{ "SetC", 5 },
 		};
 
 		public string GetInteliCommand(string value) {

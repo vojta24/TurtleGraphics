@@ -122,8 +122,8 @@ namespace TurtleGraphics {
 				d.HorizontalAlignment = HorizontalAlignment.Center;
 				Paths.Children.Add(d);
 			});
-			LoadCommand = new Command(() => {
-				SavedData data = FSSManager.Load();
+			LoadCommand = new Command(async () => {
+				SavedData data = await FSSManager.Load();
 				CommandsText = data.Code;
 			});
 			SizeChanged += MainWindow_SizeChanged;

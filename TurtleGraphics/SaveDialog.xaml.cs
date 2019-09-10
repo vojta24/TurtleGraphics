@@ -30,6 +30,11 @@ namespace TurtleGraphics {
 			CancelCommand = new Command(() => {
 				Common();
 			});
+			SaveNameInput.Loaded += SaveNameInput_Loaded;
+		}
+
+		private void SaveNameInput_Loaded(object sender, System.Windows.RoutedEventArgs e) {
+			SaveNameInput.Focus();
 		}
 
 		private void Common() {

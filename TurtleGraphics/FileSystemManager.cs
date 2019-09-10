@@ -2,12 +2,14 @@
 using System.IO;
 using System;
 using Microsoft.Win32;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace TurtleGraphics {
 	public class FileSystemManager {
 
-		private const string EXTENSION = ".tgs";
-		public string SavedDataPath => Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "SavedData");
+		public const string EXTENSION = ".tgs";
+		public string SavedDataPath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SavedData");
 
 		public FileSystemManager() {
 			if (!Directory.Exists(SavedDataPath)) {
@@ -26,18 +28,20 @@ namespace TurtleGraphics {
 		}
 
 
-		public SavedData Load() {
-			OpenFileDialog dialog = new OpenFileDialog();
-			dialog.DefaultExt = ".tgs";
-			dialog.InitialDirectory = SavedDataPath;
-			bool? res = dialog.ShowDialog();
+		public async Task<SavedData> Load() {
+			LoadSaveDataDialog d = new LoadSaveDataDialog();
+			d.Path = SavedDataPath;
+			d.VerticalAlignment = VerticalAlignment.Center;
+			d.HorizontalAlignment = HorizontalAlignment.Center;
+			MainWindow.Instance.Paths.Children.Add(d);
+			return await d.Select();
 
-			if (res.HasValue && res.Value) {
-				string lines = File.ReadAllText(dialog.FileName);
-				int lineIndex = lines.IndexOf('\r');
-				return new SavedData() { Name = lines.Substring(0, lineIndex), Code = lines.Substring(lineIndex + 2) };
-			}
-			return new SavedData() { Name = null };
+			//if (res.HasValue && res.Value) {
+			//	string lines = File.ReadAllText(dialog.FileName);
+			//	int lineIndex = lines.IndexOf('\r');
+			//	return new SavedData() { Name = lines.Substring(0, lineIndex), Code = lines.Substring(lineIndex + 2) };
+			//}
+			//return new SavedData() { Name = null };
 		}
 	}
 }

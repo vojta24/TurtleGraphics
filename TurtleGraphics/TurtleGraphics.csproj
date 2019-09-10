@@ -83,6 +83,9 @@
     <Compile Include="FileSystemManager.cs" />
     <Compile Include="InteliCommands\InteliCommandsHandler.cs" />
     <Compile Include="InteliCommands\InteliCommandsState.cs" />
+    <Compile Include="LoadSaveDataDialog.xaml.cs">
+      <DependentUpon>LoadSaveDataDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Logic\AssignmentInfo.cs" />
     <Compile Include="Logic\Condition.cs" />
     <Compile Include="Extensions.cs" />
@@ -100,6 +103,10 @@
       <DependentUpon>SaveDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Validation\LineValidators.cs" />
+    <Page Include="LoadSaveDataDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
