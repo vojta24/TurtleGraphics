@@ -55,7 +55,7 @@ namespace TurtleGraphics {
 		private ICommand _loadCommand;
 		private int _anotherDelay = 1;
 
-		public int AnotherDelay { get => _anotherDelay; set { _anotherDelay = value; Notify(nameof(AnotherDelay)); } }
+		public int CalculationFramesPreUIUpdate { get => _anotherDelay; set { _anotherDelay = value; Notify(nameof(CalculationFramesPreUIUpdate)); } }
 		public ICommand LoadCommand { get => _loadCommand; set { _loadCommand = value; Notify(nameof(LoadCommand)); } }
 		public ICommand SaveCommand { get => _saveCommand; set { _saveCommand = value; Notify(nameof(SaveCommand)); } }
 		public string InteliCommandsText { get => _inteliCommandsText; set { _inteliCommandsText = value; Notify(nameof(InteliCommandsText)); } }
@@ -69,7 +69,7 @@ namespace TurtleGraphics {
 		public ICommand ButtonCommand { get => _buttonCommand; set { _buttonCommand = value; Notify(nameof(ButtonCommand)); } }
 		public int IterationCount { get => _iterationCount; set { _iterationCount = value; Notify(nameof(IterationCount)); } }
 		public bool PenDown { get => _penDown; set { if (value == _penDown) return; _penDown = value; NewPath(); Notify(nameof(PenDown)); } }
-		public int Delay { get => _delay; set { _delay = value; Notify(nameof(Delay)); } }
+		public int PathAnimationFrames { get => _delay; set { _delay = value; Notify(nameof(PathAnimationFrames)); } }
 		public double Y { get => _y; set { _y = value; Notify(nameof(Y)); } }
 		public double X { get => _x; set { _x = value; Notify(nameof(X)); } }
 		public double Angle { get => _angle; set { _angle = value; Notify(nameof(Angle)); } }
@@ -88,10 +88,11 @@ namespace TurtleGraphics {
 		private CancellationTokenSource cancellationTokenSource;
 		private bool _inteliCommandsEnabled = true;
 		private InteliCommandsHandler _inteliCommands = new InteliCommandsHandler();
-
+		private ScrollViewer _inteliCommandsScroller;
 
 		public double DrawWidth { get; set; }
 		public double DrawHeight { get; set; }
+		public bool AnimatePath { get; set; }
 		public static MainWindow Instance { get; set; }
 		public FileSystemManager FSSManager { get; set; }
 
@@ -111,7 +112,7 @@ namespace TurtleGraphics {
 					await Task.Delay(1);
 					DrawWidth = DrawAreaX.ActualWidth;
 					IterationCount = 1;
-					Delay = 1;
+					PathAnimationFrames = 1;
 					ButtonCommand.Execute(null);
 					PreviewKeyDown += MainWindow_KeyDown;
 				}
@@ -160,9 +161,9 @@ namespace TurtleGraphics {
 			TurtleScale.ScaleX = 1;
 			TurtleScale.ScaleY = 1;
 			StartPoint = new Point(X, Y);
-			Angle = Math.PI/2;
+			Angle = Math.PI / 2;
 			BrushSize = 4;
-			Delay = 5;
+			PathAnimationFrames = 5;
 
 			NewPath();
 		}
@@ -173,7 +174,7 @@ namespace TurtleGraphics {
 		private void MainWindow_Loaded(object sender, RoutedEventArgs e) {
 			DrawWidth = DrawAreaX.ActualWidth;
 			DrawHeight = DrawAreaY.ActualHeight;
-			ContextExtensions.SetWindow(this);
+			_inteliCommandsScroller = FindDescendant<ScrollViewer>(InteliCommands);
 			Init();
 			Loaded -= MainWindow_Loaded;
 		}
@@ -202,6 +203,15 @@ namespace TurtleGraphics {
 			}
 		}
 
+
+		private void CommandsTextInput_ScrollChanged(object sender, ScrollChangedEventArgs e) {
+			Console.WriteLine(e.VerticalOffset);
+			if (_inteliCommandsScroller == null) {
+				return;
+			}
+			_inteliCommandsScroller.ScrollToVerticalOffset(e.VerticalOffset);
+		}
+
 		#endregion
 
 
@@ -211,6 +221,7 @@ namespace TurtleGraphics {
 			}
 
 			_currentPath = new Path();
+			Grid.SetColumn(_currentPath, 1);
 
 			if (!PenDown) {
 				_currentPath.Stroke = Brushes.Transparent;
@@ -222,18 +233,19 @@ namespace TurtleGraphics {
 			_currentPath.StrokeEndLineCap = PenLineCap.Round;
 			_currentPath.StrokeStartLineCap = PenLineCap.Round;
 
-			_currentPath.Data = new PathGeometry();
-			(_currentPath.Data as PathGeometry).Figures = new PathFigureCollection();
-			_currentFigure = new PathFigure();
-			_currentFigure.StartPoint = new Point(X, Y);
-			_currentFigure.Segments = new PathSegmentCollection();
-			(_currentPath.Data as PathGeometry).Figures.Add(_currentFigure);
+			PathGeometry pGeometry = new PathGeometry();
+			pGeometry.Figures = new PathFigureCollection();
+			_currentFigure = new PathFigure {
+				StartPoint = new Point(X, Y),
+				Segments = new PathSegmentCollection()
+			};
+
+			pGeometry.Figures.Add(_currentFigure);
+			_currentPath.Data = pGeometry;
 			Paths.Children.Add(_currentPath);
-			Grid.SetColumn(_currentPath, 1);
 		}
 
 		public void Rotate(double angle, bool setRotation) {
-			Console.WriteLine($"Angle: {angle}, {setRotation}");
 			if (double.IsNaN(angle)) {
 				Angle = 0;
 				TurtleRotation.Angle = 90;
@@ -241,44 +253,80 @@ namespace TurtleGraphics {
 			}
 			if (setRotation) {
 				Angle = ContextExtensions.AsRad(angle);
-				TurtleRotation.Angle = 90 + angle;
+				TurtleRotation.Angle = 90 - angle;
 			}
 			else {
 				Angle += ContextExtensions.AsRad(angle);
-				TurtleRotation.Angle += angle;
+				TurtleRotation.Angle -= angle;
 			}
 			if (Angle > 2 * Math.PI) {
 				Angle -= 2 * Math.PI;
 			}
 		}
 
-		public void SetPenDown(bool value) {
-			PenDown = value;
-		}
-
 		public async Task Forward(double length) {
 			double targetX = X + Math.Sin(Angle) * length;
 			double targetY = Y + Math.Cos(Angle) * length;
 
-			await Draw(new Point(targetX, targetY), true);
+			await Draw(new Point(targetX, targetY));
 		}
 
 		#region Drawing lines
 
-		public async Task Draw(Point to, bool displace) {
-			if (displace) {
-				_currentFigure.Segments.Add(new LineSegment(new Point(X, Y), true) { IsSmoothJoin = true });
+		private async Task DrawData(List<TurtleData> compiledTasks) {
+			Init();
+
+			for (int i = 0; i < compiledTasks.Count; i++) {
+				if (cancellationTokenSource.Token.IsCancellationRequested) {
+					return;
+				}
+
+				TurtleData data = compiledTasks[i];
+				if (i % CalculationFramesPreUIUpdate == 0) {
+					await Task.Delay(1);
+				}
+				switch (data.Action) {
+					case ParsedAction.NONE: { break; }
+					case ParsedAction.Forward: {
+						await Forward(data.Distance);
+						break;
+					}
+					case ParsedAction.Rotate: {
+						Rotate(data.Angle, data.SetAngle);
+						break;
+					}
+					case ParsedAction.MoveTo: {
+						X = data.MoveTo.X;
+						Y = data.MoveTo.Y;
+						NewPath();
+						break;
+					}
+					case ParsedAction.Color: {
+						Color = ((SolidColorBrush)data.Brush).Color.ToString();
+						NewPath();
+						break;
+					}
+					case ParsedAction.Thickness: {
+						BrushSize = data.BrushThickness;
+						double scale = BrushSize / 4;
+						TurtleScale.ScaleX = TurtleScale.ScaleY = scale;
+						NewPath();
+						break;
+					}
+					case ParsedAction.PenState: {
+						PenDown = data.PenDown;
+						NewPath();
+						break;
+					}
+				}
 			}
-			else {
-				_currentFigure.Segments.Add(new LineSegment(new Point(to.X, to.Y), true) { IsSmoothJoin = true });
-			}
+		}
+
+		public async Task Draw(Point to) {
+			_currentFigure.Segments.Add(new LineSegment(new Point(X, Y), true) { IsSmoothJoin = true });
 			X = to.X;
 			Y = to.Y;
-			if (displace) {
-				await Displace(to);
-			}
-
-			_currentFigure.Segments[_currentFigure.Segments.Count - 1].Freeze();
+			await Displace(to);
 		}
 
 
@@ -298,7 +346,9 @@ namespace TurtleGraphics {
 				TurtleTranslation.Y = lastSegment.Point.Y;
 				_currentFigure.Segments[last] = lastSegment;
 				currentInterpolation += increment;
-				await Task.Delay(Delay);
+				if (AnimatePath) {
+					await Task.Delay(1);
+				}
 			}
 			lastSegment.Freeze();
 		}
@@ -315,94 +365,14 @@ namespace TurtleGraphics {
 			ButtonCommand = StopCommand;
 			ButtonText = "Stop";
 			Queue<ParsedData> tasks = CommandParser.Parse(CommandsText, this);
-			Stopwatch s = new Stopwatch();
-			s.Start();
-			ButtonText = "START";
+
 			List<TurtleData> compiledTasks = await CompileTasks(tasks, cancellationTokenSource.Token);
-			s.Stop();
-			ButtonText = "DONE " + s.Elapsed;
 
 			await DrawData(compiledTasks);
 
-			await Task.Delay(1000);
-
-			//tasks = CommandParser.Parse(CommandsText, this);
-
-			foreach (var item in tasks) {
-				await item.Execute(cancellationTokenSource.Token);
-				if (cancellationTokenSource.Token.IsCancellationRequested) {
-					break;
-				}
-			}
 			ButtonCommand = RunCommand;
-			//ButtonText = "Run";
+			ButtonText = "Run";
 			ToggleFullscreenEnabled = true;
-		}
-
-		private async Task DrawData(List<TurtleData> compiledTasks) {
-			TurtleData prev = compiledTasks[0];
-			Init();
-
-			for (int i = 1; i < compiledTasks.Count; i++) {
-
-				TurtleData data = compiledTasks[i];
-				if(i % AnotherDelay == 0) {
-					await Task.Delay(1);
-				}
-				switch (data.Action) {
-					case ParsedAction.NONE:
-						break;
-					case ParsedAction.Forward:
-						await Forward(data.Distance);
-						break;
-					case ParsedAction.Rotate:
-						Rotate(data.Angle, data.SetAngle);
-						break;
-					case ParsedAction.MoveTo:
-						X = data.MoveTo.X;
-						Y = data.MoveTo.Y;
-						NewPath();
-						break;
-					case ParsedAction.Color:
-						Color = ((SolidColorBrush)data.Brush).Color.ToString();
-						NewPath();
-						break;
-					case ParsedAction.Thickness:
-						BrushSize = data.BrushThickness;
-						NewPath();
-						break;
-					case ParsedAction.PenState:
-						PenDown = data.PenDown;
-						NewPath();
-						break;
-					default:
-						break;
-				}
-				//if(prev.Angle != data.Angle || (prev.Angle == data.Angle && prev.SetAngle != data.SetAngle))
-				//	Rotate(data.Angle, data.SetAngle);
-
-				//X = data.Next.X;
-				//Y = data.Next.Y;
-				//if (prev.BrushThickness != data.BrushThickness) {
-				//	BrushSize = data.BrushThickness;
-				//	NewPath();
-				//}
-				//if (prev.Brush != data.Brush) {
-				//	Color = ((SolidColorBrush)data.Brush).Color.ToString();
-				//	NewPath();
-				//}
-				//if (prev.PenDown != data.PenDown) {
-				//	PenDown = data.PenDown;
-				//	NewPath();
-				//}
-				//if (!data.Jump) {
-				//	await Draw(data.Next, false);
-				//}
-				//else {
-				//	NewPath();
-				//}
-				prev = data;
-			}
 		}
 
 		private Task<List<TurtleData>> CompileTasks(Queue<ParsedData> tasks, CancellationToken token) {

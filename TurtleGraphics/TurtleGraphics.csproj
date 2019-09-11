@@ -99,6 +99,7 @@
     <Compile Include="Parsed Data\RotateParseData.cs" />
     <Compile Include="Logic\FunctionCallInfo.cs" />
     <Compile Include="Parsers\BlockParser.cs" />
+    <Compile Include="Parsers\IfStatementParser.cs" />
     <Compile Include="SavedData.cs" />
     <Compile Include="SaveDialog.xaml.cs">
       <DependentUpon>SaveDialog.xaml</DependentUpon>

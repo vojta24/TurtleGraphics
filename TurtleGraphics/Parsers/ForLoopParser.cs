@@ -123,7 +123,6 @@ namespace TurtleGraphics.Parsers {
 				Condition = condition,
 				Operator = _operator,
 				Variables = inherited.Copy(),
-				Line = line,
 				Lines = lines
 			};
 		}

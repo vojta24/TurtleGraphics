@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace TurtleGraphics {
 	public class PenPositionData : ParsedData {
@@ -33,18 +31,6 @@ namespace TurtleGraphics {
 
 		public override IList<TurtleData> CompileBlock(TurtleData previous, CancellationToken token) {
 			throw new NotImplementedException();
-		}
-
-		public override Task Execute(CancellationToken token) {
-			if (token.IsCancellationRequested) {
-				return Task.CompletedTask;
-			}
-			MainWindow.Instance.SetPenDown(PenState);
-			return Task.CompletedTask;
-		}
-
-		public override ParsedData Parse(string line, StringReader reader, Dictionary<string, object> variables) {
-			return this;
 		}
 	}
 }

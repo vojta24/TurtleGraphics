@@ -35,13 +35,6 @@ namespace TurtleGraphics {
 			d.HorizontalAlignment = HorizontalAlignment.Center;
 			MainWindow.Instance.Paths.Children.Add(d);
 			return await d.Select();
-
-			//if (res.HasValue && res.Value) {
-			//	string lines = File.ReadAllText(dialog.FileName);
-			//	int lineIndex = lines.IndexOf('\r');
-			//	return new SavedData() { Name = lines.Substring(0, lineIndex), Code = lines.Substring(lineIndex + 2) };
-			//}
-			//return new SavedData() { Name = null };
 		}
 	}
 }

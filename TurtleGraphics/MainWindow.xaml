@@ -28,12 +28,15 @@
 			<TextBox Text="{Binding CommandsText, UpdateSourceTrigger=PropertyChanged}"
 					 AcceptsReturn="True" AcceptsTab="True"
 					 FontWeight="DemiBold" FontSize="16"
-					 x:Name="CommandsTextInput"/>
+					 x:Name="CommandsTextInput"
+					 ScrollViewer.ScrollChanged="CommandsTextInput_ScrollChanged"/>
 			
 			<TextBox Text="{Binding InteliCommandsText, UpdateSourceTrigger=PropertyChanged}"
 					 FontWeight="DemiBold"
 					 FontSize="16"
-					 IsHitTestVisible="False" Opacity="0.5" Background="Transparent"/>
+					 IsHitTestVisible="False" Opacity="0.5" Background="Transparent"
+					 x:Name="InteliCommands">
+			</TextBox>
 			
 			<StackPanel Grid.Row="1">
 				<TextBlock>
@@ -50,10 +53,13 @@
 				</TextBlock>
 				<TextBox Name="BackgroundColor" Text="Transparent"/>
 				<CheckBox Content="Show Turtle" IsChecked="{Binding ShowTurtleCheckBox}"/>
-				<Slider Value="{Binding Delay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="50" TickFrequency="1" Ticks="5"/>
-				<Slider Value="{Binding IterationCount, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="100" TickFrequency="1" />
-				<Slider Value="{Binding AnotherDelay, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="100" TickFrequency="1" Name="D"/>
-				<TextBlock Text="{Binding ElementName=D, Path=Value}"/>
+				<CheckBox Content="Animate Path" IsChecked="{Binding AnimatePath}"/>
+				<Slider Value="{Binding IterationCount, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="50" TickFrequency="1" />
+				<Slider Value="{Binding CalculationFramesPreUIUpdate, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="50" TickFrequency="1" Name="D"/>
+				<TextBlock TextWrapping="Wrap">
+					<Run Text="Calculations before UI update:"/>
+					<Run Text="{Binding ElementName=D, Path=Value}"/>
+				</TextBlock>
 			</StackPanel>
 			<StackPanel Grid.Row="2">
 				<Button Content="{Binding ButtonText, FallbackValue='Run/Stop'}" Command="{Binding ButtonCommand}"/>

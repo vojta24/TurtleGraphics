@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Media;
 using Flee.PublicTypes;
 
 namespace TurtleGraphics {
@@ -20,6 +23,29 @@ namespace TurtleGraphics {
 			foreach (var item in b) {
 				a[item.Key] = item.Value;
 			}
+		}
+
+		public static T FindDescendant<T>(DependencyObject obj) where T : DependencyObject {
+			if (obj == null) return default;
+			int numberChildren = VisualTreeHelper.GetChildrenCount(obj);
+			if (numberChildren == 0) return default;
+
+			for (int i = 0; i < numberChildren; i++) {
+				DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+				if (child is T) {
+					return (T)child;
+				}
+			}
+
+			for (int i = 0; i < numberChildren; i++) {
+				DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+				var potentialMatch = FindDescendant<T>(child);
+				if (potentialMatch != default(T)) {
+					return potentialMatch;
+				}
+			}
+
+			throw new Exception($"{nameof(T)} not found in {obj}!");
 		}
 	}
 }

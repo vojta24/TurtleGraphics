@@ -40,7 +40,6 @@ namespace TurtleGraphics {
 		}
 
 
-
 		private static ParsedData ParseLine(string line, StringReader reader, Dictionary<string, object> variables) {
 			if (string.IsNullOrWhiteSpace(line) || line.Trim() == "}")
 				return null;
@@ -52,31 +51,31 @@ namespace TurtleGraphics {
 				}
 				switch (info.FunctionName) {
 					case "Rotate": {
-						return new RotateParseData(Window, ParseGenericExpression<double>(info.Arguments[0], variables), info, variables.Copy()) { Line = line };
+						return new RotateParseData(ParseGenericExpression<double>(info.Arguments[0], variables), info, variables.Copy());
 					}
 
 					case "Forward": {
-						return new ForwardParseData(Window, ParseGenericExpression<double>(info.Arguments[0], variables), variables.Copy()) { Line = line };
+						return new ForwardParseData(ParseGenericExpression<double>(info.Arguments[0], variables), variables.Copy());
 					}
 
 					case "SetBrushSize": {
-						return new BrushSizeData(Window, ParseGenericExpression<double>(info.Arguments[0], variables), variables.Copy()) { Line = line };
+						return new BrushSizeData(ParseGenericExpression<double>(info.Arguments[0], variables), variables.Copy());
 					}
 
 					case "PenUp": {
-						return new PenPositionData(false, variables.Copy()) { Line = line };
+						return new PenPositionData(false, variables.Copy());
 					}
 
 					case "PenDown": {
-						return new PenPositionData(true, variables.Copy()) { Line = line };
+						return new PenPositionData(true, variables.Copy());
 					}
 
 					case "SetColor": {
-						return new ColorData(Window, info.Arguments[0], variables.Copy()) { Line = line };
+						return new ColorData(info.Arguments[0], variables.Copy());
 					}
 
 					case "MoveTo": {
-						return new MoveData(Window, info.Arguments, variables.Copy()) { Line = line };
+						return new MoveData(info.Arguments, variables.Copy());
 					}
 
 					default: {
@@ -91,119 +90,24 @@ namespace TurtleGraphics {
 					conditionals.Peek().IsModifiable = false;
 				}
 				ForLoopData data = ForLoopParser.ParseForLoop(line, reader, variables);
-				data.Line = line;
 				return data;
 			}
 
 			if (LineValidators.IsConditional(line)) {
 				if (line.Contains("if")) {
-					ConditionalData data = ParseIfBlock(line, reader, variables.Copy());
+					ConditionalData data = IfStatementParser.ParseIfBlock(line, reader, variables.Copy());
 					conditionals.Push(data);
 					return data;
 				}
-				//if (line.Contains("else if")) {
-
-				//}
+				//TODO ElseIfs
 				if (line.Contains("else")) {
 					ConditionalData latest = conditionals.Peek();
-					latest.AddElse(line, reader);
+					latest.AddElse(reader);
 					latest.IsModifiable = false;
 					return null;
 				}
 			}
 			throw new NotImplementedException($"Unexpected squence no category: {line}");
-		}
-
-		private static ConditionalData ParseIfBlock(string line, StringReader reader, Dictionary<string, object> variables) {
-
-			//if (i > 50) {
-			//if (i <= 50) {
-			//if(i > 50) {
-			//if (i > 50){
-
-			string mod = line.Remove(0, 2).TrimStart();
-
-			//(i > 50) {
-			//(i <= 50) {
-			//(i > 50) {
-			//(i == 50){
-
-			mod = mod.Replace("{", "").Trim();
-
-
-			mod = mod.Trim('(', ')');
-
-			//Dumb
-			mod = mod.Replace("==", "=");
-
-			ExpressionContext context = new ExpressionContext();
-			context.Imports.AddType(typeof(Math));
-			context.Imports.AddType(typeof(ContextExtensions));
-
-
-			foreach (var item in variables) {
-				context.Variables[item.Key] = item.Value;
-			}
-
-			IGenericExpression<bool> ifCondition = context.CompileGeneric<bool>(mod);
-
-			List<string> lines = new List<string>();
-			string next = reader.ReadLine();
-			int openBarckets = 1;
-
-			if (next.Contains("{")) {
-				openBarckets++;
-			}
-			if (next.Contains("}")) {
-				openBarckets--;
-				if (openBarckets == 0) {
-					lines.Add(next);
-					return new ConditionalData(line, ifCondition, new Queue<ParsedData>()) {
-						Variables = variables.Copy(),
-					};
-				}
-			}
-			do {
-				lines.Add(next);
-				next = reader.ReadLine();
-				if (next.Contains("{")) {
-					openBarckets++;
-				}
-				if (next.Trim() == "}") {
-					openBarckets--;
-					if (openBarckets == 0) {
-						lines.Add(next);
-						break;
-					}
-				}
-			}
-			while (next != null);
-
-			char c = (char)reader.Peek();
-
-			List<ParsedData> singleIteration = new List<ParsedData>();
-
-			Queue<ParsedData> data = Parse(string.Join(Environment.NewLine, lines), Window, variables);
-			singleIteration.AddRange(data);
-
-			return new ConditionalData(line, ifCondition, data) {
-				Variables = variables.Copy(),
-			};
-
-		}
-
-		private static IDynamicExpression ParseExpression(string line, Dictionary<string, object> variables) {
-			ExpressionContext context = new ExpressionContext();
-
-			context.Imports.AddType(typeof(Math));
-			context.Imports.AddType(typeof(ContextExtensions));
-
-
-			foreach (KeyValuePair<string, object> item in variables) {
-				context.Variables.Add(item.Key, item.Value);
-			}
-
-			return context.CompileDynamic(line);
 		}
 
 		private static IGenericExpression<T> ParseGenericExpression<T>(string line, Dictionary<string, object> variables) {

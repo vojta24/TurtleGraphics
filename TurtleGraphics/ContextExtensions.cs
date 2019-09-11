@@ -3,7 +3,6 @@
 namespace TurtleGraphics {
 	public static class ContextExtensions {
 
-		private static MainWindow window;
 		private static readonly Random random = new Random();
 
 		public static double AsRad(double degrees) {
@@ -15,15 +14,11 @@ namespace TurtleGraphics {
 		}
 
 		public static double RandX() {
-			return random.NextDouble() * window.DrawWidth;
+			return random.NextDouble() * MainWindow.Instance.DrawWidth;
 		}
 
 		public static double RandY() {
-			return random.NextDouble() * window.DrawHeight;
-		}
-
-		internal static void SetWindow(MainWindow mainWindow) {
-			window = mainWindow;
+			return random.NextDouble() * MainWindow.Instance.DrawHeight;
 		}
 	}
 }

@@ -57,6 +57,7 @@ namespace TurtleGraphics {
 		private int _addedLinesCount;
 		private int _addedLinesIndex;
 		private bool _ignoreEvent = false;
+		private int _textLength;
 
 		public void Handle(MainWindow window, TextBox inputControl) {
 			if (_ignoreEvent) {
@@ -71,14 +72,13 @@ namespace TurtleGraphics {
 					_triggerCommand = newText.Substring(values.start, values.length);
 
 					string commandFull = GetInteliCommand(_triggerCommand);
-					char lastFullChar = commandFull[commandFull.Length - 1]; 
 					_addedLinesCount = (commandFull.Split('\n').Length - 1) * Environment.NewLine.Length;
 					_addedLinesIndex = inputControl.CaretIndex;
 					State = InteliCommandsState.IsSuggesting;
 
 					window.InteliCommandsText = newText.Remove(values.start, values.length).Insert(values.start, commandFull);
 					_ignoreEvent = true;
-					window.CommandsText = newText.Insert(_addedLinesIndex, string.Concat(Enumerable.Repeat(Environment.NewLine, _addedLinesCount / Environment.NewLine.Length)) + (_addedLinesCount > 1 ? lastFullChar.ToString() : ""));
+					window.CommandsText = newText.Insert(_addedLinesIndex, string.Concat(Enumerable.Repeat(Environment.NewLine, _addedLinesCount / Environment.NewLine.Length)));
 					_ignoreEvent = true;
 					inputControl.CaretIndex = carret;
 				}
@@ -86,6 +86,7 @@ namespace TurtleGraphics {
 					window.InteliCommandsText = newText;
 					window.CommandsText = newText;
 				}
+				_textLength = window.CommandsText.Length;
 			}
 			else {
 				int carret = inputControl.CaretIndex;
@@ -98,11 +99,28 @@ namespace TurtleGraphics {
 					inputControl.CaretIndex = lastChar - _triggerCommand.Length + GetIndexForCaret(_triggerCommand);
 				}
 				else {
+					if (lastChar < 0) {
+						State = InteliCommandsState.Normal;
+						window.InteliCommandsText = newText;
+						window.CommandsText = newText;
+						return;
+					}
+
 					int selectionLen = inputControl.SelectionLength;
 					int selectionIndex = inputControl.SelectionStart;
-					window.InteliCommandsText = newText.Remove(_addedLinesIndex, _addedLinesCount);
 					_ignoreEvent = true;
-					window.CommandsText = newText.Remove(_addedLinesIndex, (_addedLinesCount > 1 ? 1 : 0));
+					if (_textLength > newText.Length/* == newText.Length - _addedLinesCount + 1*/) {
+						window.InteliCommandsText = newText.Remove(_addedLinesIndex - 1, _addedLinesCount);
+						window.CommandsText = newText.Remove(_addedLinesIndex - 1, _addedLinesCount);
+					}
+					else if (_textLength < newText.Length/*_addedLinesIndex == newText.Length - _addedLinesCount - 1*/) {
+						window.InteliCommandsText = newText.Remove(_addedLinesIndex + 1, _addedLinesCount);
+						window.CommandsText = newText.Remove(_addedLinesIndex + 1, _addedLinesCount);
+					}
+					else {
+						window.InteliCommandsText = newText.Remove(_addedLinesIndex, _addedLinesCount);
+						window.CommandsText = newText.Remove(_addedLinesIndex, _addedLinesCount);
+					}
 					if (selectionLen != 0) {
 						_ignoreEvent = true;
 						inputControl.SelectionStart = selectionIndex;
@@ -132,13 +150,19 @@ namespace TurtleGraphics {
 				lastChar--;
 			}
 
-			if(lastChar >= 0 && value[lastChar] != '\n') {
+			if (lastChar >= 0 && value[lastChar] != '\n') {
 				return false;
 			}
 
 			lastChar++;
 
 			string sub = value.Substring(lastChar, carret - lastChar);
+
+			if (carret < value.Length) {
+				if (!char.IsWhiteSpace(value[carret])) {
+					return false;
+				}
+			}
 
 			if (_inteliCommands.ContainsKey(sub)) {
 				substringInfo = (lastChar, carret - lastChar);

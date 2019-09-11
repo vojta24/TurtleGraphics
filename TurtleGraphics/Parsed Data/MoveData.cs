@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using Flee.PublicTypes;
 
 namespace TurtleGraphics {
 	public class MoveData : ParsedData {
-		private readonly MainWindow _window;
 
 		private readonly ExpressionContext expression = new ExpressionContext();
 
 		private readonly IGenericExpression<double> x;
 		private readonly IGenericExpression<double> y;
 
-		public MoveData(MainWindow win, string[] args, Dictionary<string, object> variables) : base(args) {
-			_window = win;
+		public MoveData(string[] args, Dictionary<string, object> variables) : base(args) {
 			Variables = variables;
 
 			expression.Imports.AddType(typeof(Math));
@@ -53,27 +49,6 @@ namespace TurtleGraphics {
 
 		public override IList<TurtleData> CompileBlock(TurtleData previous, CancellationToken token) {
 			throw new NotImplementedException();
-		}
-
-		public override Task Execute(CancellationToken token) {
-			if (token.IsCancellationRequested) {
-				return Task.CompletedTask;
-			}
-			UpdateVars(x);
-			UpdateVars(y);
-
-			double x_ = Convert.ToDouble(x.Evaluate());
-			double y_ = Convert.ToDouble(y.Evaluate());
-
-			_window.X = x_;
-			_window.Y = y_;
-
-			_window.NewPath();
-			return Task.CompletedTask;
-		}
-
-		public override ParsedData Parse(string line, StringReader reader, Dictionary<string, object> variables) {
-			return this;
 		}
 	}
 }
