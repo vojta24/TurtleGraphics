@@ -4,19 +4,24 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TurtleGraphics"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="auto"/>
-			<RowDefinition/>
-		</Grid.RowDefinitions>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition/>
-			<ColumnDefinition/>
-		</Grid.ColumnDefinitions>
-		<TextBox Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding SaveFileName, UpdateSourceTrigger=PropertyChanged}" x:Name="SaveNameInput"/>
-		<Button Grid.Row="1" Content="Cancel" Command="{Binding CancelCommand}"/>
-		<Button Grid.Row="1" Grid.Column="1" Content="Save" Command="{Binding SaveCommand}"/>
+             mc:Ignorable="d" KeyboardNavigation.TabNavigation="Cycle">
+
+	<Grid>
+		<Grid Background="SlateGray" Opacity="0.8"/>
+		<Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="SlateGray">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="auto"/>
+				<RowDefinition/>
+			</Grid.RowDefinitions>
+			<StackPanel MinWidth="200">
+				<TextBlock Text="Name" FontSize="16" FontWeight="DemiBold"/>
+				<TextBox Text="{Binding SaveFileName, UpdateSourceTrigger=PropertyChanged}" x:Name="SaveNameInput" Margin="0 5 0 0"/>
+
+			</StackPanel>
+			<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+				<Button Content="Cancel" Command="{Binding CancelCommand}" Margin="5" Padding="2"/>
+				<Button Content="Save" Command="{Binding SaveCommand}" Margin="0 5" Padding="2"/>
+			</StackPanel>
+		</Grid>
 	</Grid>
 </UserControl>

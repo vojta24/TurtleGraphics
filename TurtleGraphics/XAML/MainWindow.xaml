@@ -70,7 +70,7 @@
 			</StackPanel>
 		</Grid>
 		
-		<Grid Grid.Column="1" Grid.ColumnSpan="99" Grid.RowSpan="99" Panel.ZIndex="1">
+		<Grid Grid.Column="1" Panel.ZIndex="1">
 
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="auto"/>
@@ -78,7 +78,7 @@
 			<Grid.RowDefinitions>
 				<RowDefinition Height="auto"/>
 			</Grid.RowDefinitions>
-			<Image  Source="Resources/turtle.png" Width="24" Height="24" Margin="-12,-12" Visibility="{Binding ShowTurtleCheckBox, Converter={StaticResource BoolToVis}}">
+			<Image Width="24" Height="24" Margin="-12,-12" Visibility="{Binding ShowTurtleCheckBox, Converter={StaticResource BoolToVis}}" Source="/TurtleGraphics;component/Resources/turtle.png">
 				<Image.RenderTransform>
 					<TransformGroup>
 						<RotateTransform x:Name="TurtleRotation" CenterX="12" CenterY="12"/>

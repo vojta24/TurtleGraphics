@@ -90,11 +90,14 @@ namespace TurtleGraphics {
 		private InteliCommandsHandler _inteliCommands = new InteliCommandsHandler();
 		private ScrollViewer _inteliCommandsScroller;
 
+
 		public double DrawWidth { get; set; }
 		public double DrawHeight { get; set; }
 		public bool AnimatePath { get; set; }
 		public static MainWindow Instance { get; set; }
 		public FileSystemManager FSSManager { get; set; }
+		public bool SaveDialogActive { get; set; }
+		public bool LoadDialogActive { get; set; }
 
 		public MainWindow() {
 			InitializeComponent();
@@ -120,15 +123,22 @@ namespace TurtleGraphics {
 			Loaded += MainWindow_Loaded;
 			FSSManager = new FileSystemManager();
 			SaveCommand = new Command(() => {
+				if (SaveDialogActive || LoadDialogActive)
+					return;
+				SaveDialogActive = true;
 				SaveDialog d = new SaveDialog();
-				Grid.SetColumnSpan(d, 2);
-				d.VerticalAlignment = VerticalAlignment.Center;
-				d.HorizontalAlignment = HorizontalAlignment.Center;
+				Grid.SetColumn(d, 1);
 				Paths.Children.Add(d);
 			});
 			LoadCommand = new Command(async () => {
+				if (SaveDialogActive || LoadDialogActive)
+					return;
+				LoadDialogActive = true;
 				SavedData data = await FSSManager.Load();
-				CommandsText = data.Code;
+				LoadDialogActive = false;
+				if (data.Name != null) {
+					CommandsText = data.Code;
+				}
 			});
 			SizeChanged += MainWindow_SizeChanged;
 			CommandsTextInput.SelectionChanged += CommandsTextInput_SelectionChanged;

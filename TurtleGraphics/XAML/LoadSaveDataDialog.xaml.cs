@@ -75,8 +75,11 @@ namespace TurtleGraphics {
 		}
 
 		public async Task<SavedData> Select() {
+			bool bck = MainWindow.Instance.ShowTurtleCheckBox;
+			MainWindow.Instance.ShowTurtleCheckBox = false;
 			evnt.Reset();
 			await Task.Run(evnt.Wait);
+			MainWindow.Instance.ShowTurtleCheckBox = bck;
 			return SelectedData;
 		}
 	}

@@ -29,10 +29,10 @@ namespace TurtleGraphics {
 
 
 		public async Task<SavedData> Load() {
-			LoadSaveDataDialog d = new LoadSaveDataDialog();
-			d.Path = SavedDataPath;
-			d.VerticalAlignment = VerticalAlignment.Center;
-			d.HorizontalAlignment = HorizontalAlignment.Center;
+			LoadSaveDataDialog d = new LoadSaveDataDialog {
+				Path = SavedDataPath
+			};
+			Grid.SetColumn(d, 1);
 			MainWindow.Instance.Paths.Children.Add(d);
 			return await d.Select();
 		}
