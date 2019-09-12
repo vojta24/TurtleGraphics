@@ -13,119 +13,132 @@ namespace TurtleGraphics.Parsers {
 
 			context.Variables.AddRange(inherited);
 
-			// for(int i = 0; i < 50; i++) {
-			// for (int i=0;i<20;i++){
-			line = line.Remove(0, 3).Trim();
+			string errorMessage = "";
+
+			try {
+				// for(int i = 0; i < 50; i++) {
+				// for (int i=0;i<20;i++){
+				line = line.Remove(0, 3).Trim();
 
 
-			// (int i = 0; i < 50; i++) {
-			// (int i=0;i<20;i++){
-			// (long val=1; val <50; val+=2){
+				// (int i = 0; i < 50; i++) {
+				// (int i=0;i<20;i++){
+				// (long val=1; val <50; val+=2){
+				errorMessage = "Invalid for loop syntax!";
+				line = line.Replace("(", "");
 
-			line = line.Replace("(", "");
+				// int i = 0; i < 50; i++) {
+				// int i=0;i<20;i++){
+				// long val=1; val <50; val+=2){
+				errorMessage = "Unsupported interation type!";
+				line = line.Replace("int ", "").Replace("long ", "");
 
-			// int i = 0; i < 50; i++) {
-			// int i=0;i<20;i++){
-			// long val=1; val <50; val+=2){
+				// i = 0; i < 50; i++) {
+				// i=0;i<20;i++){
+				// val=1; val <50; val+=2){
+				errorMessage = "Invalid for loop syntax!";
+				string variableName = line.Split('=')[0].Trim();
+				line = line.Remove(0, line.IndexOf("=") + 1).Trim();
 
-			line = line.Replace("int ", "").Replace("long ", "");
+				// 0; i < 50; i++) {
+				// 0 ;i<20;i++){
+				// 1; val <50; val+=2){
+				errorMessage = "Invalid expression for starting value!";
+				IGenericExpression<int> startValueExp = context.CompileGeneric<int>(line.Split(';')[0].Trim());
 
-			// i = 0; i < 50; i++) {
-			// i=0;i<20;i++){
-			// val=1; val <50; val+=2){
+				errorMessage = "Invalid for loop syntax!";
+				line = line.Remove(0, line.IndexOf(";") + 1).Trim();
 
-			string variableName = line.Split('=')[0].Trim();
-			line = line.Remove(0, line.IndexOf("=") + 1).Trim();
+				// i < 50; i++) {
+				// i<20 ;i++){
+				// val >=50; val+=2){
 
-			// 0; i < 50; i++) {
-			// 0 ;i<20;i++){
-			// 1; val <50; val+=2){
+				line = line.Remove(0, variableName.Length).Trim();
 
-			//int startValue = int.Parse(line.Split(';')[0].Trim());
-			IGenericExpression<int> startValueExp = context.CompileGeneric<int>(line.Split(';')[0].Trim());
+				// < 50; i++) {
+				// <20 ;i++){
+				// >=50; val+=2){
 
-			line = line.Remove(0, line.IndexOf(";") + 1).Trim();
-
-			// i < 50; i++) {
-			// i<20 ;i++){
-			// val >=50; val+=2){
-
-			line = line.Remove(0, variableName.Length).Trim();
-
-			// < 50; i++) {
-			// <20 ;i++){
-			// >=50; val+=2){
-
-			string lhs = line.Split(';')[0].Trim();
-			ConditionType condition = LogicParsers.ParseCondition(lhs);
+				string lhs = line.Split(';')[0].Trim();
+				ConditionType condition = LogicParsers.ParseCondition(lhs);
 
 
-			if (lhs.Contains("=")) {
+				if (lhs.Contains("=")) {
+					line = line.Remove(0, 2).Trim();
+				}
+				else {
+					line = line.Remove(0, 1).Trim();
+				}
+
+				string[] endValAndChange = line.Split(';');
+
+				errorMessage = "Invalid expression for end value!";
+				IGenericExpression<int> endValueExp = context.CompileGeneric<int>(endValAndChange[0].Trim());
+
+				errorMessage = "Invalid for loop syntax!";
+				line = endValAndChange[1].Trim();
+
+				// i++) {
+				// i++){
+				// val +=2){
+
+				line = line.Remove(0, variableName.Length).Trim();
+
+				// ++) {
+				// ++){
+				// +=2){
+
+				OperatorType _operator = LogicParsers.ParseOperator(line.Split(')')[0]);
+
 				line = line.Remove(0, 2).Trim();
+
+				// ) {
+				// ){
+				// 2){
+
+				IGenericExpression<int> changeValueExp = null;
+
+
+				if (_operator == OperatorType.PlusEquals || _operator == OperatorType.MinusEquals) {
+					string[] changeSplit = line.Split(')');
+					errorMessage = "Invalid expression for change of value!";
+					changeValueExp = context.CompileGeneric<int>(changeSplit[0]);
+					line = changeSplit[1].Trim();
+				}
+
+				// ) {
+				// ){
+				// ){
+
+				line = line.Replace(")", "");
+				if (line.IndexOf('{') == -1) {
+					throw new ParsingException("For loop requires a block of code!");
+				}
+				line = line.Replace("{", "");
+
+				if (!string.IsNullOrWhiteSpace(line)) {
+					throw new ParsingException("Invalid for loop syntax!");
+				}
+
+				List<string> lines = BlockParser.ParseBlock(reader);
+
+				return new ForLoopData() {
+					From = startValueExp,
+					To = endValueExp,
+					LoopVariable = variableName,
+					Change = changeValueExp,
+					Condition = condition,
+					Operator = _operator,
+					Variables = inherited.Copy(),
+					Lines = lines,
+				};
 			}
-			else {
-				line = line.Remove(0, 1).Trim();
+			catch (ParsingException) {
+				throw;
 			}
-
-			string[] endValAndChange = line.Split(';');
-
-			//int endValue = int.Parse(endValAndChange[0].Trim());
-			IGenericExpression<int> endValueExp = context.CompileGeneric<int>(endValAndChange[0].Trim());
-
-			line = endValAndChange[1].Trim();
-
-			// i++) {
-			// i++){
-			// val +=2){
-
-			line = line.Remove(0, variableName.Length).Trim();
-
-			// ++) {
-			// ++){
-			// +=2){
-
-			OperatorType _operator = LogicParsers.ParseOperator(line.Split(')')[0]);
-
-			line = line.Remove(0, 2).Trim();
-
-			// ) {
-			// ){
-			// 2){
-
-			IGenericExpression<int> changeValueExp = null;
-
-
-			if (_operator == OperatorType.PlusEquals || _operator == OperatorType.MinusEquals) {
-				string[] changeSplit = line.Split(')');
-				//change = int.Parse(changeSplit[0]);
-				changeValueExp = context.CompileGeneric<int>(changeSplit[0]);
-				line = changeSplit[1].Trim();
+			catch (Exception e) {
+				throw new ParsingException(errorMessage, e);
 			}
-
-			// ) {
-			// ){
-			// ){
-
-			line = line.Replace(")", "");
-			line = line.Replace("{", "");
-
-			if (!string.IsNullOrWhiteSpace(line)) {
-				throw new Exception("Follow the syntax pls?");
-			}
-
-			List<string> lines = BlockParser.ParseBlock(reader);
-
-			return new ForLoopData() {
-				From = startValueExp,
-				To = endValueExp,
-				LoopVariable = variableName,
-				Change = changeValueExp,
-				Condition = condition,
-				Operator = _operator,
-				Variables = inherited.Copy(),
-				Lines = lines
-			};
 		}
-
 	}
 }

@@ -12,6 +12,7 @@ namespace TurtleGraphics {
 		public Queue<ParsedData> ElseData { get; set; } = null;
 		public IList<(IGenericExpression<bool>, Queue<ParsedData>)> ElseIfs { get; set; }
 		public bool IsModifiable { get; set; } = true;
+		public int LineIndex { get; set; }
 
 		public override bool IsBlock => true;
 
@@ -51,6 +52,10 @@ namespace TurtleGraphics {
 			List<TurtleData> interData = new List<TurtleData>();
 			ParsedData current;
 			int counter = 0;
+			if (data.Count == 0) {
+				return interData;
+			}
+
 			while (data.Count > 0) {
 				token.ThrowIfCancellationRequested();
 				current = data.Dequeue();

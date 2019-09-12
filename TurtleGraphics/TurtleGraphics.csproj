@@ -79,12 +79,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Exceptions\ParsingException.cs" />
     <Compile Include="Parsed Data\ContextExtensions.cs" />
     <Compile Include="IO\FileSystemManager.cs" />
     <Compile Include="InteliCommands\InteliCommandsHandler.cs" />
     <Compile Include="InteliCommands\InteliCommandsState.cs" />
     <Compile Include="XAML\CompilationStatus.xaml.cs">
       <DependentUpon>CompilationStatus.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\ExceptionDisplay.xaml.cs">
+      <DependentUpon>ExceptionDisplay.xaml</DependentUpon>
     </Compile>
     <Compile Include="XAML\LoadSaveDataDialog.xaml.cs">
       <DependentUpon>LoadSaveDataDialog.xaml</DependentUpon>
@@ -110,6 +114,10 @@
     <Compile Include="Parsers\TurtleData.cs" />
     <Compile Include="Validation\LineValidators.cs" />
     <Page Include="XAML\CompilationStatus.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="XAML\ExceptionDisplay.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

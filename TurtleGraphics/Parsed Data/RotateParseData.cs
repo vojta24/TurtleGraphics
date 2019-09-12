@@ -11,15 +11,19 @@ namespace TurtleGraphics {
 		public RotateParseData(IGenericExpression<double> expression, FunctionCallInfo info, Dictionary<string, object> variables) {
 			_expression = expression;
 			Variables = variables;
-
-			if (info.Arguments.Length == 2) {
-				bool.TryParse(info.Arguments[1], out _setRotation);
+			string exceptionMessage = "Invalid arguments for rotation";
+			try {
+				if (info.Arguments.Length == 2) {
+					SetRotation = bool.Parse(info.Arguments[1]);
+				}
+			}
+			catch (Exception e) {
+				throw new ParsingException(exceptionMessage, e);
 			}
 		}
 
 		public double Angle { get; set; } = double.NaN;
-		private bool _setRotation;
-		public bool SetRotation { get => _setRotation; set => _setRotation = value; }
+		public bool SetRotation { get; set; }
 
 		public override bool IsBlock => false;
 

@@ -22,9 +22,16 @@ namespace TurtleGraphics {
 			foreach (var item in variables) {
 				expression.Variables[item.Key] = item.Value;
 			}
-
-			x = expression.CompileGeneric<double>(args[0]);
-			y = expression.CompileGeneric<double>(args[1]);
+			string exceptionMessage = "";
+			try {
+				exceptionMessage = "Invalid expression for X coordinate!";
+				x = expression.CompileGeneric<double>(args[0]);
+				exceptionMessage = "Invalid expression for Y coordinate!";
+				y = expression.CompileGeneric<double>(args[1]);
+			}
+			catch (Exception e) {
+				throw new ParsingException(exceptionMessage, e);
+			}
 		}
 
 		public override bool IsBlock => false;

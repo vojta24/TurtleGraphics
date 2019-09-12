@@ -90,6 +90,7 @@ namespace TurtleGraphics {
 		private InteliCommandsHandler _inteliCommands = new InteliCommandsHandler();
 		private ScrollViewer _inteliCommandsScroller;
 		private readonly CompilationStatus _compilationStatus = new CompilationStatus();
+		private readonly ExceptionDisplay _exceptionDisplay = new ExceptionDisplay();
 
 
 		public double DrawWidth { get; set; }
@@ -99,6 +100,7 @@ namespace TurtleGraphics {
 		public FileSystemManager FSSManager { get; set; }
 		public bool SaveDialogActive { get; set; }
 		public bool LoadDialogActive { get; set; }
+		public bool ExceptionDialogActive { get; set; }
 
 		public MainWindow() {
 			InitializeComponent();
@@ -111,7 +113,7 @@ namespace TurtleGraphics {
 			ButtonCommand = RunCommand;
 			ToggleFullScreenCommand = new Command(ToggleFullScreenAction);
 			ButtonFullSizeCommand = new Command(async () => {
-				if (ButtonCommand == RunCommand) {
+				if (ButtonCommand == RunCommand && NoWindowsActive) {
 					ControlArea.Width = new GridLength(0, GridUnitType.Pixel);
 					await Task.Delay(1);
 					DrawWidth = DrawAreaX.ActualWidth;
@@ -124,7 +126,7 @@ namespace TurtleGraphics {
 			Loaded += MainWindow_Loaded;
 			FSSManager = new FileSystemManager();
 			SaveCommand = new Command(() => {
-				if (SaveDialogActive || LoadDialogActive)
+				if (!NoWindowsActive)
 					return;
 				SaveDialogActive = true;
 				SaveDialog d = new SaveDialog();
@@ -132,7 +134,7 @@ namespace TurtleGraphics {
 				Paths.Children.Add(d);
 			});
 			LoadCommand = new Command(async () => {
-				if (SaveDialogActive || LoadDialogActive)
+				if (!NoWindowsActive)
 					return;
 				LoadDialogActive = true;
 				SavedData data = await FSSManager.Load();
@@ -386,6 +388,12 @@ namespace TurtleGraphics {
 				//Operation was cancelled
 				_compilationStatus.Stop();
 			}
+			catch(ParsingException e) {
+				_compilationStatus.Stop();
+				_exceptionDisplay.Exception = e;
+				_exceptionDisplay.ExceptionMessage = e.Message;
+				_exceptionDisplay.Show();
+			}
 			finally {
 				ButtonCommand = RunCommand;
 				ButtonText = "Run";
@@ -424,6 +432,8 @@ namespace TurtleGraphics {
 				WindowState = WindowState.Normal;
 			}
 		}
+
+		public bool NoWindowsActive => !(SaveDialogActive || LoadDialogActive || ExceptionDialogActive);
 
 		#endregion
 	}

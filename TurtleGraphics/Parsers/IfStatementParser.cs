@@ -19,12 +19,26 @@ namespace TurtleGraphics.Parsers {
 			//(i > 50) {
 			//(i == 50){
 
+			if (line.IndexOf('{') == -1) {
+				throw new ParsingException("If statement requires a block of code!");
+			}
+
 			mod = mod.Replace("{", "").Trim();
 
+			if (line.IndexOf('(') == -1) {
+				throw new ParsingException("If statement invalid syntax!");
+			}
+
+			if (line.IndexOf(')') == -1) {
+				throw new ParsingException("If statement invalid syntax!");
+			}
 
 			mod = mod.Trim('(', ')');
 
-			//Dumb
+			if (mod.IndexOf("=") == mod.LastIndexOf("=")) {
+				throw new ParsingException("If statement invalid syntax (== for comparison)!");
+			}
+
 			mod = mod.Replace("==", "=");
 
 			ExpressionContext context = new ExpressionContext();
@@ -36,50 +50,25 @@ namespace TurtleGraphics.Parsers {
 				context.Variables[item.Key] = item.Value;
 			}
 
-			IGenericExpression<bool> ifCondition = context.CompileGeneric<bool>(mod);
+			try {
+				IGenericExpression<bool> ifCondition = context.CompileGeneric<bool>(mod);
+				List<string> lines = BlockParser.ParseBlock(reader);
 
-			List<string> lines = new List<string>();
-			string next = reader.ReadLine();
-			int openBarckets = 1;
+				List<ParsedData> isStatement = new List<ParsedData>();
 
-			if (next.Contains("{")) {
-				openBarckets++;
+				Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), MainWindow.Instance, variables);
+				isStatement.AddRange(data);
+
+				return new ConditionalData(line, ifCondition, data) {
+					Variables = variables.Copy(),
+				};
 			}
-			if (next.Contains("}")) {
-				openBarckets--;
-				if (openBarckets == 0) {
-					lines.Add(next);
-					return new ConditionalData(line, ifCondition, new Queue<ParsedData>()) {
-						Variables = variables.Copy(),
-					};
-				}
+			catch (ParsingException) {
+				throw;
 			}
-			do {
-				lines.Add(next);
-				next = reader.ReadLine();
-				if (next.Contains("{")) {
-					openBarckets++;
-				}
-				if (next.Trim() == "}") {
-					openBarckets--;
-					if (openBarckets == 0) {
-						lines.Add(next);
-						break;
-					}
-				}
+			catch (Exception e) {
+				throw new ParsingException("Invalid boolean expression!", e);
 			}
-			while (next != null);
-
-			List<ParsedData> singleIteration = new List<ParsedData>();
-
-			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), MainWindow.Instance, variables);
-			singleIteration.AddRange(data);
-
-			return new ConditionalData(line, ifCondition, data) {
-				Variables = variables.Copy(),
-			};
-
 		}
-
 	}
 }

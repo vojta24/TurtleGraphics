@@ -12,7 +12,6 @@ namespace TurtleGraphics {
 		private static readonly Stack<ConditionalData> conditionals = new Stack<ConditionalData>();
 
 		public static Queue<ParsedData> Parse(string commands, MainWindow window, Dictionary<string, object> additionalVars = null) {
-
 			Window = window;
 			conditionals.Clear();
 			Dictionary<string, object> globalVars = new Dictionary<string, object>() {
@@ -79,7 +78,7 @@ namespace TurtleGraphics {
 					}
 
 					default: {
-						throw new NotImplementedException($"Unexpected squence function call: {line}");
+						throw new ParsingException($"Unknown function: {line}");
 					}
 				}
 
@@ -99,7 +98,6 @@ namespace TurtleGraphics {
 					conditionals.Push(data);
 					return data;
 				}
-				//TODO ElseIfs
 				if (line.Contains("else")) {
 					ConditionalData latest = conditionals.Peek();
 					latest.AddElse(reader);
@@ -107,7 +105,7 @@ namespace TurtleGraphics {
 					return null;
 				}
 			}
-			throw new NotImplementedException($"Unexpected squence no category: {line}");
+			throw new ParsingException($"Unexpected squence at: {line}");
 		}
 
 		private static IGenericExpression<T> ParseGenericExpression<T>(string line, Dictionary<string, object> variables) {
@@ -120,8 +118,12 @@ namespace TurtleGraphics {
 			foreach (KeyValuePair<string, object> item in variables) {
 				context.Variables.Add(item.Key, item.Value);
 			}
-
-			return context.CompileGeneric<T>(line);
+			try {
+				return context.CompileGeneric<T>(line);
+			}
+			catch (Exception e) {
+				throw new ParsingException($"Unable to parse expression of {typeof(T).FullName} from '{line}'", e);
+			}
 		}
 	}
 }

@@ -34,6 +34,11 @@ namespace TurtleGraphics {
 				}
 			}
 			while (next != null);
+
+			if(openBarckets != 0) {
+				throw new ParsingException("Missing closing bracket!");
+			}
+
 			return ret;
 		}
 	}
