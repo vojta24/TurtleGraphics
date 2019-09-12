@@ -52,6 +52,7 @@ namespace TurtleGraphics {
 			ParsedData current;
 			int counter = 0;
 			while (data.Count > 0) {
+				token.ThrowIfCancellationRequested();
 				current = data.Dequeue();
 				counter++;
 				if (current.IsBlock) {

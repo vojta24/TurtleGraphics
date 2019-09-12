@@ -32,6 +32,7 @@ namespace TurtleGraphics {
 		public override ParsedAction Action => ParsedAction.MoveTo;
 
 		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
+			token.ThrowIfCancellationRequested();
 			UpdateVars(x);
 			UpdateVars(y);
 

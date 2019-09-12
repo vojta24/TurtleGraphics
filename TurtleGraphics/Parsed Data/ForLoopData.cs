@@ -46,6 +46,7 @@ namespace TurtleGraphics {
 			}
 
 			void Exec(int i) {
+				token.ThrowIfCancellationRequested();
 				for (int counter = 0; counter < data.Count; counter++) {
 					current = data[counter];
 					current.Variables[LoopVariable] = i;

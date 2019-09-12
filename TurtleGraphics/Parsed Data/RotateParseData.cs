@@ -26,6 +26,7 @@ namespace TurtleGraphics {
 		public override ParsedAction Action => ParsedAction.Rotate;
 
 		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
+			token.ThrowIfCancellationRequested();
 			UpdateVars(_expression);
 			return new TurtleData {
 				Angle = _expression == null ? 0 : _expression.Evaluate(),

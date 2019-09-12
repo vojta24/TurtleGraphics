@@ -376,16 +376,21 @@ namespace TurtleGraphics {
 			cancellationTokenSource = new CancellationTokenSource();
 			ButtonCommand = StopCommand;
 			ButtonText = "Stop";
-			Queue<ParsedData> tasks = CommandParser.Parse(CommandsText, this);
-
-			List<TurtleData> compiledTasks = await CompileTasks(tasks, cancellationTokenSource.Token);
-			_compilationStatus.Stop();
-
-			await DrawData(compiledTasks);
-
-			ButtonCommand = RunCommand;
-			ButtonText = "Run";
-			ToggleFullscreenEnabled = true;
+			try {
+				Queue<ParsedData> tasks = CommandParser.Parse(CommandsText, this);
+				List<TurtleData> compiledTasks = await CompileTasks(tasks, cancellationTokenSource.Token);
+				_compilationStatus.Stop();
+				await DrawData(compiledTasks);
+			}
+			catch (OperationCanceledException) {
+				//Operation was cancelled
+				_compilationStatus.Stop();
+			}
+			finally {
+				ButtonCommand = RunCommand;
+				ButtonText = "Run";
+				ToggleFullscreenEnabled = true;
+			}
 		}
 
 		private Task<List<TurtleData>> CompileTasks(Queue<ParsedData> tasks, CancellationToken token) {

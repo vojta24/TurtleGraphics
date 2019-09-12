@@ -19,6 +19,7 @@ namespace TurtleGraphics {
 		}
 
 		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
+			token.ThrowIfCancellationRequested();
 			UpdateVars(_expression);
 			return new TurtleData {
 				Angle = previous.Angle,

@@ -20,10 +20,14 @@ namespace TurtleGraphics {
 		public override ParsedAction Action => ParsedAction.Color;
 
 		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
+			token.ThrowIfCancellationRequested();
+			Brush brush = (Brush)new BrushConverter().ConvertFromString(Arg1 == "random" ? RandColor() : Arg1);
+			brush.Freeze();
+
 			return new TurtleData {
 				Angle = previous.Angle,
 				SetAngle = previous.SetAngle,
-				Brush = (Brush)new BrushConverter().ConvertFromString(Arg1 == "random" ? RandColor() : Arg1),
+				Brush = brush,
 				BrushThickness = previous.BrushThickness,
 				MoveTo = previous.MoveTo,
 				PenDown = previous.PenDown,

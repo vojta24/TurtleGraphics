@@ -21,6 +21,7 @@ namespace TurtleGraphics {
 		public override ParsedAction Action => ParsedAction.Forward;
 
 		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
+			token.ThrowIfCancellationRequested();
 			UpdateVars(_expression);
 			Distance = _expression.Evaluate();
 			return new TurtleData {
