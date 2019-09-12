@@ -88,6 +88,7 @@
 				</Image.RenderTransform>
 			</Image>
 		</Grid>
-			
+		
+		<local:CompilationStatus/>
 	</Grid>
 </Window>

@@ -89,6 +89,7 @@ namespace TurtleGraphics {
 		private bool _inteliCommandsEnabled = true;
 		private InteliCommandsHandler _inteliCommands = new InteliCommandsHandler();
 		private ScrollViewer _inteliCommandsScroller;
+		private readonly CompilationStatus _compilationStatus = new CompilationStatus();
 
 
 		public double DrawWidth { get; set; }
@@ -369,6 +370,7 @@ namespace TurtleGraphics {
 		#region Actions
 
 		private async Task RunCommandAction() {
+			_compilationStatus.Start();
 			ToggleFullscreenEnabled = false;
 			Init();
 			cancellationTokenSource = new CancellationTokenSource();
@@ -377,6 +379,7 @@ namespace TurtleGraphics {
 			Queue<ParsedData> tasks = CommandParser.Parse(CommandsText, this);
 
 			List<TurtleData> compiledTasks = await CompileTasks(tasks, cancellationTokenSource.Token);
+			_compilationStatus.Stop();
 
 			await DrawData(compiledTasks);
 
