@@ -25,7 +25,7 @@ namespace TurtleGraphics.Parsers {
 				// (int i=0;i<20;i++){
 				// (long val=1; val <50; val+=2){
 				errorMessage = "Invalid for loop syntax!";
-				mod = mod.Replace("(", "");
+				mod = mod.Remove(0, 1);
 
 				// int i = 0; i < 50; i++) {
 				// int i=0;i<20;i++){
@@ -36,8 +36,13 @@ namespace TurtleGraphics.Parsers {
 				// i = 0; i < 50; i++) {
 				// i=0;i<20;i++){
 				// val=1; val <50; val+=2){
-				errorMessage = "Invalid for loop syntax!";
+				errorMessage = "Redefinition of variable!";
 				string variableName = mod.Split('=')[0].Trim();
+
+				if (inherited.ContainsKey(variableName)) {
+					throw new ParsingException(errorMessage) { LineText = line };
+				}
+
 				mod = mod.Remove(0, mod.IndexOf("=") + 1).Trim();
 
 				// 0; i < 50; i++) {

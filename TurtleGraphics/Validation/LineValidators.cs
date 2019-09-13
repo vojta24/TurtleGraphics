@@ -79,7 +79,14 @@ namespace TurtleGraphics.Validation {
 
 		public static bool IsForLoop(string line) {
 			string[] split = line.Split('(', ')');
-			return split.Length == 3 && split[0].Trim() == "for";
+			bool startsWithFor = line.StartsWith("for");
+			bool endsWithBracket = line.EndsWith("{");
+
+			if (!(startsWithFor || endsWithBracket)) return false;
+
+			bool isValidType = IsType(split[1].Split()[0], out _);
+
+			return split.Length >= 3 && startsWithFor && endsWithBracket && isValidType;
 		}
 
 		internal static bool IsConditional(string line) {

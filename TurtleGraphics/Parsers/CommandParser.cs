@@ -25,12 +25,12 @@ namespace TurtleGraphics {
 							start++;
 							continue;
 						}
-						LineIndexes.Add($"{{{start}}}" + split[i], i);
+						LineIndexes.Add($"{{{start}}}" + split[i], i + 1);
 						break;
 					}
 				}
 				else {
-					LineIndexes.Add(split[i], i);
+					LineIndexes.Add(split[i], i + 1);
 				}
 			}
 
@@ -112,7 +112,7 @@ namespace TurtleGraphics {
 					}
 
 					default: {
-						throw new ParsingException($"Unknown function: {line}");
+						throw new ParsingException($"Unknown function!") { LineText = line };
 					}
 				}
 
@@ -139,7 +139,7 @@ namespace TurtleGraphics {
 					return null;
 				}
 			}
-			throw new ParsingException($"Unexpected squence at: {line}");
+			throw new ParsingException($"Unexpected squence!") { LineText = line };
 		}
 
 		private static IGenericExpression<T> ParseGenericExpression<T>(string line, string fullLine, Dictionary<string, object> variables) {

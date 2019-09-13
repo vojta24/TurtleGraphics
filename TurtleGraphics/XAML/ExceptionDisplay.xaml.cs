@@ -28,6 +28,7 @@ namespace TurtleGraphics {
 			_dismissCommand = new Command(() => {
 				MainWindow.Instance.Paths.Children.Remove(this);
 				MainWindow.Instance.ShowTurtleCheckBox = _turtleVisibilityBck;
+				MainWindow.Instance.ExceptionDialogActive = false;
 			});
 			Loaded += ExceptionDisplay_Loaded;
 		}
@@ -47,7 +48,13 @@ namespace TurtleGraphics {
 
 		public string StackTrace { get => _stackTrace; set { _stackTrace = value; Notify(nameof(StackTrace)); } }
 		public ICommand DismissCommand { get => _dismissCommand; set { _dismissCommand = value; Notify(nameof(DismissCommand)); } }
-		public string ExceptionMessage { get => _exceptionMessage; set { _exceptionMessage = value + $"{Environment.NewLine}  at line: {Exception.LineText}"; Notify(nameof(ExceptionMessage)); } }
+		public string ExceptionMessage {
+			get => _exceptionMessage;
+			set {
+				_exceptionMessage = value + $"{Environment.NewLine}  at line ({CommandParser.LineIndexes[Exception.LineText]}): {Exception.LineText}";
+				Notify(nameof(ExceptionMessage));
+			}
+		}
 
 		public ParsingException Exception {
 			get => _exception;

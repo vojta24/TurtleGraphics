@@ -249,9 +249,10 @@ namespace TurtleGraphics {
 			_currentPath.StrokeStartLineCap = PenLineCap.Round;
 			PathGeometry pGeometry = new PathGeometry();
 			pGeometry.Figures = new PathFigureCollection();
+			_currentSegment = new PolyLineSegment();
 			_currentFigure = new PathFigure {
 				StartPoint = new Point(X, Y),
-				Segments = new PathSegmentCollection()
+				Segments = new PathSegmentCollection { _currentSegment }
 			};
 			pGeometry.Figures.Add(_currentFigure);
 			_currentPath.Data = pGeometry;
@@ -336,7 +337,7 @@ namespace TurtleGraphics {
 		}
 
 		public async Task Draw(Point to) {
-			_currentFigure.Segments.Add(new LineSegment(new Point(X, Y), true) { IsSmoothJoin = true });
+			_currentSegment.Points.Add(new Point(X, Y));
 			X = to.X;
 			Y = to.Y;
 			await Displace(to);
@@ -344,9 +345,8 @@ namespace TurtleGraphics {
 
 
 		public async Task Displace(Point to) {
-			int last = _currentFigure.Segments.Count - 1;
-			LineSegment lastSegment = (LineSegment)_currentFigure.Segments[last];
-			Point origin = lastSegment.Point;
+			int last = _currentSegment.Points.Count - 1;
+			Point origin = _currentSegment.Points[last];
 			double increment = 1d / IterationCount;
 			double currentInterpolation = 0;
 
@@ -354,16 +354,14 @@ namespace TurtleGraphics {
 				if (cancellationTokenSource.Token.IsCancellationRequested) {
 					break;
 				}
-				lastSegment.Point = new Point(Lerp(origin.X, to.X, currentInterpolation), Lerp(origin.Y, to.Y, currentInterpolation));
-				TurtleTranslation.X = lastSegment.Point.X;
-				TurtleTranslation.Y = lastSegment.Point.Y;
-				_currentFigure.Segments[last] = lastSegment;
+				_currentSegment.Points[last] = new Point(Lerp(origin.X, to.X, currentInterpolation), Lerp(origin.Y, to.Y, currentInterpolation));
+				TurtleTranslation.X = _currentSegment.Points[last].X;
+				TurtleTranslation.Y = _currentSegment.Points[last].Y;
 				currentInterpolation += increment;
 				if (AnimatePath) {
 					await Task.Delay(1);
 				}
 			}
-			lastSegment.Freeze();
 		}
 
 		#endregion
