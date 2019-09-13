@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime;
 using System.Threading;
 using System.Threading.Tasks;
@@ -147,10 +148,26 @@ namespace TurtleGraphics {
 			});
 			SizeChanged += MainWindow_SizeChanged;
 			CommandsTextInput.SelectionChanged += CommandsTextInput_SelectionChanged;
+			CommandsTextInput.TextChanged += CommandsTextInput_TextChanged; ;
 			DataContext = this;
 			Instance = this;
 		}
 
+		private void CommandsTextInput_TextChanged(object sender, TextChangedEventArgs e) {
+			foreach (TextChange change in e.Changes) {
+				if (change.AddedLength == Environment.NewLine.Length) {
+					string changedText = _commandsText.Substring(change.Offset, change.AddedLength);
+					if (changedText == Environment.NewLine) {
+						string region = _commandsText.Substring(0, CommandsTextInput.CaretIndex);
+						int indentLevel = region.Count(s => s == '{') - region.Count(s => s == '}');
+						int carret = CommandsTextInput.CaretIndex;
+						CommandsTextInput.Text = CommandsTextInput.Text.Insert(change.Offset + change.AddedLength, new string(' ', 3 * indentLevel));
+						InteliCommandsText = CommandsTextInput.Text;
+						CommandsTextInput.CaretIndex = carret + 3 * indentLevel;
+					}
+				}
+			}
+		}
 
 		public void Init() {
 			List<UIElement> toRemove = new List<UIElement>();
@@ -176,7 +193,7 @@ namespace TurtleGraphics {
 			TurtleScale.ScaleX = 1;
 			TurtleScale.ScaleY = 1;
 			StartPoint = new Point(X, Y);
-			Angle = Math.PI / 2;
+			Angle = 0;
 			BrushSize = 4;
 			PathAnimationFrames = 5;
 
@@ -218,17 +235,15 @@ namespace TurtleGraphics {
 			}
 		}
 
-
 		private void CommandsTextInput_ScrollChanged(object sender, ScrollChangedEventArgs e) {
-			Console.WriteLine(e.VerticalOffset);
 			if (_inteliCommandsScroller == null) {
 				return;
 			}
 			_inteliCommandsScroller.ScrollToVerticalOffset(e.VerticalOffset);
+			_inteliCommandsScroller.ScrollToHorizontalOffset(e.HorizontalOffset);
 		}
 
 		#endregion
-
 
 		public void NewPath() {
 			if (_currentPath != null) {
@@ -267,11 +282,11 @@ namespace TurtleGraphics {
 			}
 			if (setRotation) {
 				Angle = ContextExtensions.AsRad(angle);
-				TurtleRotation.Angle = 90 - angle;
+				TurtleRotation.Angle = 90 + angle;
 			}
 			else {
 				Angle += ContextExtensions.AsRad(angle);
-				TurtleRotation.Angle -= angle;
+				TurtleRotation.Angle += angle;
 			}
 			if (Angle > 2 * Math.PI) {
 				Angle -= 2 * Math.PI;
@@ -279,8 +294,8 @@ namespace TurtleGraphics {
 		}
 
 		public async Task Forward(double length) {
-			double targetX = X + Math.Sin(Angle) * length;
-			double targetY = Y + Math.Cos(Angle) * length;
+			double targetX = X + Math.Cos(Angle) * length;
+			double targetY = Y + Math.Sin(Angle) * length;
 
 			await Draw(new Point(targetX, targetY));
 		}
@@ -386,7 +401,7 @@ namespace TurtleGraphics {
 				//Operation was cancelled
 				_compilationStatus.Stop();
 			}
-			catch(ParsingException e) {
+			catch (ParsingException e) {
 				_compilationStatus.Stop();
 				_exceptionDisplay.Exception = e;
 				_exceptionDisplay.ExceptionMessage = e.Message;

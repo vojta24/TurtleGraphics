@@ -10,8 +10,8 @@ namespace TurtleGraphics {
 
 		#region InteliCommands
 		private Dictionary<string, string> _inteliCommands = new Dictionary<string, string> {
-			{ "for", " (int i = 0; i < ; i++) {" + Environment.NewLine + Environment.NewLine + "}" },
-			{ "if", " () {" + Environment.NewLine + Environment.NewLine + "}" },
+			{ "for", " (int i = 0; i < ; i++) {" + Environment.NewLine + "{0}" + Environment.NewLine + "{1}" + "}" },
+			{ "if", " () {" + Environment.NewLine + "{0}" +  Environment.NewLine + "{1}" + "}" },
 			{ "R", "otate();" },
 			{ "M", "oveTo();" },
 			{ "F", "orward();" },
@@ -58,6 +58,7 @@ namespace TurtleGraphics {
 		private int _addedLinesIndex;
 		private bool _ignoreEvent = false;
 		private int _textLength;
+		private int _currentIndentLevel;
 
 		public void Handle(MainWindow window, TextBox inputControl) {
 			if (_ignoreEvent) {
@@ -66,12 +67,18 @@ namespace TurtleGraphics {
 			}
 			string newText = inputControl.Text;
 
+			string region = newText.Substring(0, inputControl.CaretIndex);
+			_currentIndentLevel = region.Count(s => s == '{') - region.Count(s => s == '}');
+
 			if (State == InteliCommandsState.Normal) {
 				int carret = inputControl.CaretIndex;
 				if (IsValidCommand(newText, carret, out (int start, int length) values)) {
 					_triggerCommand = newText.Substring(values.start, values.length);
 
 					string commandFull = GetInteliCommand(_triggerCommand);
+					commandFull = commandFull.Replace("{0}", new string(' ', 3 * (_currentIndentLevel + 1)));
+					commandFull = commandFull.Replace("{1}", new string(' ', 3 * _currentIndentLevel));
+
 					_addedLinesCount = (commandFull.Split('\n').Length - 1) * Environment.NewLine.Length;
 					_addedLinesIndex = inputControl.CaretIndex;
 					State = InteliCommandsState.IsSuggesting;
@@ -109,11 +116,11 @@ namespace TurtleGraphics {
 					int selectionLen = inputControl.SelectionLength;
 					int selectionIndex = inputControl.SelectionStart;
 					_ignoreEvent = true;
-					if (_textLength > newText.Length/* == newText.Length - _addedLinesCount + 1*/) {
+					if (_textLength > newText.Length) {
 						window.InteliCommandsText = newText.Remove(_addedLinesIndex - 1, _addedLinesCount);
 						window.CommandsText = newText.Remove(_addedLinesIndex - 1, _addedLinesCount);
 					}
-					else if (_textLength < newText.Length/*_addedLinesIndex == newText.Length - _addedLinesCount - 1*/) {
+					else if (_textLength < newText.Length) {
 						window.InteliCommandsText = newText.Remove(_addedLinesIndex + 1, _addedLinesCount);
 						window.CommandsText = newText.Remove(_addedLinesIndex + 1, _addedLinesCount);
 					}
@@ -146,9 +153,16 @@ namespace TurtleGraphics {
 				return false;
 			}
 
-			while (lastChar >= 0 && !char.IsWhiteSpace(value[lastChar])) {
+			while (lastChar >= 0 && !char.IsWhiteSpace(value[lastChar]) && !Environment.NewLine.Contains(value[lastChar])) {
 				lastChar--;
 			}
+
+			int whiteSpaceCount = 0;
+			while (lastChar >= 0 && value[lastChar] == ' ') {
+				lastChar--;
+				whiteSpaceCount++;
+			}
+
 
 			if (lastChar >= 0 && value[lastChar] != '\n') {
 				return false;
@@ -156,7 +170,7 @@ namespace TurtleGraphics {
 
 			lastChar++;
 
-			string sub = value.Substring(lastChar, carret - lastChar);
+			string sub = value.Substring(lastChar + whiteSpaceCount, carret - (lastChar + whiteSpaceCount));
 
 			if (carret < value.Length) {
 				if (!char.IsWhiteSpace(value[carret])) {
@@ -165,7 +179,7 @@ namespace TurtleGraphics {
 			}
 
 			if (_inteliCommands.ContainsKey(sub)) {
-				substringInfo = (lastChar, carret - lastChar);
+				substringInfo = (lastChar + whiteSpaceCount, carret - (lastChar + whiteSpaceCount));
 				return true;
 			}
 			return false;
