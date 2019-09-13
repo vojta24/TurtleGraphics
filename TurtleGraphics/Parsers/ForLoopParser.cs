@@ -18,79 +18,79 @@ namespace TurtleGraphics.Parsers {
 			try {
 				// for(int i = 0; i < 50; i++) {
 				// for (int i=0;i<20;i++){
-				line = line.Remove(0, 3).Trim();
+				string mod = line.Remove(0, 3).Trim();
 
 
 				// (int i = 0; i < 50; i++) {
 				// (int i=0;i<20;i++){
 				// (long val=1; val <50; val+=2){
 				errorMessage = "Invalid for loop syntax!";
-				line = line.Replace("(", "");
+				mod = mod.Replace("(", "");
 
 				// int i = 0; i < 50; i++) {
 				// int i=0;i<20;i++){
 				// long val=1; val <50; val+=2){
 				errorMessage = "Unsupported interation type!";
-				line = line.Replace("int ", "").Replace("long ", "");
+				mod = mod.Replace("int ", "").Replace("long ", "");
 
 				// i = 0; i < 50; i++) {
 				// i=0;i<20;i++){
 				// val=1; val <50; val+=2){
 				errorMessage = "Invalid for loop syntax!";
-				string variableName = line.Split('=')[0].Trim();
-				line = line.Remove(0, line.IndexOf("=") + 1).Trim();
+				string variableName = mod.Split('=')[0].Trim();
+				mod = mod.Remove(0, mod.IndexOf("=") + 1).Trim();
 
 				// 0; i < 50; i++) {
 				// 0 ;i<20;i++){
 				// 1; val <50; val+=2){
 				errorMessage = "Invalid expression for starting value!";
-				IGenericExpression<int> startValueExp = context.CompileGeneric<int>(line.Split(';')[0].Trim());
+				IGenericExpression<int> startValueExp = context.CompileGeneric<int>(mod.Split(';')[0].Trim());
 
 				errorMessage = "Invalid for loop syntax!";
-				line = line.Remove(0, line.IndexOf(";") + 1).Trim();
+				mod = mod.Remove(0, mod.IndexOf(";") + 1).Trim();
 
 				// i < 50; i++) {
 				// i<20 ;i++){
 				// val >=50; val+=2){
 
-				line = line.Remove(0, variableName.Length).Trim();
+				mod = mod.Remove(0, variableName.Length).Trim();
 
 				// < 50; i++) {
 				// <20 ;i++){
 				// >=50; val+=2){
 
-				string lhs = line.Split(';')[0].Trim();
+				string lhs = mod.Split(';')[0].Trim();
 				ConditionType condition = LogicParsers.ParseCondition(lhs);
 
 
 				if (lhs.Contains("=")) {
-					line = line.Remove(0, 2).Trim();
+					mod = mod.Remove(0, 2).Trim();
 				}
 				else {
-					line = line.Remove(0, 1).Trim();
+					mod = mod.Remove(0, 1).Trim();
 				}
 
-				string[] endValAndChange = line.Split(';');
+				string[] endValAndChange = mod.Split(';');
 
 				errorMessage = "Invalid expression for end value!";
 				IGenericExpression<int> endValueExp = context.CompileGeneric<int>(endValAndChange[0].Trim());
 
 				errorMessage = "Invalid for loop syntax!";
-				line = endValAndChange[1].Trim();
+				mod = endValAndChange[1].Trim();
 
 				// i++) {
 				// i++){
 				// val +=2){
 
-				line = line.Remove(0, variableName.Length).Trim();
+				mod = mod.Remove(0, variableName.Length).Trim();
 
 				// ++) {
 				// ++){
 				// +=2){
 
-				OperatorType _operator = LogicParsers.ParseOperator(line.Split(')')[0]);
+				OperatorType _operator = LogicParsers.ParseOperator(mod.Split(')')[0]);
 
-				line = line.Remove(0, 2).Trim();
+				mod = mod.Remove(0, 2).Trim();
 
 				// ) {
 				// ){
@@ -100,23 +100,23 @@ namespace TurtleGraphics.Parsers {
 
 
 				if (_operator == OperatorType.PlusEquals || _operator == OperatorType.MinusEquals) {
-					string[] changeSplit = line.Split(')');
+					string[] changeSplit = mod.Split(')');
 					errorMessage = "Invalid expression for change of value!";
 					changeValueExp = context.CompileGeneric<int>(changeSplit[0]);
-					line = changeSplit[1].Trim();
+					mod = changeSplit[1].Trim();
 				}
 
 				// ) {
 				// ){
 				// ){
 
-				line = line.Replace(")", "");
-				if (line.IndexOf('{') == -1) {
+				mod = mod.Replace(")", "");
+				if (mod.IndexOf('{') == -1) {
 					throw new ParsingException("For loop requires a block of code!");
 				}
-				line = line.Replace("{", "");
+				mod = mod.Replace("{", "");
 
-				if (!string.IsNullOrWhiteSpace(line)) {
+				if (!string.IsNullOrWhiteSpace(mod)) {
 					throw new ParsingException("Invalid for loop syntax!");
 				}
 
@@ -131,13 +131,14 @@ namespace TurtleGraphics.Parsers {
 					Operator = _operator,
 					Variables = inherited.Copy(),
 					Lines = lines,
+					Line = line,
 				};
 			}
 			catch (ParsingException) {
 				throw;
 			}
 			catch (Exception e) {
-				throw new ParsingException(errorMessage, e);
+				throw new ParsingException(errorMessage, e) { LineText = line };
 			}
 		}
 	}

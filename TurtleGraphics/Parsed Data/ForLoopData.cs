@@ -19,6 +19,7 @@ namespace TurtleGraphics {
 		public override ParsedAction Action => ParsedAction.NONE;
 
 		public int LineIndex { get; set; }
+		public override string Line { get; set; }
 
 		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
 			throw new NotImplementedException();
@@ -58,7 +59,9 @@ namespace TurtleGraphics {
 					else {
 						interData.Add(current.Compile(previous, token));
 					}
-					previous = interData[interData.Count - 1];
+					if(interData.Count != 0) {
+						previous = interData[interData.Count - 1];
+					}
 				}
 			}
 

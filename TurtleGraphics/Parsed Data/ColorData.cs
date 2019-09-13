@@ -10,14 +10,17 @@ namespace TurtleGraphics {
 		private readonly char[] HEX = new[] { '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 		private readonly Random _random;
 
-		public ColorData(string inputColor, Dictionary<string, object> variables) : base(inputColor.Trim()) {
+		public ColorData(string inputColor, Dictionary<string, object> variables, string line) : base(inputColor.Trim()) {
 			_random = new Random((int)DateTime.Now.Ticks);
 			Variables = variables;
+			Line = line;
 		}
 
 		public override bool IsBlock => false;
 
 		public override ParsedAction Action => ParsedAction.Color;
+
+		public override string Line { get; set; }
 
 		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
 			token.ThrowIfCancellationRequested();

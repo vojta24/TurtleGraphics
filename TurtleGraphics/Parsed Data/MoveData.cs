@@ -12,7 +12,7 @@ namespace TurtleGraphics {
 		private readonly IGenericExpression<double> x;
 		private readonly IGenericExpression<double> y;
 
-		public MoveData(string[] args, Dictionary<string, object> variables) : base(args) {
+		public MoveData(string[] args, Dictionary<string, object> variables, string line) : base(args) {
 			Variables = variables;
 
 			expression.Imports.AddType(typeof(Math));
@@ -30,13 +30,15 @@ namespace TurtleGraphics {
 				y = expression.CompileGeneric<double>(args[1]);
 			}
 			catch (Exception e) {
-				throw new ParsingException(exceptionMessage, e);
+				throw new ParsingException(exceptionMessage, e) { LineText = line };
 			}
 		}
 
 		public override bool IsBlock => false;
 
 		public override ParsedAction Action => ParsedAction.MoveTo;
+
+		public override string Line { get; set; }
 
 		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
 			token.ThrowIfCancellationRequested();

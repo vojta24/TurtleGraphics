@@ -14,6 +14,10 @@ namespace TurtleGraphics {
 
 		public abstract bool IsBlock { get; }
 
+		public abstract string Line { get; set; }
+
+		public int LineHash => Line.GetHashCode();
+
 		public Dictionary<string, object> Variables { get; set; }
 
 		public string[] Parameters { get; set; }

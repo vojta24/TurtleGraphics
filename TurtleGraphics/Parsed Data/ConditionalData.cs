@@ -18,12 +18,15 @@ namespace TurtleGraphics {
 
 		public override ParsedAction Action => ParsedAction.NONE;
 
+		public override string Line { get; set; }
+
 		public ConditionalData(string line,
 			IGenericExpression<bool> ifCondition, Queue<ParsedData> data,
 			IList<(IGenericExpression<bool>, Queue<ParsedData>)> elseIfs = null) : base(line) {
 			IfCondition = ifCondition;
 			IfData = data;
 			ElseIfs = elseIfs;
+			Line = line;
 		}
 
 		public void AddElse(StringReader reader) {

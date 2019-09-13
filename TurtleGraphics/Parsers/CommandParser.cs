@@ -10,10 +10,38 @@ namespace TurtleGraphics {
 
 		public static MainWindow Window { get; set; }
 		private static readonly Stack<ConditionalData> conditionals = new Stack<ConditionalData>();
+		public static Dictionary<string, int> LineIndexes = new Dictionary<string, int>();
+
+		public static Queue<ParsedData> ParseCommands(string commands, MainWindow window) {
+			LineIndexes.Clear();
+			string[] split = commands.Replace("\r", "").Split('\n');
+			for (int i = 0; i < split.Length; i++) {
+				split[i] = split[i].Trim();
+
+				if (LineIndexes.ContainsKey(split[i])) {
+					int start = 1;
+					while (true) {
+						if (LineIndexes.ContainsKey($"{{{start}}}" + split[i])) {
+							start++;
+							continue;
+						}
+						LineIndexes.Add($"{{{start}}}" + split[i], i);
+						break;
+					}
+				}
+				else {
+					LineIndexes.Add(split[i], i);
+				}
+			}
+
+			commands = string.Join(Environment.NewLine, split);
+			return Parse(commands, window);
+		}
 
 		public static Queue<ParsedData> Parse(string commands, MainWindow window, Dictionary<string, object> additionalVars = null) {
 			Window = window;
 			conditionals.Clear();
+
 			Dictionary<string, object> globalVars = new Dictionary<string, object>() {
 				{ "Width", Window.DrawWidth },
 				{ "Height", Window.DrawHeight }
@@ -42,7 +70,13 @@ namespace TurtleGraphics {
 		private static ParsedData ParseLine(string line, StringReader reader, Dictionary<string, object> variables) {
 			if (string.IsNullOrWhiteSpace(line) || line.Trim() == "}")
 				return null;
-			line = line.Trim();
+			string original = line;
+
+			if (line.Length > 3) {
+				if (line[0] == '{' && char.IsDigit(line[1]) && line[2] == '}') {
+					line = line.Remove(0, 3);
+				}
+			}
 
 			if (LineValidators.IsFunctionCall(line, out FunctionCallInfo info)) {
 				if (conditionals.Count > 0) {
@@ -50,31 +84,31 @@ namespace TurtleGraphics {
 				}
 				switch (info.FunctionName) {
 					case "Rotate": {
-						return new RotateParseData(ParseGenericExpression<double>(info.Arguments[0], variables), info, variables.Copy());
+						return new RotateParseData(ParseGenericExpression<double>(info.Arguments[0], line, variables), info, variables.Copy(), original);
 					}
 
 					case "Forward": {
-						return new ForwardParseData(ParseGenericExpression<double>(info.Arguments[0], variables), variables.Copy());
+						return new ForwardParseData(ParseGenericExpression<double>(info.Arguments[0], line, variables), variables.Copy(), original);
 					}
 
 					case "SetBrushSize": {
-						return new BrushSizeData(ParseGenericExpression<double>(info.Arguments[0], variables), variables.Copy());
+						return new BrushSizeData(ParseGenericExpression<double>(info.Arguments[0], line, variables), variables.Copy(), original);
 					}
 
 					case "PenUp": {
-						return new PenPositionData(false, variables.Copy());
+						return new PenPositionData(false, variables.Copy(), original);
 					}
 
 					case "PenDown": {
-						return new PenPositionData(true, variables.Copy());
+						return new PenPositionData(true, variables.Copy(), original);
 					}
 
 					case "SetColor": {
-						return new ColorData(info.Arguments[0], variables.Copy());
+						return new ColorData(info.Arguments[0], variables.Copy(), original);
 					}
 
 					case "MoveTo": {
-						return new MoveData(info.Arguments, variables.Copy());
+						return new MoveData(info.Arguments, variables.Copy(), original);
 					}
 
 					default: {
@@ -108,7 +142,7 @@ namespace TurtleGraphics {
 			throw new ParsingException($"Unexpected squence at: {line}");
 		}
 
-		private static IGenericExpression<T> ParseGenericExpression<T>(string line, Dictionary<string, object> variables) {
+		private static IGenericExpression<T> ParseGenericExpression<T>(string line, string fullLine, Dictionary<string, object> variables) {
 			ExpressionContext context = new ExpressionContext();
 
 			context.Imports.AddType(typeof(Math));
@@ -122,7 +156,7 @@ namespace TurtleGraphics {
 				return context.CompileGeneric<T>(line);
 			}
 			catch (Exception e) {
-				throw new ParsingException($"Unable to parse expression of {typeof(T).FullName} from '{line}'", e);
+				throw new ParsingException($"Unable to parse expression of {typeof(T).FullName} from '{line}'", e) { LineText = fullLine };
 			}
 		}
 	}

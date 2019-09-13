@@ -5,9 +5,10 @@ using System.Threading;
 namespace TurtleGraphics {
 	public class PenPositionData : ParsedData {
 
-		public PenPositionData(bool state, Dictionary<string, object> variables) {
+		public PenPositionData(bool state, Dictionary<string, object> variables, string line) {
 			PenState = state;
 			Variables = variables;
+			Line = line;
 		}
 
 		public bool PenState { get; set; }
@@ -15,6 +16,8 @@ namespace TurtleGraphics {
 		public override bool IsBlock => false;
 
 		public override ParsedAction Action => ParsedAction.PenState;
+
+		public override string Line { get; set; }
 
 		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
 			token.ThrowIfCancellationRequested();

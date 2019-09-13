@@ -9,9 +9,10 @@ namespace TurtleGraphics {
 
 		private readonly IGenericExpression<double> _expression;
 
-		public ForwardParseData(IGenericExpression<double> expression, Dictionary<string, object> variables) {
+		public ForwardParseData(IGenericExpression<double> expression, Dictionary<string, object> variables, string line) {
 			_expression = expression;
 			Variables = variables;
+			Line = line;
 		}
 
 		public double Distance { get; set; }
@@ -19,6 +20,8 @@ namespace TurtleGraphics {
 		public override bool IsBlock => false;
 
 		public override ParsedAction Action => ParsedAction.Forward;
+
+		public override string Line { get; set; }
 
 		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
 			token.ThrowIfCancellationRequested();

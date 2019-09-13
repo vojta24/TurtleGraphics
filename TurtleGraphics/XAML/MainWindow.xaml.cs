@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -85,6 +86,7 @@ namespace TurtleGraphics {
 
 		private Path _currentPath;
 		private PathFigure _currentFigure;
+		private PolyLineSegment _currentSegment;
 		private CancellationTokenSource cancellationTokenSource;
 		private bool _inteliCommandsEnabled = true;
 		private InteliCommandsHandler _inteliCommands = new InteliCommandsHandler();
@@ -245,14 +247,12 @@ namespace TurtleGraphics {
 			_currentPath.StrokeThickness = BrushSize;
 			_currentPath.StrokeEndLineCap = PenLineCap.Round;
 			_currentPath.StrokeStartLineCap = PenLineCap.Round;
-
 			PathGeometry pGeometry = new PathGeometry();
 			pGeometry.Figures = new PathFigureCollection();
 			_currentFigure = new PathFigure {
 				StartPoint = new Point(X, Y),
 				Segments = new PathSegmentCollection()
 			};
-
 			pGeometry.Figures.Add(_currentFigure);
 			_currentPath.Data = pGeometry;
 			Paths.Children.Add(_currentPath);
@@ -379,7 +379,7 @@ namespace TurtleGraphics {
 			ButtonCommand = StopCommand;
 			ButtonText = "Stop";
 			try {
-				Queue<ParsedData> tasks = CommandParser.Parse(CommandsText, this);
+				Queue<ParsedData> tasks = CommandParser.ParseCommands(CommandsText, this);
 				List<TurtleData> compiledTasks = await CompileTasks(tasks, cancellationTokenSource.Token);
 				_compilationStatus.Stop();
 				await DrawData(compiledTasks);

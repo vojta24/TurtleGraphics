@@ -8,9 +8,10 @@ namespace TurtleGraphics {
 
 		private readonly IGenericExpression<double> _expression;
 
-		public RotateParseData(IGenericExpression<double> expression, FunctionCallInfo info, Dictionary<string, object> variables) {
+		public RotateParseData(IGenericExpression<double> expression, FunctionCallInfo info, Dictionary<string, object> variables, string line) {
 			_expression = expression;
 			Variables = variables;
+			Line = line;
 			string exceptionMessage = "Invalid arguments for rotation";
 			try {
 				if (info.Arguments.Length == 2) {
@@ -18,7 +19,7 @@ namespace TurtleGraphics {
 				}
 			}
 			catch (Exception e) {
-				throw new ParsingException(exceptionMessage, e);
+				throw new ParsingException(exceptionMessage, e) { LineText = line };
 			}
 		}
 
@@ -28,6 +29,8 @@ namespace TurtleGraphics {
 		public override bool IsBlock => false;
 
 		public override ParsedAction Action => ParsedAction.Rotate;
+
+		public override string Line { get; set; }
 
 		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
 			token.ThrowIfCancellationRequested();

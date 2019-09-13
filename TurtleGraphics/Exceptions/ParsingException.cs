@@ -8,6 +8,8 @@ namespace TurtleGraphics {
 
 		public int LineIndex { get; set; }
 
+		public string LineText { get; set; }
+
 		public ParsingException(string message, Exception innerException) : base(message, innerException) {
 			//LineIndex = lineIndex;
 		}

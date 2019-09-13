@@ -34,8 +34,9 @@ namespace TurtleGraphics.Parsers {
 			}
 
 			mod = mod.Trim('(', ')');
+			int equalsIndex = mod.IndexOf("=");
 
-			if (mod.IndexOf("=") == mod.LastIndexOf("=")) {
+			if (equalsIndex == mod.LastIndexOf("=") && equalsIndex != -1) {
 				throw new ParsingException("If statement invalid syntax (== for comparison)!");
 			}
 
@@ -61,13 +62,14 @@ namespace TurtleGraphics.Parsers {
 
 				return new ConditionalData(line, ifCondition, data) {
 					Variables = variables.Copy(),
+					Line = line,
 				};
 			}
 			catch (ParsingException) {
 				throw;
 			}
 			catch (Exception e) {
-				throw new ParsingException("Invalid boolean expression!", e);
+				throw new ParsingException("Invalid boolean expression!", e) { LineText = line };
 			}
 		}
 	}
