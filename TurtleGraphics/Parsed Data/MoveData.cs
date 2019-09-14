@@ -7,21 +7,13 @@ using Flee.PublicTypes;
 namespace TurtleGraphics {
 	public class MoveData : ParsedData {
 
-		private readonly ExpressionContext expression = new ExpressionContext();
-
 		private readonly IGenericExpression<double> x;
 		private readonly IGenericExpression<double> y;
 
 		public MoveData(string[] args, Dictionary<string, object> variables, string line) : base(args) {
 			Variables = variables;
 
-			expression.Imports.AddType(typeof(Math));
-			expression.Imports.AddType(typeof(ContextExtensions));
-
-
-			foreach (var item in variables) {
-				expression.Variables[item.Key] = item.Value;
-			}
+			ExpressionContext expression = FleeHelper.GetExpression(variables);
 			string exceptionMessage = "";
 			try {
 				exceptionMessage = "Invalid expression for X coordinate!";

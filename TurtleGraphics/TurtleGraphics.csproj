@@ -80,10 +80,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Exceptions\ParsingException.cs" />
+    <Compile Include="Helpers\FleeHelper.cs" />
+    <Compile Include="Parsed Data\BrushCappingData.cs" />
     <Compile Include="Parsed Data\ContextExtensions.cs" />
     <Compile Include="IO\FileSystemManager.cs" />
     <Compile Include="InteliCommands\InteliCommandsHandler.cs" />
     <Compile Include="InteliCommands\InteliCommandsState.cs" />
+    <Compile Include="Parsers\ArgParser.cs" />
     <Compile Include="XAML\CompilationStatus.xaml.cs">
       <DependentUpon>CompilationStatus.xaml</DependentUpon>
     </Compile>

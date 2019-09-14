@@ -7,11 +7,7 @@ namespace TurtleGraphics.Parsers {
 	public class ForLoopParser {
 		public static ForLoopData ParseForLoop(string line, StringReader reader, Dictionary<string, object> inherited) {
 
-			ExpressionContext context = new ExpressionContext();
-			context.Imports.AddType(typeof(Math));
-			context.Imports.AddType(typeof(ContextExtensions));
-
-			context.Variables.AddRange(inherited);
+			ExpressionContext context = FleeHelper.GetExpression(inherited);
 
 			string errorMessage = "";
 

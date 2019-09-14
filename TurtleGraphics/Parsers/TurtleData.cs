@@ -12,5 +12,6 @@ namespace TurtleGraphics {
 		public bool PenDown { get; set; }
 		public bool Jump { get; set; }
 		public ParsedAction Action { get; set; }
+		public PenLineCap LineCap { get; set; }
 	}
 }

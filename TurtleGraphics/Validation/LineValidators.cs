@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using TurtleGraphics.Parsers;
 
 namespace TurtleGraphics.Validation {
 	public static class LineValidators {
@@ -40,14 +41,16 @@ namespace TurtleGraphics.Validation {
 
 			//test (20);
 			//teset(ToDeg(Sin(PI))); 
+			//Func(RandX(),Rand(20,50));
 
 			info = null;
 			string[] split = line.Split(new[] { '(' }, 2, StringSplitOptions.RemoveEmptyEntries);
 
 			//test 20);
 			//teset ToDeg(Sin(PI))); 
+			//Func RandX(),Rand(20,50));
 
-			if(split.Length < 2)
+			if (split.Length < 2)
 				return false;
 			
 
@@ -58,11 +61,13 @@ namespace TurtleGraphics.Validation {
 
 			//test 20)
 			//teset ToDeg(Sin(PI)))
+			//Func RandX(),Rand(20,50))
 
 			split[1] = split[1].Remove(split[1].Length - 1, 1);
 
 			//test 20
 			//teset ToDeg(Sin(PI))
+			//Func RandX(),Rand(20,50)
 
 
 			if (IsType(split[1].Split()[0], out _))
@@ -71,8 +76,8 @@ namespace TurtleGraphics.Validation {
 			FunctionCallInfo i = new FunctionCallInfo();
 			i.FunctionName = split[0].TrimEnd();
 
-			//TODO this can be a string!
-			i.Arguments = split[1].TrimEnd().Split(',');
+			i.Arguments = ArgParser.Parse(split[1].TrimEnd());
+
 			info = i;
 			return true;
 		}

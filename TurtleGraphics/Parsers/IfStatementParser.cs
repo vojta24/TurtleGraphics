@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using Flee.PublicTypes;
 
@@ -42,14 +43,7 @@ namespace TurtleGraphics.Parsers {
 
 			mod = mod.Replace("==", "=");
 
-			ExpressionContext context = new ExpressionContext();
-			context.Imports.AddType(typeof(Math));
-			context.Imports.AddType(typeof(ContextExtensions));
-
-
-			foreach (var item in variables) {
-				context.Variables[item.Key] = item.Value;
-			}
+			ExpressionContext context = FleeHelper.GetExpression(variables);
 
 			try {
 				IGenericExpression<bool> ifCondition = context.CompileGeneric<bool>(mod);

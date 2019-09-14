@@ -19,6 +19,7 @@ namespace TurtleGraphics {
 			{ "PenD", "own();" },
 			{ "SetB", "rushSize();" },
 			{ "SetC", "olor();" },
+			{ "SetL", "ineCapping();" },
 		};
 
 		private Dictionary<string, int> _inteliCommandsIndexes = new Dictionary<string, int> {
@@ -31,6 +32,7 @@ namespace TurtleGraphics {
 			{ "PenD", 4 },
 			{ "SetB", 9 },
 			{ "SetC", 5 },
+			{ "SetL", 11 },
 		};
 
 		public string GetInteliCommand(string value) {

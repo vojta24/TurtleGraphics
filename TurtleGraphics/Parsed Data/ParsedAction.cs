@@ -6,6 +6,7 @@
 		MoveTo,
 		Color,
 		Thickness,
-		PenState,	
+		PenState,
+		Capping,
 	}
 }

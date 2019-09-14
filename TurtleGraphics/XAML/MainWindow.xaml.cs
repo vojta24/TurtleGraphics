@@ -56,7 +56,9 @@ namespace TurtleGraphics {
 		private ICommand _saveCommand;
 		private ICommand _loadCommand;
 		private int _anotherDelay = 1;
+		private PenLineCap _lineCapping;
 
+		public PenLineCap LineCapping { get => _lineCapping; set { _lineCapping = value; Notify(nameof(LineCapping)); } }
 		public int CalculationFramesPreUIUpdate { get => _anotherDelay; set { _anotherDelay = value; Notify(nameof(CalculationFramesPreUIUpdate)); } }
 		public ICommand LoadCommand { get => _loadCommand; set { _loadCommand = value; Notify(nameof(LoadCommand)); } }
 		public ICommand SaveCommand { get => _saveCommand; set { _saveCommand = value; Notify(nameof(SaveCommand)); } }
@@ -196,6 +198,7 @@ namespace TurtleGraphics {
 			Angle = 0;
 			BrushSize = 4;
 			PathAnimationFrames = 5;
+			LineCapping = PenLineCap.Round;
 
 			NewPath();
 		}
@@ -260,10 +263,11 @@ namespace TurtleGraphics {
 				_currentPath.Stroke = (Brush)new BrushConverter().ConvertFromString(Color);
 			}
 			_currentPath.StrokeThickness = BrushSize;
-			_currentPath.StrokeEndLineCap = PenLineCap.Round;
-			_currentPath.StrokeStartLineCap = PenLineCap.Round;
-			PathGeometry pGeometry = new PathGeometry();
-			pGeometry.Figures = new PathFigureCollection();
+			_currentPath.StrokeEndLineCap = LineCapping;
+			_currentPath.StrokeStartLineCap = LineCapping;
+			PathGeometry pGeometry = new PathGeometry {
+				Figures = new PathFigureCollection()
+			};
 			_currentSegment = new PolyLineSegment();
 			_currentFigure = new PathFigure {
 				StartPoint = new Point(X, Y),
@@ -347,6 +351,11 @@ namespace TurtleGraphics {
 						NewPath();
 						break;
 					}
+					case ParsedAction.Capping: {
+						LineCapping = data.LineCap;
+						NewPath();
+						break;
+					}
 				}
 			}
 		}
@@ -392,7 +401,9 @@ namespace TurtleGraphics {
 			ButtonCommand = StopCommand;
 			ButtonText = "Stop";
 			try {
+				_compilationStatus.Status = "Parsing text...";
 				Queue<ParsedData> tasks = CommandParser.ParseCommands(CommandsText, this);
+				_compilationStatus.Status = "Compiling...";
 				List<TurtleData> compiledTasks = await CompileTasks(tasks, cancellationTokenSource.Token);
 				_compilationStatus.Stop();
 				await DrawData(compiledTasks);

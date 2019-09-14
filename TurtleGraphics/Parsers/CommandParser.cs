@@ -104,11 +104,15 @@ namespace TurtleGraphics {
 					}
 
 					case "SetColor": {
-						return new ColorData(info.Arguments[0], variables.Copy(), original);
+						return new ColorData(info.Arguments, variables.Copy(), original);
 					}
 
 					case "MoveTo": {
 						return new MoveData(info.Arguments, variables.Copy(), original);
+					}
+
+					case "SetLineCapping": {
+						return new BrushCappingData(info.Arguments, variables.Copy(), original);
 					}
 
 					default: {
@@ -143,15 +147,7 @@ namespace TurtleGraphics {
 		}
 
 		private static IGenericExpression<T> ParseGenericExpression<T>(string line, string fullLine, Dictionary<string, object> variables) {
-			ExpressionContext context = new ExpressionContext();
-
-			context.Imports.AddType(typeof(Math));
-			context.Imports.AddType(typeof(ContextExtensions));
-
-
-			foreach (KeyValuePair<string, object> item in variables) {
-				context.Variables.Add(item.Key, item.Value);
-			}
+			ExpressionContext context = FleeHelper.GetExpression(variables);
 			try {
 				return context.CompileGeneric<T>(line);
 			}

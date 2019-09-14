@@ -24,6 +24,8 @@ namespace TurtleGraphics {
 
 		public string Arg1 => Parameters[0];
 		public string Arg2 => Parameters[1];
+		public string Arg3 => Parameters[2];
+		public string Arg4 => Parameters[3];
 
 		public abstract ParsedAction Action { get; }
 
