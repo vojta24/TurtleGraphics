@@ -78,6 +78,10 @@ namespace TurtleGraphics {
 				}
 			}
 
+			if (line.StartsWith("//")) {
+				return null;
+			}
+
 			if (LineValidators.IsFunctionCall(line, out FunctionCallInfo info)) {
 				if (conditionals.Count > 0) {
 					conditionals.Peek().IsModifiable = false;
