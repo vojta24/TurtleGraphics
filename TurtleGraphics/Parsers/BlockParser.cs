@@ -9,19 +9,8 @@ namespace TurtleGraphics {
 			string next = reader.ReadLine();
 			int openBarckets = 1;
 
-			if (next.Contains("{")) {
-				openBarckets++;
-			}
-			if (next.Contains("}")) {
-				openBarckets--;
-				if (openBarckets == 0) {
-					ret.Add(next);
-					return ret;
-				}
-			}
-			do {
+			while (next != null){
 				ret.Add(next);
-				next = reader.ReadLine();
 				if (next.Contains("{")) {
 					openBarckets++;
 				}
@@ -32,11 +21,11 @@ namespace TurtleGraphics {
 						break;
 					}
 				}
+				next = reader.ReadLine();
 			}
-			while (next != null);
 
-			if(openBarckets != 0) {
-				throw new ParsingException("Missing closing bracket!");
+			if (openBarckets != 0) {
+				throw new ParsingException("Missing closing bracket!") { LineText = "" };
 			}
 
 			return ret;
