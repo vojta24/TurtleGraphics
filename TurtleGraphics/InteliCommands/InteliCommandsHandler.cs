@@ -9,7 +9,7 @@ namespace TurtleGraphics {
 	public class InteliCommandsHandler {
 
 		#region InteliCommands
-		private Dictionary<string, string> _inteliCommands = new Dictionary<string, string> {
+		private readonly Dictionary<string, string> _inteliCommands = new Dictionary<string, string> {
 			{ "for", " (int i = 0; i < ; i++) {" + Environment.NewLine + "{0}" + Environment.NewLine + "{1}" + "}" },
 			{ "if", " () {" + Environment.NewLine + "{0}" +  Environment.NewLine + "{1}" + "}" },
 			{ "R", "otate();" },
@@ -22,7 +22,7 @@ namespace TurtleGraphics {
 			{ "SetL", "ineCapping();" },
 		};
 
-		private Dictionary<string, int> _inteliCommandsIndexes = new Dictionary<string, int> {
+		private readonly Dictionary<string, int> _inteliCommandsIndexes = new Dictionary<string, int> {
 			{ "for", 17  },
 			{ "if", 2 },
 			{ "R", 6 },
@@ -92,8 +92,20 @@ namespace TurtleGraphics {
 					inputControl.CaretIndex = carret;
 				}
 				else {
-					window.InteliCommandsText = newText;
-					window.CommandsText = newText;
+					if (carret > 0 && inputControl.Text[carret - 1] == '}') {
+						int indent = CountIndent(inputControl, carret - 2);
+						if (indent > 3 * _currentIndentLevel) {
+							int difference = Math.Abs(indent - 3 * _currentIndentLevel);
+							_ignoreEvent = true;
+							window.CommandsText = inputControl.Text.Remove(carret - 1 - indent, difference);
+							_ignoreEvent = true;
+							inputControl.CaretIndex = carret - difference;
+						}
+					}
+					else {
+						window.InteliCommandsText = newText;
+						window.CommandsText = newText;
+					}
 				}
 				_textLength = window.CommandsText.Length;
 			}
@@ -105,7 +117,8 @@ namespace TurtleGraphics {
 					_ignoreEvent = true;
 					window.CommandsText = window.InteliCommandsText;
 					_ignoreEvent = true;
-					inputControl.CaretIndex = lastChar - _triggerCommand.Length + GetIndexForCaret(_triggerCommand);
+					int carretIndexOffset = GetIndexForCaret(_triggerCommand);
+					inputControl.CaretIndex = lastChar - _triggerCommand.Length + carretIndexOffset;
 				}
 				else {
 					if (lastChar < 0) {
@@ -145,6 +158,20 @@ namespace TurtleGraphics {
 			}
 		}
 
+		private int CountIndent(TextBox inputControl, int index) {
+			int counter = 0;
+			while (index >= 0) {
+				if (inputControl.Text[index] == ' ') {
+					counter++;
+					index--;
+				}
+				else {
+					break;
+				}
+			}
+			return counter;
+		}
+
 		private bool IsValidCommand(string value, int carret, out (int, int) substringInfo) {
 			substringInfo = (0, 0);
 
@@ -172,15 +199,15 @@ namespace TurtleGraphics {
 
 			lastChar++;
 
-			string sub = value.Substring(lastChar + whiteSpaceCount, carret - (lastChar + whiteSpaceCount));
+			string possibleCommand = value.Substring(lastChar + whiteSpaceCount, carret - (lastChar + whiteSpaceCount));
 
 			if (carret < value.Length) {
-				if (!char.IsWhiteSpace(value[carret])) {
+				if (value[carret] != Environment.NewLine[0]) {
 					return false;
 				}
 			}
 
-			if (_inteliCommands.ContainsKey(sub)) {
+			if (_inteliCommands.ContainsKey(possibleCommand)) {
 				substringInfo = (lastChar + whiteSpaceCount, carret - (lastChar + whiteSpaceCount));
 				return true;
 			}

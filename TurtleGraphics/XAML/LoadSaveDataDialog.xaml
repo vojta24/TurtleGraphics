@@ -16,12 +16,28 @@
 				 ItemContainerStyle="{StaticResource SeamlessNoHighlight}">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
-					<Grid>
+					<Grid Background="Transparent" Margin="0 0 0 -2">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*"/>
 							<ColumnDefinition Width="auto"/>
 						</Grid.ColumnDefinitions>
-						<TextBlock Text="{Binding Name}" FontSize="16" FontWeight="DemiBold"/>
+						<Grid.Triggers>
+							<EventTrigger RoutedEvent="MouseEnter">
+								<BeginStoryboard>
+									<Storyboard Storyboard.TargetProperty="(Grid.Background).(SolidColorBrush.Color)">
+										<ColorAnimation To="White" Duration="0:0:0.1"/>
+									</Storyboard>
+								</BeginStoryboard>
+							</EventTrigger>
+							<EventTrigger RoutedEvent="MouseLeave">
+								<BeginStoryboard>
+									<Storyboard Storyboard.TargetProperty="(Grid.Background).(SolidColorBrush.Color)">
+										<ColorAnimation To="Transparent" Duration="0:0:0.2"/>
+									</Storyboard>
+								</BeginStoryboard>
+							</EventTrigger>
+						</Grid.Triggers>
+						<TextBlock Margin="5 0 0 0" Text="{Binding Name}" FontSize="16" FontWeight="DemiBold" VerticalAlignment="Center"/>
 						<Button Padding="20 5" Grid.Column="1" Content="Load" Command="{Binding ElementName=Root, Path=DataContext.LoadCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Path=DataContext}"/>
 					</Grid>
 				</DataTemplate>

@@ -87,7 +87,7 @@ namespace TurtleGraphics.Validation {
 			bool startsWithFor = line.StartsWith("for");
 			bool endsWithBracket = line.EndsWith("{");
 
-			if (!(startsWithFor || endsWithBracket)) return false;
+			if (!startsWithFor || !endsWithBracket) return false;
 
 			bool isValidType = IsType(split[1].Split()[0], out _);
 
