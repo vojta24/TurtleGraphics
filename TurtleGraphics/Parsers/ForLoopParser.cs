@@ -14,23 +14,27 @@ namespace TurtleGraphics.Parsers {
 			try {
 				// for(int i = 0; i < 50; i++) {
 				// for (int i=0;i<20;i++){
+				// for (int i=0;i<20;i++)
 				string mod = line.Remove(0, 3).Trim();
 
 
 				// (int i = 0; i < 50; i++) {
 				// (int i=0;i<20;i++){
+				// (int i=0;i<20;i++)
 				// (long val=1; val <50; val+=2){
 				errorMessage = "Invalid for loop syntax!";
 				mod = mod.Remove(0, 1);
 
 				// int i = 0; i < 50; i++) {
 				// int i=0;i<20;i++){
+				// int i=0;i<20;i++)
 				// long val=1; val <50; val+=2){
 				errorMessage = "Unsupported interation type!";
 				mod = mod.Replace("int ", "").Replace("long ", "");
 
 				// i = 0; i < 50; i++) {
 				// i=0;i<20;i++){
+				// i=0;i<20;i++)
 				// val=1; val <50; val+=2){
 				errorMessage = "Redefinition of variable!";
 				string variableName = mod.Split('=')[0].Trim();
@@ -43,6 +47,7 @@ namespace TurtleGraphics.Parsers {
 
 				// 0; i < 50; i++) {
 				// 0 ;i<20;i++){
+				// 0 ;i<20;i++)
 				// 1; val <50; val+=2){
 				errorMessage = "Invalid expression for starting value!";
 				IGenericExpression<int> startValueExp = context.CompileGeneric<int>(mod.Split(';')[0].Trim());
@@ -52,12 +57,14 @@ namespace TurtleGraphics.Parsers {
 
 				// i < 50; i++) {
 				// i<20 ;i++){
+				// i<20 ;i++)
 				// val >=50; val+=2){
 
 				mod = mod.Remove(0, variableName.Length).Trim();
 
 				// < 50; i++) {
 				// <20 ;i++){
+				// <20 ;i++)
 				// >=50; val+=2){
 
 				string lhs = mod.Split(';')[0].Trim();
@@ -81,12 +88,14 @@ namespace TurtleGraphics.Parsers {
 
 				// i++) {
 				// i++){
+				// i++)
 				// val +=2){
 
 				mod = mod.Remove(0, variableName.Length).Trim();
 
 				// ++) {
 				// ++){
+				// ++)
 				// +=2){
 
 				OperatorType _operator = LogicParsers.ParseOperator(mod.Split(')')[0]);
@@ -95,6 +104,7 @@ namespace TurtleGraphics.Parsers {
 
 				// ) {
 				// ){
+				// )
 				// 2){
 
 				IGenericExpression<int> changeValueExp = null;
@@ -109,18 +119,16 @@ namespace TurtleGraphics.Parsers {
 
 				// ) {
 				// ){
+				// )
 				// ){
 
 				mod = mod.Replace(")", "");
-				if (mod.IndexOf('{') == -1) {
-					throw new ParsingException("For loop requires a block of code!");
-				}
-				mod = mod.Replace("{", "");
 
-				if (!string.IsNullOrWhiteSpace(mod)) {
-					throw new ParsingException("Invalid for loop syntax!");
+				// {
+				//{
+				if (!mod.Contains("{")) {
+					BlockParser.ReadToBlock(reader, line);
 				}
-
 				List<string> lines = BlockParser.ParseBlock(reader);
 
 				return new ForLoopData() {

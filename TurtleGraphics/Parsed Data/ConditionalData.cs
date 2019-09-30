@@ -29,7 +29,8 @@ namespace TurtleGraphics {
 			Line = line;
 		}
 
-		public void AddElse(StringReader reader) {
+		public void AddElse(StringReader reader, string line) {
+			BlockParser.ReadToBlock(reader, line);
 			List<string> lines = BlockParser.ParseBlock(reader);
 
 			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), CommandParser.Window, Variables);

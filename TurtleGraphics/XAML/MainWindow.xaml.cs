@@ -218,7 +218,7 @@ namespace TurtleGraphics {
 		private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e) {
 			DrawWidth = DrawAreaX.ActualWidth;
 			DrawHeight = DrawAreaY.ActualHeight;
-			Init();
+			//Init();
 		}
 
 		private async void MainWindow_KeyDown(object sender, KeyEventArgs e) {

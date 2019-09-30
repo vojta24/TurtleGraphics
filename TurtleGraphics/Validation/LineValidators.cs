@@ -42,6 +42,8 @@ namespace TurtleGraphics.Validation {
 			//test (20);
 			//teset(ToDeg(Sin(PI))); 
 			//Func(RandX(),Rand(20,50));
+			//for (int i = 0; i < 20, i++)
+			//if (True)
 
 			info = null;
 			string[] split = line.Split(new[] { '(' }, 2, StringSplitOptions.RemoveEmptyEntries);
@@ -49,6 +51,9 @@ namespace TurtleGraphics.Validation {
 			//test 20);
 			//teset ToDeg(Sin(PI))); 
 			//Func RandX(),Rand(20,50));
+			//for int i = 0; i < 20, i++)
+			//if True)
+
 
 			if (split.Length < 2)
 				return false;
@@ -62,15 +67,21 @@ namespace TurtleGraphics.Validation {
 			//test 20)
 			//teset ToDeg(Sin(PI)))
 			//Func RandX(),Rand(20,50))
+			//for int i = 0; i < 20, i++)
+			//if True)
 
 			split[1] = split[1].Remove(split[1].Length - 1, 1);
 
 			//test 20
 			//teset ToDeg(Sin(PI))
 			//Func RandX(),Rand(20,50)
-
+			//for int i = 0; i < 20, i++
+			//if True
 
 			if (IsType(split[1].Split()[0], out _))
+				return false;
+
+			if (split[0].TrimEnd() == "for" || split[0].TrimEnd() == "if")
 				return false;
 
 			FunctionCallInfo i = new FunctionCallInfo();
@@ -85,13 +96,12 @@ namespace TurtleGraphics.Validation {
 		public static bool IsForLoop(string line) {
 			string[] split = line.Split('(', ')');
 			bool startsWithFor = line.StartsWith("for");
-			bool endsWithBracket = line.EndsWith("{");
 
-			if (!startsWithFor || !endsWithBracket) return false;
+			if (!startsWithFor) return false;
 
 			bool isValidType = IsType(split[1].Split()[0], out _);
 
-			return split.Length >= 3 && startsWithFor && endsWithBracket && isValidType;
+			return split.Length >= 3 && startsWithFor && isValidType;
 		}
 
 		internal static bool IsConditional(string line) {

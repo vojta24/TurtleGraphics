@@ -112,6 +112,7 @@ namespace TurtleGraphics {
 				_textLength = window.CommandsText.Length;
 			}
 			else {
+				//TODO rescan for new intelicommands after skipping cuurrent
 				int carret = inputControl.CaretIndex;
 				int lastChar = inputControl.CaretIndex - 1;
 
@@ -204,6 +205,7 @@ namespace TurtleGraphics {
 			string possibleCommand = value.Substring(lastChar + whiteSpaceCount, carret - (lastChar + whiteSpaceCount));
 
 			if (carret < value.Length) {
+				//TODO smarter
 				if (value[carret] != Environment.NewLine[0]) {
 					return false;
 				}

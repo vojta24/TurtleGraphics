@@ -131,7 +131,6 @@ namespace TurtleGraphics {
 						throw new ParsingException($"Unknown function!") { LineText = line };
 					}
 				}
-
 			}
 
 			if (LineValidators.IsForLoop(line)) {
@@ -150,7 +149,7 @@ namespace TurtleGraphics {
 				}
 				if (line.Contains("else")) {
 					ConditionalData latest = conditionals.Peek();
-					latest.AddElse(reader);
+					latest.AddElse(reader, line);
 					latest.IsModifiable = false;
 					return null;
 				}
