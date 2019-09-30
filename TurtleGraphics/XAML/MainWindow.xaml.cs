@@ -308,6 +308,7 @@ namespace TurtleGraphics {
 
 		private async Task DrawData(List<TurtleData> compiledTasks) {
 			Init();
+			Stack<(Point, double)> storedPositions = new Stack<(Point, double)>();
 
 			for (int i = 0; i < compiledTasks.Count; i++) {
 				if (cancellationTokenSource.Token.IsCancellationRequested) {
@@ -353,6 +354,21 @@ namespace TurtleGraphics {
 					}
 					case ParsedAction.Capping: {
 						LineCapping = data.LineCap;
+						NewPath();
+						break;
+					}
+					case ParsedAction.StorePos: {
+						storedPositions.Push((new Point(X,Y), ContextExtensions.AsDeg(Angle)));
+						break;
+					}
+					case ParsedAction.RestorePos: {
+						(Point _point, double _angle) = storedPositions.Peek();
+						if (data.PopPosition) {
+							storedPositions.Pop();
+						}
+						X = _point.X;
+						Y = _point.Y;
+						Rotate(_angle, true);
 						NewPath();
 						break;
 					}

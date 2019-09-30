@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Threading;
 
 namespace TurtleGraphics {
 	public class InteliCommandsHandler {
@@ -20,6 +18,8 @@ namespace TurtleGraphics {
 			{ "SetB", "rushSize();" },
 			{ "SetC", "olor();" },
 			{ "SetL", "ineCapping();" },
+			{ "St", "oreTurtlePosition();" },
+			{ "Re", "storeTurtlePosition();" },
 		};
 
 		private readonly Dictionary<string, int> _inteliCommandsIndexes = new Dictionary<string, int> {
@@ -33,6 +33,8 @@ namespace TurtleGraphics {
 			{ "SetB", 9 },
 			{ "SetC", 5 },
 			{ "SetL", 11 },
+			{ "St", 20 },
+			{ "Re", 20 }
 		};
 
 		public string GetInteliCommand(string value) {

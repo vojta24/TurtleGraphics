@@ -86,6 +86,8 @@
     <Compile Include="IO\FileSystemManager.cs" />
     <Compile Include="InteliCommands\InteliCommandsHandler.cs" />
     <Compile Include="InteliCommands\InteliCommandsState.cs" />
+    <Compile Include="Parsed Data\RestorePositionData.cs" />
+    <Compile Include="Parsed Data\StoredPositionData.cs" />
     <Compile Include="Parsers\ArgParser.cs" />
     <Compile Include="XAML\CompilationStatus.xaml.cs">
       <DependentUpon>CompilationStatus.xaml</DependentUpon>

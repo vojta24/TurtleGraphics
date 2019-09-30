@@ -22,10 +22,10 @@ namespace TurtleGraphics {
 
 		public string[] Parameters { get; set; }
 
-		public string Arg1 => Parameters[0];
-		public string Arg2 => Parameters[1];
-		public string Arg3 => Parameters[2];
-		public string Arg4 => Parameters[3];
+		public string Arg1 => Parameters.Length > 0 ? Parameters[0] : null;
+		public string Arg2 => Parameters.Length > 1 ? Parameters[1] : null;
+		public string Arg3 => Parameters.Length > 2 ? Parameters[2] : null;
+		public string Arg4 => Parameters.Length > 3 ? Parameters[3] : null;
 
 		public abstract ParsedAction Action { get; }
 

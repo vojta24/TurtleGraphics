@@ -119,6 +119,14 @@ namespace TurtleGraphics {
 						return new BrushCappingData(info.Arguments, variables.Copy(), original);
 					}
 
+					case "StoreTurtlePosition": {
+						return new StoredPositionData(info.Arguments, variables.Copy(), original);
+					}
+
+					case "RestoreTurtlePosition": {
+						return new RestorePositionData(info.Arguments, variables.Copy(), original);
+					}
+
 					default: {
 						throw new ParsingException($"Unknown function!") { LineText = line };
 					}

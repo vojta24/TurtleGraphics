@@ -8,5 +8,7 @@
 		Thickness,
 		PenState,
 		Capping,
+		StorePos,
+		RestorePos,
 	}
 }
