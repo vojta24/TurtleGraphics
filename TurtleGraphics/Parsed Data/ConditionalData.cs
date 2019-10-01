@@ -30,7 +30,9 @@ namespace TurtleGraphics {
 		}
 
 		public void AddElse(StringReader reader, string line) {
-			BlockParser.ReadToBlock(reader, line);
+			if (!line.EndsWith("{")) {
+				BlockParser.ReadToBlock(reader, line);
+			}
 			List<string> lines = BlockParser.ParseBlock(reader);
 
 			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), CommandParser.Window, Variables);
