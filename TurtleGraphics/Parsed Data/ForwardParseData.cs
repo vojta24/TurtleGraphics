@@ -27,6 +27,7 @@ namespace TurtleGraphics {
 			Distance = _expression.Evaluate();
 			return new TurtleData {
 				MoveTo = new Point(previous.MoveTo.X + Math.Cos(previous.Angle) * Distance, previous.MoveTo.Y + Math.Sin(previous.Angle) * Distance),
+				Distance = Distance,
 				Action = Action,
 			};
 		}
