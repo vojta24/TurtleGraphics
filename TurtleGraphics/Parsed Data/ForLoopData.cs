@@ -61,7 +61,7 @@ namespace TurtleGraphics {
 					else {
 						interData.Add(current.Compile(previous, token));
 					}
-					if(interData.Count != 0) {
+					if (interData.Count != 0) {
 						previous = interData[interData.Count - 1];
 					}
 				}

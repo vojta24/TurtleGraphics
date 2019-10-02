@@ -4,7 +4,7 @@ using System.Threading;
 namespace TurtleGraphics {
 	public class RestorePositionData : ParsedData {
 
-		public RestorePositionData(string[] args, Dictionary<string,object> variables, string line) : base(variables, line) {
+		public RestorePositionData(string[] args, Dictionary<string, object> variables, string line) : base(variables, line) {
 			Parameters = args;
 			if (Arg1 != null) {
 				IsPop = bool.Parse(Arg1);
@@ -22,15 +22,6 @@ namespace TurtleGraphics {
 		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
 			return new TurtleData {
 				Action = Action,
-				Angle = previous.Angle,
-				Brush = previous.Brush,
-				BrushThickness = previous.BrushThickness,
-				Distance = previous.Distance,
-				Jump = false,
-				LineCap = previous.LineCap,
-				MoveTo = previous.MoveTo,
-				PenDown = previous.PenDown,
-				SetAngle = previous.SetAngle,
 				PopPosition = IsPop
 			};
 		}

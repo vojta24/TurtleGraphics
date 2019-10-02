@@ -17,13 +17,6 @@ namespace TurtleGraphics {
 			token.ThrowIfCancellationRequested();
 
 			return new TurtleData {
-				Angle = previous.Angle,
-				SetAngle = previous.SetAngle,
-				Brush = previous.Brush,
-				BrushThickness = previous.BrushThickness,
-				MoveTo = previous.MoveTo,
-				PenDown = previous.PenDown,
-				Jump = false,
 				Action = Action,
 				LineCap = (PenLineCap)Enum.Parse(typeof(PenLineCap), Arg1),
 			};

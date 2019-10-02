@@ -36,11 +36,6 @@ namespace TurtleGraphics {
 			UpdateVars(y);
 
 			return new TurtleData {
-				Angle = previous.Angle,
-				SetAngle = previous.SetAngle,
-				Brush = previous.Brush,
-				BrushThickness = previous.BrushThickness,
-				PenDown = previous.PenDown,
 				MoveTo = new Point(x.Evaluate(), y.Evaluate()),
 				Jump = true,
 				Action = Action,

@@ -62,13 +62,7 @@ namespace TurtleGraphics {
 			brush.Freeze();
 
 			return new TurtleData {
-				Angle = previous.Angle,
-				SetAngle = previous.SetAngle,
 				Brush = brush,
-				BrushThickness = previous.BrushThickness,
-				MoveTo = previous.MoveTo,
-				PenDown = previous.PenDown,
-				Jump = false,
 				Action = Action,
 			};
 		}

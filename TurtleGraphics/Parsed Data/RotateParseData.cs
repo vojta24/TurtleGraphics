@@ -8,7 +8,7 @@ namespace TurtleGraphics {
 
 		private readonly IGenericExpression<double> _expression;
 
-		public RotateParseData(IGenericExpression<double> expression, FunctionCallInfo info, Dictionary<string, object> variables, string line) : base(variables,line) {
+		public RotateParseData(IGenericExpression<double> expression, FunctionCallInfo info, Dictionary<string, object> variables, string line) : base(variables, line) {
 			_expression = expression;
 			string exceptionMessage = "Invalid arguments for rotation";
 			try {
@@ -36,11 +36,6 @@ namespace TurtleGraphics {
 			return new TurtleData {
 				Angle = _expression == null ? 0 : _expression.Evaluate(),
 				SetAngle = SetRotation,
-				Brush = previous.Brush,
-				BrushThickness = previous.BrushThickness,
-				PenDown = previous.PenDown,
-				MoveTo = previous.MoveTo,
-				Jump = false,
 				Action = Action,
 			};
 		}

@@ -23,13 +23,7 @@ namespace TurtleGraphics {
 			token.ThrowIfCancellationRequested();
 			UpdateVars(_expression);
 			return new TurtleData {
-				Angle = previous.Angle,
-				SetAngle = previous.SetAngle,
-				Brush = previous.Brush,
 				BrushThickness = _expression.Evaluate(),
-				MoveTo = previous.MoveTo,
-				PenDown = previous.PenDown,
-				Jump = false,
 				Action = Action,
 			};
 		}

@@ -9,7 +9,7 @@ namespace TurtleGraphics {
 
 		private readonly IGenericExpression<double> _expression;
 
-		public ForwardParseData(IGenericExpression<double> expression, Dictionary<string, object> variables, string line) : base(variables,line) {
+		public ForwardParseData(IGenericExpression<double> expression, Dictionary<string, object> variables, string line) : base(variables, line) {
 			_expression = expression;
 		}
 
@@ -26,14 +26,7 @@ namespace TurtleGraphics {
 			UpdateVars(_expression);
 			Distance = _expression.Evaluate();
 			return new TurtleData {
-				Angle = previous.Angle,
-				SetAngle = previous.SetAngle,
-				Distance = Distance,
-				Brush = previous.Brush,
-				BrushThickness = previous.BrushThickness,
 				MoveTo = new Point(previous.MoveTo.X + Math.Cos(previous.Angle) * Distance, previous.MoveTo.Y + Math.Sin(previous.Angle) * Distance),
-				PenDown = previous.PenDown,
-				Jump = false,
 				Action = Action,
 			};
 		}
