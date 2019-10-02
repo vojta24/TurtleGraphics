@@ -128,7 +128,7 @@ namespace TurtleGraphics {
 					}
 
 					default: {
-						throw new ParsingException($"Unknown function!") { LineText = line };
+						throw new ParsingException($"Unknown function!", line);
 					}
 				}
 			}
@@ -154,7 +154,7 @@ namespace TurtleGraphics {
 					return null;
 				}
 			}
-			throw new ParsingException($"Unexpected squence!") { LineText = line };
+			throw new ParsingException($"Unexpected squence!", line);
 		}
 
 		private static IGenericExpression<T> ParseGenericExpression<T>(string line, string fullLine, Dictionary<string, object> variables) {
@@ -163,7 +163,7 @@ namespace TurtleGraphics {
 				return context.CompileGeneric<T>(line);
 			}
 			catch (Exception e) {
-				throw new ParsingException($"Unable to parse expression of {typeof(T).FullName} from '{line}'", e) { LineText = fullLine };
+				throw new ParsingException($"Unable to parse expression of {typeof(T).FullName} from '{line}'", line, e);
 			}
 		}
 	}

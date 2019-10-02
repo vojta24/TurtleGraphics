@@ -33,30 +33,41 @@ namespace TurtleGraphics {
 						colorData = colorData.Replace(key, Variables[key].ToString());
 					}
 				}
-
-				brush = (Brush)new BrushConverter().ConvertFromString(Arg1 == "random" ? RandColor() : Arg1);
+				try {
+					brush = (Brush)new BrushConverter().ConvertFromString(Arg1 == "random" ? RandColor() : Arg1);
+				}
+				catch (FormatException e) {
+					throw new ParsingException("Invalid token for 'Color'", Line, e);
+				}
 			}
 			else if (Parameters.Length == 3) {
 				ExpressionContext c = FleeHelper.GetExpression(Variables);
-
-				byte r = Convert.ToByte(c.CompileGeneric<double>(Arg1).Evaluate());
-				byte g = Convert.ToByte(c.CompileGeneric<double>(Arg2).Evaluate());
-				byte b = Convert.ToByte(c.CompileGeneric<double>(Arg3).Evaluate());
-
-				brush = new SolidColorBrush(new Color() { A = byte.MaxValue, R = r, G = g, B = b });
+				try {
+					byte r = Convert.ToByte(c.CompileGeneric<double>(Arg1).Evaluate());
+					byte g = Convert.ToByte(c.CompileGeneric<double>(Arg2).Evaluate());
+					byte b = Convert.ToByte(c.CompileGeneric<double>(Arg3).Evaluate());
+					brush = new SolidColorBrush(new Color() { A = byte.MaxValue, R = r, G = g, B = b });
+				}
+				catch (Exception e) {
+					throw new ParsingException("Invalid value, expected " + typeof(byte).Name, Line, e);
+				}
 			}
 			else if (Parameters.Length == 4) {
 				ExpressionContext c = FleeHelper.GetExpression(Variables);
+				try {
+					byte a = Convert.ToByte(c.CompileGeneric<double>(Arg1).Evaluate());
+					byte r = Convert.ToByte(c.CompileGeneric<double>(Arg2).Evaluate());
+					byte g = Convert.ToByte(c.CompileGeneric<double>(Arg3).Evaluate());
+					byte b = Convert.ToByte(c.CompileGeneric<double>(Arg4).Evaluate());
 
-				byte a = Convert.ToByte(c.CompileGeneric<double>(Arg1).Evaluate());
-				byte r = Convert.ToByte(c.CompileGeneric<double>(Arg2).Evaluate());
-				byte g = Convert.ToByte(c.CompileGeneric<double>(Arg3).Evaluate());
-				byte b = Convert.ToByte(c.CompileGeneric<double>(Arg4).Evaluate());
-
-				brush = new SolidColorBrush(new Color() { A = a, R = r, G = g, B = b });
+					brush = new SolidColorBrush(new Color() { A = a, R = r, G = g, B = b });
+				}
+				catch (Exception e) {
+					throw new ParsingException("Invalid value, expected " + typeof(byte).Name, Line, e);
+				}
 			}
 			else {
-				throw new ParsingException("Non-existent overload for function!") { LineText = Line };
+				throw new ParsingException("Non-existent overload for function!", Line);
 			}
 
 			brush.Freeze();

@@ -22,18 +22,18 @@ namespace TurtleGraphics.Parsers {
 			mod = mod.Replace("{", "").Trim();
 
 			if (line.IndexOf('(') == -1) {
-				throw new ParsingException("If statement invalid syntax!");
+				throw new ParsingException("If statement invalid syntax!", line);
 			}
 
 			if (line.IndexOf(')') == -1) {
-				throw new ParsingException("If statement invalid syntax!");
+				throw new ParsingException("If statement invalid syntax!", line);
 			}
 
 			mod = mod.Trim('(', ')');
 			int equalsIndex = mod.IndexOf("=");
 
 			if (equalsIndex == mod.LastIndexOf("=") && equalsIndex != -1 && mod[equalsIndex - 1] != '!') {
-				throw new ParsingException("If statement invalid syntax (== for comparison)!");
+				throw new ParsingException("If statement invalid syntax (== for comparison)!", line);
 			}
 
 			mod = mod.Replace("==", "=");
@@ -59,7 +59,7 @@ namespace TurtleGraphics.Parsers {
 				throw;
 			}
 			catch (Exception e) {
-				throw new ParsingException("Invalid boolean expression!", e) { LineText = line };
+				throw new ParsingException("Invalid boolean expression!", line, e);
 			}
 		}
 	}

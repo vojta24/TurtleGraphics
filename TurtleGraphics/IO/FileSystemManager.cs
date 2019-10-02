@@ -7,6 +7,7 @@ namespace TurtleGraphics {
 	public class FileSystemManager {
 
 		public const string EXTENSION = ".tgs";
+		public const string CRASH_BCK = ".crash_bck";
 		public string SavedDataPath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SavedData");
 
 		public FileSystemManager() {
@@ -33,6 +34,20 @@ namespace TurtleGraphics {
 			Grid.SetColumn(d, 1);
 			MainWindow.Instance.Paths.Children.Add(d);
 			return await d.Select();
+		}
+
+		public void CreateCodeBackup(string commandsText) {
+			File.WriteAllText(Path.Combine(SavedDataPath, CRASH_BCK), commandsText);
+		}
+
+		public string RestoreCodeIfExists() {
+			string fullPath = Path.Combine(SavedDataPath, CRASH_BCK);
+			if (File.Exists(fullPath)) {
+				string content = File.ReadAllText(fullPath);
+				File.Delete(fullPath);
+				return content;
+			}
+			return "";
 		}
 	}
 }

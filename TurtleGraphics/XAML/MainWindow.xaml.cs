@@ -127,6 +127,7 @@ namespace TurtleGraphics {
 				}
 			});
 			Loaded += MainWindow_Loaded;
+			Closed += MainWindow_Closed;
 			FSSManager = new FileSystemManager();
 			SaveCommand = new Command(() => {
 				if (!NoWindowsActive)
@@ -151,22 +152,6 @@ namespace TurtleGraphics {
 			CommandsTextInput.TextChanged += CommandsTextInput_TextChanged; ;
 			DataContext = this;
 			Instance = this;
-		}
-
-		private void CommandsTextInput_TextChanged(object sender, TextChangedEventArgs e) {
-			foreach (TextChange change in e.Changes) {
-				if (change.AddedLength == Environment.NewLine.Length) {
-					string changedText = _commandsText.Substring(change.Offset, change.AddedLength);
-					if (changedText == Environment.NewLine) {
-						string region = _commandsText.Substring(0, CommandsTextInput.CaretIndex);
-						int indentLevel = region.Count(s => s == '{') - region.Count(s => s == '}');
-						int carret = CommandsTextInput.CaretIndex;
-						CommandsTextInput.Text = CommandsTextInput.Text.Insert(change.Offset + change.AddedLength, new string(' ', 3 * indentLevel));
-						InteliCommandsText = CommandsTextInput.Text;
-						CommandsTextInput.CaretIndex = carret + 3 * indentLevel;
-					}
-				}
-			}
 		}
 
 		public void Init() {
@@ -209,14 +194,17 @@ namespace TurtleGraphics {
 			DrawHeight = DrawAreaY.ActualHeight;
 			_inteliCommandsScroller = FindDescendant<ScrollViewer>(InteliCommands);
 			Init();
+			CommandsText = FSSManager.RestoreCodeIfExists();
 			Loaded -= MainWindow_Loaded;
 		}
 
+		private void MainWindow_Closed(object sender, EventArgs e) {
+			FSSManager.RestoreCodeIfExists();
+		}
 
 		private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e) {
 			DrawWidth = DrawAreaX.ActualWidth;
 			DrawHeight = DrawAreaY.ActualHeight;
-			//Init();
 		}
 
 		private async void MainWindow_KeyDown(object sender, KeyEventArgs e) {
@@ -242,6 +230,22 @@ namespace TurtleGraphics {
 			}
 			_inteliCommandsScroller.ScrollToVerticalOffset(e.VerticalOffset);
 			_inteliCommandsScroller.ScrollToHorizontalOffset(e.HorizontalOffset);
+		}
+
+		private void CommandsTextInput_TextChanged(object sender, TextChangedEventArgs e) {
+			foreach (TextChange change in e.Changes) {
+				if (change.AddedLength == Environment.NewLine.Length) {
+					string changedText = _commandsText.Substring(change.Offset, change.AddedLength);
+					if (changedText == Environment.NewLine) {
+						string region = _commandsText.Substring(0, CommandsTextInput.CaretIndex);
+						int indentLevel = region.Count(s => s == '{') - region.Count(s => s == '}');
+						int carret = CommandsTextInput.CaretIndex;
+						CommandsTextInput.Text = CommandsTextInput.Text.Insert(change.Offset + change.AddedLength, new string(' ', 3 * indentLevel));
+						InteliCommandsText = CommandsTextInput.Text;
+						CommandsTextInput.CaretIndex = carret + 3 * indentLevel;
+					}
+				}
+			}
 		}
 
 		#endregion
@@ -416,6 +420,7 @@ namespace TurtleGraphics {
 			ButtonText = "Stop";
 			try {
 				_compilationStatus.Status = "Parsing text...";
+				FSSManager.CreateCodeBackup(CommandsText);
 				Queue<ParsedData> tasks = CommandParser.ParseCommands(CommandsText, this);
 				_compilationStatus.Status = "Compiling...";
 				List<TurtleData> compiledTasks = await CompileTasks(tasks, cancellationTokenSource.Token);

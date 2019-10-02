@@ -20,7 +20,7 @@ namespace TurtleGraphics {
 				y = expression.CompileGeneric<double>(args[1]);
 			}
 			catch (Exception e) {
-				throw new ParsingException(exceptionMessage, e) { LineText = line };
+				throw new ParsingException(exceptionMessage, line, e);
 			}
 		}
 

@@ -40,7 +40,7 @@ namespace TurtleGraphics.Parsers {
 				string variableName = mod.Split('=')[0].Trim();
 
 				if (inherited.ContainsKey(variableName)) {
-					throw new ParsingException(errorMessage) { LineText = line };
+					throw new ParsingException(errorMessage, line);
 				}
 
 				mod = mod.Remove(0, mod.IndexOf("=") + 1).Trim();
@@ -145,7 +145,7 @@ namespace TurtleGraphics.Parsers {
 				throw;
 			}
 			catch (Exception e) {
-				throw new ParsingException(errorMessage, e) { LineText = line };
+				throw new ParsingException(errorMessage, line, e);
 			}
 		}
 	}

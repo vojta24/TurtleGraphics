@@ -25,7 +25,7 @@ namespace TurtleGraphics {
 			}
 
 			if (openBarckets != 0) {
-				throw new ParsingException("Missing closing bracket!") { LineText = "" };
+				throw new ParsingException("Missing closing bracket!", "");
 			}
 
 			return ret;
@@ -36,7 +36,7 @@ namespace TurtleGraphics {
 
 			while (read != '{') {
 				if (!char.IsWhiteSpace((char)read)) {
-					throw new ParsingException("Invalid characters between a control and its block") { LineText = lineToReport };
+					throw new ParsingException("Invalid characters between a control and its block", lineToReport);
 				}
 				read = reader.Read();
 			}
