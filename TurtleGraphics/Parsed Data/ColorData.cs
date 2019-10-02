@@ -11,10 +11,8 @@ namespace TurtleGraphics {
 		private readonly char[] HEX = new[] { '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 		private readonly Random _random;
 
-		public ColorData(string[] args, Dictionary<string, object> variables, string line) : base(args) {
+		public ColorData(string[] args, Dictionary<string, object> variables, string line) : base(variables, line, args) {
 			_random = new Random((int)DateTime.Now.Ticks);
-			Variables = variables;
-			Line = line;
 		}
 
 		public override bool IsBlock => false;

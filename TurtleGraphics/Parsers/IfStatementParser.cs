@@ -54,10 +54,7 @@ namespace TurtleGraphics.Parsers {
 				Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), MainWindow.Instance, variables);
 				isStatement.AddRange(data);
 
-				return new ConditionalData(line, ifCondition, data) {
-					Variables = variables.Copy(),
-					Line = line,
-				};
+				return new ConditionalData(line, ifCondition, data, variables.Copy());
 			}
 			catch (ParsingException) {
 				throw;

@@ -9,10 +9,8 @@ namespace TurtleGraphics {
 
 		private readonly IGenericExpression<double> _expression;
 
-		public ForwardParseData(IGenericExpression<double> expression, Dictionary<string, object> variables, string line) {
+		public ForwardParseData(IGenericExpression<double> expression, Dictionary<string, object> variables, string line) : base(variables,line) {
 			_expression = expression;
-			Variables = variables;
-			Line = line;
 		}
 
 		public double Distance { get; set; }

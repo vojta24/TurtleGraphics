@@ -5,10 +5,8 @@ using System.Threading;
 namespace TurtleGraphics {
 	public class PenPositionData : ParsedData {
 
-		public PenPositionData(bool state, Dictionary<string, object> variables, string line) {
+		public PenPositionData(bool state, Dictionary<string, object> variables, string line) : base(variables, line) {
 			PenState = state;
-			Variables = variables;
-			Line = line;
 		}
 
 		public bool PenState { get; set; }

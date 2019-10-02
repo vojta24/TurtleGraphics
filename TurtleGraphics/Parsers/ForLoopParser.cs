@@ -131,16 +131,14 @@ namespace TurtleGraphics.Parsers {
 				}
 				List<string> lines = BlockParser.ParseBlock(reader);
 
-				return new ForLoopData() {
+				return new ForLoopData(inherited.Copy(), line) {
 					From = startValueExp,
 					To = endValueExp,
 					LoopVariable = variableName,
 					Change = changeValueExp,
 					Condition = condition,
 					Operator = _operator,
-					Variables = inherited.Copy(),
 					Lines = lines,
-					Line = line,
 				};
 			}
 			catch (ParsingException) {

@@ -8,8 +8,10 @@ namespace TurtleGraphics {
 
 	public abstract class ParsedData {
 
-		public ParsedData(params string[] parameters) {
+		public ParsedData(Dictionary<string, object> variables, string originalLine, params string[] parameters) {
 			Parameters = parameters;
+			Variables = variables;
+			Line = originalLine;
 		}
 
 		public abstract bool IsBlock { get; }

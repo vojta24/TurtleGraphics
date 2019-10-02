@@ -20,12 +20,9 @@ namespace TurtleGraphics {
 
 		public override string Line { get; set; }
 
-		public ConditionalData(string line,
-			IGenericExpression<bool> ifCondition, Queue<ParsedData> data,
-			IList<(IGenericExpression<bool>, Queue<ParsedData>)> elseIfs = null) : base(line) {
+		public ConditionalData(string line, IGenericExpression<bool> ifCondition, Queue<ParsedData> data, Dictionary<string, object> variables) : base(variables, line, line) {
 			IfCondition = ifCondition;
 			IfData = data;
-			ElseIfs = elseIfs;
 			Line = line;
 		}
 

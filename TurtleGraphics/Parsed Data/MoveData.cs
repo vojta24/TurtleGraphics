@@ -10,9 +10,7 @@ namespace TurtleGraphics {
 		private readonly IGenericExpression<double> x;
 		private readonly IGenericExpression<double> y;
 
-		public MoveData(string[] args, Dictionary<string, object> variables, string line) : base(args) {
-			Variables = variables;
-
+		public MoveData(string[] args, Dictionary<string, object> variables, string line) : base(variables, line, args) {
 			ExpressionContext expression = FleeHelper.GetExpression(variables);
 			string exceptionMessage = "";
 			try {

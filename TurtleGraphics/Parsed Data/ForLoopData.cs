@@ -21,6 +21,8 @@ namespace TurtleGraphics {
 		public int LineIndex { get; set; }
 		public override string Line { get; set; }
 
+		public ForLoopData(Dictionary<string, object> dictionary, string line) : base(dictionary, line) { }
+
 		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
 			throw new NotImplementedException();
 		}
