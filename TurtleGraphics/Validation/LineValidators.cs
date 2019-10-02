@@ -57,7 +57,7 @@ namespace TurtleGraphics.Validation {
 
 			if (split.Length < 2)
 				return false;
-			
+
 
 			if (split[1].EndsWith("{"))
 				return false;

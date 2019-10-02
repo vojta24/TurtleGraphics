@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -358,7 +356,7 @@ namespace TurtleGraphics {
 						break;
 					}
 					case ParsedAction.StorePos: {
-						storedPositions.Push((new Point(X,Y), ContextExtensions.AsDeg(Angle)));
+						storedPositions.Push((new Point(X, Y), ContextExtensions.AsDeg(Angle)));
 						break;
 					}
 					case ParsedAction.RestorePos: {

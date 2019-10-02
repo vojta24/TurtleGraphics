@@ -23,7 +23,7 @@ namespace TurtleGraphics {
 		public CompilationStatus() {
 			InitializeComponent();
 			DataContext = this;
-			
+
 			Loaded += CompilationStatus_Loaded;
 			Grid.SetColumn(this, 1);
 		}

@@ -1,9 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using System;
 using System.IO;
-using System;
-using Microsoft.Win32;
 using System.Threading.Tasks;
-using System.Windows;
+using System.Windows.Controls;
 
 namespace TurtleGraphics {
 	public class FileSystemManager {

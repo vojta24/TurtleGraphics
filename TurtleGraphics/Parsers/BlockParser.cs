@@ -9,7 +9,7 @@ namespace TurtleGraphics {
 			string next = reader.ReadLine();
 			int openBarckets = 1;
 
-			while (next != null){
+			while (next != null) {
 				ret.Add(next);
 				if (next.Contains("{")) {
 					openBarckets++;

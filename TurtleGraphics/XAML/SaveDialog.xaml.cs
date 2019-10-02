@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Igor.Models;
@@ -25,7 +24,7 @@ namespace TurtleGraphics {
 			DataContext = this;
 			_showTurtleBck = MainWindow.Instance.ShowTurtleCheckBox;
 			MainWindow.Instance.ShowTurtleCheckBox = false;
-			SaveCommand = new Command(() => { 
+			SaveCommand = new Command(() => {
 				MainWindow.Instance.FSSManager.Save(SaveFileName, MainWindow.Instance.CommandsText);
 				Common();
 			});

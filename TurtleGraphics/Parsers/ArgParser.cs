@@ -31,7 +31,7 @@ namespace TurtleGraphics.Parsers {
 					break;
 				}
 			}
-			if(parsed.Count == 0 && !string.IsNullOrWhiteSpace(args)) {
+			if (parsed.Count == 0 && !string.IsNullOrWhiteSpace(args)) {
 				parsed.Add(args);
 			}
 			return parsed.ToArray();
