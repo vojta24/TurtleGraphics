@@ -89,7 +89,7 @@ namespace TurtleGraphics {
 		private PathFigure _currentFigure;
 		private PolyLineSegment _currentSegment;
 		private CancellationTokenSource cancellationTokenSource;
-		private bool _inteliCommandsEnabled = true;
+		private bool _inteliCommandsEnabled = false;
 		private InteliCommandsHandler _inteliCommands = new InteliCommandsHandler();
 		private ScrollViewer _inteliCommandsScroller;
 		private readonly CompilationStatus _compilationStatus = new CompilationStatus();
@@ -225,7 +225,7 @@ namespace TurtleGraphics {
 		}
 
 		private void CommandsTextInput_ScrollChanged(object sender, ScrollChangedEventArgs e) {
-			if (_inteliCommandsScroller == null) {
+			if (!_inteliCommandsEnabled || _inteliCommandsScroller == null) {
 				return;
 			}
 			_inteliCommandsScroller.ScrollToVerticalOffset(e.VerticalOffset);
@@ -241,7 +241,9 @@ namespace TurtleGraphics {
 						int indentLevel = region.Count(s => s == '{') - region.Count(s => s == '}');
 						int carret = CommandsTextInput.CaretIndex;
 						CommandsTextInput.Text = CommandsTextInput.Text.Insert(change.Offset + change.AddedLength, new string(' ', 3 * indentLevel));
-						InteliCommandsText = CommandsTextInput.Text;
+						if (_inteliCommandsEnabled) {
+							InteliCommandsText = CommandsTextInput.Text;
+						}
 						CommandsTextInput.CaretIndex = carret + 3 * indentLevel;
 					}
 				}
