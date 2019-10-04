@@ -89,7 +89,7 @@ namespace TurtleGraphics {
 		private PathFigure _currentFigure;
 		private PolyLineSegment _currentSegment;
 		private CancellationTokenSource cancellationTokenSource;
-		private bool _inteliCommandsEnabled = false;
+		private bool _inteliCommandsEnabled = true;
 		private InteliCommandsHandler _inteliCommands = new InteliCommandsHandler();
 		private ScrollViewer _inteliCommandsScroller;
 		private readonly CompilationStatus _compilationStatus = new CompilationStatus();
