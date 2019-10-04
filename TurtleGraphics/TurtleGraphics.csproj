@@ -89,6 +89,7 @@
     <Compile Include="Parsed Data\RestorePositionData.cs" />
     <Compile Include="Parsed Data\StoredPositionData.cs" />
     <Compile Include="Parsers\ArgParser.cs" />
+    <Compile Include="Parsers\FunctionNames.cs" />
     <Compile Include="XAML\CompilationStatus.xaml.cs">
       <DependentUpon>CompilationStatus.xaml</DependentUpon>
     </Compile>

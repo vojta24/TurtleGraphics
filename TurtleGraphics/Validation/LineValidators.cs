@@ -48,7 +48,7 @@ namespace TurtleGraphics.Validation {
 			info = null;
 			string[] split = line.Split(new[] { '(' }, 2, StringSplitOptions.RemoveEmptyEntries);
 
-			//test 20);
+			//test  20);
 			//teset ToDeg(Sin(PI))); 
 			//Func RandX(),Rand(20,50));
 			//for int i = 0; i < 20, i++)
@@ -58,9 +58,11 @@ namespace TurtleGraphics.Validation {
 			if (split.Length < 2)
 				return false;
 
+			split[0] = split[0].TrimEnd();
 
-			if (split[1].EndsWith("{"))
-				return false;
+			if (FunctionNames.Fuctions.Contains(split[0]) && !split[1].EndsWith(";")) {
+				throw new ParsingException("Missing semicolon after a function call!", line);
+			}
 
 			split[1] = split[1].TrimEnd(';', ' ');
 
