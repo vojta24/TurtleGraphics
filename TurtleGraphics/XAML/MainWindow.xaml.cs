@@ -44,7 +44,7 @@ namespace TurtleGraphics {
 		private int _iterationCount = 1;
 		private ICommand _buttonCommand;
 		private ICommand _stopCommand;
-		private string _buttonText = "Run";
+		private string _buttonText = "Run (F5)";
 		private ICommand _toggleFullScreenCommand;
 		private bool _toggleFullscreenEnabled = true;
 		private string _buttonTextFullSize = "Run on fullsize canvas";
@@ -89,8 +89,7 @@ namespace TurtleGraphics {
 		private PathFigure _currentFigure;
 		private PolyLineSegment _currentSegment;
 		private CancellationTokenSource cancellationTokenSource;
-		private bool _inteliCommandsEnabled = true;
-		private InteliCommandsHandler _inteliCommands = new InteliCommandsHandler();
+		private readonly InteliCommandsHandler _inteliCommands = new InteliCommandsHandler();
 		private ScrollViewer _inteliCommandsScroller;
 		private readonly CompilationStatus _compilationStatus = new CompilationStatus();
 		private readonly ExceptionDisplay _exceptionDisplay = new ExceptionDisplay();
@@ -111,7 +110,7 @@ namespace TurtleGraphics {
 			StopCommand = new Command(() => {
 				cancellationTokenSource.Cancel();
 				ButtonCommand = RunCommand;
-				ButtonText = "Run";
+				ButtonText = "Run (F5)";
 			});
 			ButtonCommand = RunCommand;
 			ToggleFullScreenCommand = new Command(ToggleFullScreenAction);
@@ -128,6 +127,7 @@ namespace TurtleGraphics {
 			});
 			Loaded += MainWindow_Loaded;
 			Closed += MainWindow_Closed;
+
 			FSSManager = new FileSystemManager();
 			SaveCommand = new Command(() => {
 				if (!NoWindowsActive)
@@ -217,19 +217,20 @@ namespace TurtleGraphics {
 		}
 
 		private void CommandsTextInput_SelectionChanged(object sender, RoutedEventArgs e) {
-			if (_inteliCommandsEnabled) {
-				_inteliCommands.Handle(this, CommandsTextInput);
-				Notify(nameof(CommandsText));
-				Notify(nameof(InteliCommandsText));
-			}
+#if INTELI_COMMANDS
+			_inteliCommands.Handle(this, CommandsTextInput);
+			Notify(nameof(CommandsText));
+			Notify(nameof(InteliCommandsText));
+#endif
 		}
 
 		private void CommandsTextInput_ScrollChanged(object sender, ScrollChangedEventArgs e) {
-			if (!_inteliCommandsEnabled || _inteliCommandsScroller == null) {
-				return;
+#if INTELI_COMMANDS
+			if (_inteliCommandsScroller != null) {
+				_inteliCommandsScroller.ScrollToVerticalOffset(e.VerticalOffset);
+				_inteliCommandsScroller.ScrollToHorizontalOffset(e.HorizontalOffset);
 			}
-			_inteliCommandsScroller.ScrollToVerticalOffset(e.VerticalOffset);
-			_inteliCommandsScroller.ScrollToHorizontalOffset(e.HorizontalOffset);
+#endif
 		}
 
 		private void CommandsTextInput_TextChanged(object sender, TextChangedEventArgs e) {
@@ -241,12 +242,19 @@ namespace TurtleGraphics {
 						int indentLevel = region.Count(s => s == '{') - region.Count(s => s == '}');
 						int carret = CommandsTextInput.CaretIndex;
 						CommandsTextInput.Text = CommandsTextInput.Text.Insert(change.Offset + change.AddedLength, new string(' ', 3 * indentLevel));
-						if (_inteliCommandsEnabled) {
-							InteliCommandsText = CommandsTextInput.Text;
-						}
+#if INTELI_COMMANDS
+						InteliCommandsText = CommandsTextInput.Text;
+#endif
 						CommandsTextInput.CaretIndex = carret + 3 * indentLevel;
 					}
 				}
+			}
+		}
+
+		protected override void OnKeyDown(KeyEventArgs e) {
+			if(e.Key == Key.F5) {
+				ButtonCommand.Execute(null);
+				e.Handled = true;
 			}
 		}
 
@@ -311,7 +319,6 @@ namespace TurtleGraphics {
 		#region Drawing lines
 
 		private async Task DrawData(List<TurtleData> compiledTasks) {
-			Init();
 			Stack<(Point, double)> storedPositions = new Stack<(Point, double)>();
 
 			for (int i = 0; i < compiledTasks.Count; i++) {
@@ -419,7 +426,7 @@ namespace TurtleGraphics {
 			Init();
 			cancellationTokenSource = new CancellationTokenSource();
 			ButtonCommand = StopCommand;
-			ButtonText = "Stop";
+			ButtonText = "Stop (F5)";
 			try {
 				_compilationStatus.Status = "Parsing text...";
 				FSSManager.CreateCodeBackup(CommandsText);
@@ -441,7 +448,7 @@ namespace TurtleGraphics {
 			}
 			finally {
 				ButtonCommand = RunCommand;
-				ButtonText = "Run";
+				ButtonText = "Run (F5)";
 				ToggleFullscreenEnabled = true;
 			}
 		}
