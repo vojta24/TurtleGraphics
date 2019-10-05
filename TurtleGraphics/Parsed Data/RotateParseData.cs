@@ -30,7 +30,7 @@ namespace TurtleGraphics {
 
 		public override string Line { get; set; }
 
-		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
+		public override TurtleData Compile(CancellationToken token) {
 			token.ThrowIfCancellationRequested();
 			UpdateVars(_expression);
 			return new TurtleData {
@@ -40,7 +40,7 @@ namespace TurtleGraphics {
 			};
 		}
 
-		public override IList<TurtleData> CompileBlock(TurtleData previous, CancellationToken token) {
+		public override IList<TurtleData> CompileBlock(CancellationToken token) {
 			throw new NotImplementedException();
 		}
 	}

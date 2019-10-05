@@ -252,7 +252,7 @@ namespace TurtleGraphics {
 		}
 
 		protected override void OnKeyDown(KeyEventArgs e) {
-			if(e.Key == Key.F5) {
+			if (e.Key == Key.F5) {
 				ButtonCommand.Execute(null);
 				e.Handled = true;
 			}
@@ -455,20 +455,18 @@ namespace TurtleGraphics {
 
 		private Task<List<TurtleData>> CompileTasks(Queue<ParsedData> tasks, CancellationToken token) {
 			return Task.Run(() => {
-				List<TurtleData> ret = new List<TurtleData>(8192);
-
-				TurtleData initial = new TurtleData() { Angle = Angle, Brush = Brushes.Blue, BrushThickness = BrushSize, MoveTo = new Point(X, Y), PenDown = true };
-				ret.Add(initial);
+				List<TurtleData> ret = new List<TurtleData>(8192) {
+					new TurtleData() { Angle = Angle, Brush = Brushes.Blue, BrushThickness = BrushSize, MoveTo = new Point(X, Y), PenDown = true }
+				};
 
 				while (tasks.Count > 0) {
 					ParsedData current = tasks.Dequeue();
 					if (current.IsBlock) {
-						ret.AddRange(current.CompileBlock(initial, token));
+						ret.AddRange(current.CompileBlock(token));
 					}
 					else {
-						ret.Add(current.Compile(initial, token));
+						ret.Add(current.Compile(token));
 					}
-					initial = ret[ret.Count - 1];
 				}
 				return ret;
 			});

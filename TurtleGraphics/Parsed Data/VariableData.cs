@@ -18,11 +18,11 @@ namespace TurtleGraphics {
 			Value = value;
 		}
 
-		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
+		public override TurtleData Compile(CancellationToken token) {
 			return TurtleData.NoAction;
 		}
 
-		public override IList<TurtleData> CompileBlock(TurtleData previous, CancellationToken token) {
+		public override IList<TurtleData> CompileBlock(CancellationToken token) {
 			throw new System.NotImplementedException();
 		}
 	}

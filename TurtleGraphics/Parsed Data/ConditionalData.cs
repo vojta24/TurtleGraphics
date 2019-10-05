@@ -36,22 +36,22 @@ namespace TurtleGraphics {
 			ElseData = data;
 		}
 
-		public override IList<TurtleData> CompileBlock(TurtleData previous, CancellationToken token) {
+		public override IList<TurtleData> CompileBlock(CancellationToken token) {
 			List<TurtleData> ret = new List<TurtleData>(4096);
 			UpdateVars(IfCondition);
 
 			if (IfCondition.Evaluate()) {
-				ret.AddRange(CompileQueue(previous, IfData, token));
+				ret.AddRange(CompileQueue(IfData, token));
 			}
 			else {
 				if (ElseData != null) {
-					ret.AddRange(CompileQueue(previous, ElseData, token));
+					ret.AddRange(CompileQueue(ElseData, token));
 				}
 			}
 			return ret;
 		}
 
-		private IEnumerable<TurtleData> CompileQueue(TurtleData previous, Queue<ParsedData> data, CancellationToken token) {
+		private IEnumerable<TurtleData> CompileQueue(Queue<ParsedData> data, CancellationToken token) {
 			List<TurtleData> interData = new List<TurtleData>();
 			ParsedData current;
 			int counter = 0;
@@ -64,12 +64,11 @@ namespace TurtleGraphics {
 				current = data.Dequeue();
 				counter++;
 				if (current.IsBlock) {
-					interData.AddRange(current.CompileBlock(previous, token));
+					interData.AddRange(current.CompileBlock(token));
 				}
 				else {
-					interData.Add(current.Compile(previous, token));
+					interData.Add(current.Compile(token));
 				}
-				previous = interData[interData.Count - 1];
 				data.Enqueue(current);
 				if (counter == data.Count) {
 					return interData;
@@ -78,7 +77,7 @@ namespace TurtleGraphics {
 			throw new Exception();
 		}
 
-		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
+		public override TurtleData Compile(CancellationToken token) {
 			throw new NotImplementedException();
 		}
 	}
