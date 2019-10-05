@@ -35,5 +35,36 @@
 // Makes the turtle draw when moving
 //PenDown();
 
+// Cycles
+//  For Loop:
+//    for([int,long] {var_n} = {initial_value}; {var_n} [<,>,<=,>=] {some_value_of_equal_type}; {var_n}[++,--,+={some_value_of_equal_type},-={some_value_of_equal_type}]) {
+//        Code to repeat here.
+//    }
 
-//for, if, if/else
+
+// Conditions
+//  If:
+//   if([true,false]) {
+//       Code to execute.
+//   }
+//  If/else:
+//   if([true,false]) {
+//       Code to execute.
+//   }
+//   else {
+//       Code to execute instead.
+//   }
+
+// Variables:
+//  Global - readonly:
+//    Height = {Height of the drawing canvas}
+//    Width = {Width of the drawing canvas}
+//  Local:
+//    The for loop iteration variable - readonly
+//  Custom:
+//    {variable_type} {variable_name} = {variable_value};
+//
+//    Supported Types: int, long (but work the same)
+//  Non-readonly:
+//    Can be reassigned:
+//      {existing_variable_name} = {new_variable_value};

@@ -210,15 +210,15 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Patterns.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Resources\Patterns.txt" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\turtle.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\HowTo.txt" />
+    <None Include="SavedData\HowTo.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.6.0.0\build\Fody.targets" Condition="Exists('..\packages\Fody.6.0.0\build\Fody.targets')" />
