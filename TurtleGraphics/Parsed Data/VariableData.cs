@@ -13,7 +13,7 @@ namespace TurtleGraphics {
 		public string VariableName { get; }
 		public IDynamicExpression Value { get; }
 
-		public VariableData(string varName, IDynamicExpression value, Dictionary<string, object> variables, string line) : base(variables, line) {
+		public VariableData(string varName, IDynamicExpression value, VariableStore variables, string line) : base(variables, line) {
 			VariableName = varName;
 			Value = value;
 		}
@@ -22,7 +22,7 @@ namespace TurtleGraphics {
 			return TurtleData.NoAction;
 		}
 
-		public override IList<TurtleData> CompileBlock(CancellationToken token) {
+		public override IList<TurtleData> CompileBlock(CancellationToken token, int indent) {
 			throw new System.NotImplementedException();
 		}
 	}

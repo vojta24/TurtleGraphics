@@ -20,10 +20,13 @@ namespace TurtleGraphics {
 
 		public override string Line { get; set; }
 
-		public ConditionalData(string line, IGenericExpression<bool> ifCondition, Queue<ParsedData> data, Dictionary<string, object> variables) : base(variables, line, line) {
+		public int Indentaion { get; set; }
+
+		public ConditionalData(string line, IGenericExpression<bool> ifCondition, Queue<ParsedData> data, VariableStore variables, int indentation) : base(variables, line, line) {
 			IfCondition = ifCondition;
 			IfData = data;
 			Line = line;
+			Indentaion = indentation;
 		}
 
 		public void AddElse(StringReader reader, string line) {
@@ -32,11 +35,11 @@ namespace TurtleGraphics {
 			}
 			List<string> lines = BlockParser.ParseBlock(reader);
 
-			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), CommandParser.Window, Variables);
+			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), CommandParser.Window, Indentaion, Variables);
 			ElseData = data;
 		}
 
-		public override IList<TurtleData> CompileBlock(CancellationToken token) {
+		public override IList<TurtleData> CompileBlock(CancellationToken token, int indent) {
 			List<TurtleData> ret = new List<TurtleData>(4096);
 			UpdateVars(IfCondition);
 
@@ -64,10 +67,13 @@ namespace TurtleGraphics {
 				current = data.Dequeue();
 				counter++;
 				if (current.IsBlock) {
-					interData.AddRange(current.CompileBlock(token));
+					interData.AddRange(current.CompileBlock(token, Indentaion));
 				}
 				else {
-					interData.Add(current.Compile(token));
+					TurtleData compiled = current.Compile(token);
+					if (compiled.Action != ParsedAction.NONE) {
+						interData.Add(compiled);
+					}
 				}
 				data.Enqueue(current);
 				if (counter == data.Count) {

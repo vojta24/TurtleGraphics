@@ -470,10 +470,13 @@ namespace TurtleGraphics {
 				while (tasks.Count > 0) {
 					ParsedData current = tasks.Dequeue();
 					if (current.IsBlock) {
-						ret.AddRange(current.CompileBlock(token));
+						ret.AddRange(current.CompileBlock(token, 0));
 					}
 					else {
-						ret.Add(current.Compile(token));
+						TurtleData compiled = current.Compile(token);
+						if (compiled.Action != ParsedAction.NONE) {
+							ret.Add(compiled);
+						}
 					}
 				}
 				return ret;

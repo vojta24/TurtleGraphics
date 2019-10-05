@@ -9,7 +9,7 @@ namespace TurtleGraphics {
 
 		private readonly IGenericExpression<double> _expression;
 
-		public ForwardParseData(IGenericExpression<double> expression, Dictionary<string, object> variables, string line) : base(variables, line) {
+		public ForwardParseData(IGenericExpression<double> expression, VariableStore variables, string line) : base(variables, line) {
 			_expression = expression;
 		}
 
@@ -31,7 +31,7 @@ namespace TurtleGraphics {
 			};
 		}
 
-		public override IList<TurtleData> CompileBlock(CancellationToken token) {
+		public override IList<TurtleData> CompileBlock(CancellationToken token, int indent) {
 			throw new NotImplementedException();
 		}
 	}

@@ -21,21 +21,22 @@ namespace TurtleGraphics {
 		public int LineIndex { get; set; }
 		public override string Line { get; set; }
 
-		public ForLoopData(Dictionary<string, object> dictionary, string line) : base(dictionary, line) { }
+		public ForLoopData(VariableStore dictionary, string line) : base(dictionary, line) { }
 
 		public override TurtleData Compile(CancellationToken token) {
 			throw new NotImplementedException();
 		}
 
-		public override IList<TurtleData> CompileBlock(CancellationToken token) {
+		public override IList<TurtleData> CompileBlock(CancellationToken token, int indent) {
 			List<TurtleData> ret = new List<TurtleData>(4096);
-			List<ParsedData> loopContents = CompileLoop();
+			List<ParsedData> loopContents = CompileLoop(indent);
 
-			ret.AddRange(CompileQueue(loopContents, token));
+			ret.AddRange(CompileQueue(loopContents, token, indent));
+			Variables.OnBlockLeave(indent);
 			return ret;
 		}
 
-		private IEnumerable<TurtleData> CompileQueue(List<ParsedData> data, CancellationToken token) {
+		private IEnumerable<TurtleData> CompileQueue(List<ParsedData> data, CancellationToken token, int indentation) {
 			List<TurtleData> interData = new List<TurtleData>();
 			ParsedData current;
 
@@ -55,20 +56,16 @@ namespace TurtleGraphics {
 				for (int counter = 0; counter < data.Count; counter++) {
 					current = data[counter];
 
-					current.Variables[LoopVariable] = i;
-					foreach (var item in Variables) {
-						current.Variables[item.Key] = item.Value;
-					}
+					current.Variables.Add(LoopVariable, i, indentation);
 
 					if (current.IsBlock) {
-						interData.AddRange(current.CompileBlock(token));
-					}
-					else if (current is VariableData variableChange) {
-						current.UpdateVars(variableChange.Value);
-						Variables[variableChange.VariableName] = variableChange.Value.Evaluate();
+						interData.AddRange(current.CompileBlock(token, indentation += 1));
 					}
 					else {
-						interData.Add(current.Compile(token));
+						TurtleData compiled = current.Compile(token);
+						if (compiled.Action != ParsedAction.NONE) {
+							interData.Add(compiled);
+						}
 					}
 				}
 			}
@@ -170,13 +167,14 @@ namespace TurtleGraphics {
 			return interData;
 		}
 
-		private List<ParsedData> CompileLoop() {
+		private List<ParsedData> CompileLoop(int indentation) {
 			List<ParsedData> singleIteration = new List<ParsedData>();
-
+			Variables.Add(LoopVariable, 0, indentation);
 			Queue<ParsedData> data = CommandParser.Parse(
 				string.Join(Environment.NewLine, Lines),
 				CommandParser.Window,
-				Helpers.Join(Variables, new Dictionary<string, object> { { LoopVariable, 0 } }));
+				indentation,
+				Variables);
 
 			singleIteration.AddRange(data);
 

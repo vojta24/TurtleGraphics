@@ -11,7 +11,7 @@ namespace TurtleGraphics {
 		private readonly char[] HEX = new[] { '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 		private readonly Random _random;
 
-		public ColorData(string[] args, Dictionary<string, object> variables, string line) : base(variables, line, args) {
+		public ColorData(string[] args, VariableStore variables, string line) : base(variables, line, args) {
 			_random = new Random((int)DateTime.Now.Ticks);
 		}
 
@@ -78,7 +78,7 @@ namespace TurtleGraphics {
 			};
 		}
 
-		public override IList<TurtleData> CompileBlock(CancellationToken token) {
+		public override IList<TurtleData> CompileBlock(CancellationToken token, int indent) {
 			throw new NotImplementedException();
 		}
 

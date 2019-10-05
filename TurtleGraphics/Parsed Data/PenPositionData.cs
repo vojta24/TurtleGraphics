@@ -5,7 +5,7 @@ using System.Threading;
 namespace TurtleGraphics {
 	public class PenPositionData : ParsedData {
 
-		public PenPositionData(bool state, Dictionary<string, object> variables, string line) : base(variables, line) {
+		public PenPositionData(bool state, VariableStore variables, string line) : base(variables, line) {
 			PenState = state;
 		}
 
@@ -25,7 +25,7 @@ namespace TurtleGraphics {
 			};
 		}
 
-		public override IList<TurtleData> CompileBlock(CancellationToken token) {
+		public override IList<TurtleData> CompileBlock(CancellationToken token, int indent) {
 			throw new NotImplementedException();
 		}
 	}

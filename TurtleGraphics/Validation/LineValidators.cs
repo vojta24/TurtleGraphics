@@ -114,7 +114,7 @@ namespace TurtleGraphics.Validation {
 			return isIf || isElseIf || isElse;
 		}
 
-		internal static bool IsVariableDeclaration(string line, Dictionary<string, object> variables, out (string, string, string) data) {
+		internal static bool IsVariableDeclaration(string line, VariableStore variables, out (string, string, string) data) {
 			data = (null, null, null);
 			string[] values = line.Split('=');
 			values[0].Trim();
@@ -125,7 +125,7 @@ namespace TurtleGraphics.Validation {
 				typeName[0].TrimEnd();
 				typeName[1].TrimStart();
 				if (!SupportedTypes.Types.Contains(typeName[0])) { return false; }
-				if (typeName[1] == "Width" || typeName[1] == "Height" || variables.ContainsKey(typeName[1])) { throw new ParsingException($"'{typeName[1]}' is already defined in an outer scope!", line); }
+				if (typeName[1] == "Width" || typeName[1] == "Height" || variables.ContainsVariable(typeName[1])) { throw new ParsingException($"'{typeName[1]}' is already defined in an outer scope!", line); }
 				if (!values[1].EndsWith(";")) { return false; }
 				values[1] = values[1].TrimEnd(' ', ';');
 				data = (typeName[0], typeName[1], values[1]);
@@ -141,8 +141,8 @@ namespace TurtleGraphics.Validation {
 			}
 		}
 
-		private static bool IsVariableAssignment(string[] info, string line, Dictionary<string, object> variables, out (string, string) data) {
-			if (!variables.ContainsKey(info[0])) { throw new ParsingException("Unable to assign value to an undefined variable!", line); }
+		private static bool IsVariableAssignment(string[] info, string line, VariableStore variables, out (string, string) data) {
+			if (!variables.ContainsVariable(info[0])) { throw new ParsingException("Unable to assign value to an undefined variable!", line); }
 			if (info[0] == "Width" || info[0] == "Height") { throw new ParsingException($"'{info[0]}' is a read-only variable!", line); }
 			if (!info[1].EndsWith(";")) { throw new ParsingException($"Missing a semicolon at the end of variable assignment!", line); }
 			info[1] = info[1].TrimEnd(' ', ';');

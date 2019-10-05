@@ -6,7 +6,7 @@ namespace TurtleGraphics {
 
 	public abstract class ParsedData {
 
-		public ParsedData(Dictionary<string, object> variables, string originalLine, params string[] parameters) {
+		public ParsedData(VariableStore variables, string originalLine, params string[] parameters) {
 			Parameters = parameters;
 			Variables = variables;
 			Line = originalLine;
@@ -18,7 +18,7 @@ namespace TurtleGraphics {
 
 		public int LineHash => Line.GetHashCode();
 
-		public Dictionary<string, object> Variables { get; set; }
+		public VariableStore Variables { get; set; }
 
 		public string[] Parameters { get; set; }
 
@@ -32,7 +32,7 @@ namespace TurtleGraphics {
 		public abstract TurtleData Compile(CancellationToken token);
 
 
-		public abstract IList<TurtleData> CompileBlock(CancellationToken token);
+		public abstract IList<TurtleData> CompileBlock(CancellationToken token, int indent);
 
 		internal void UpdateVars(IDynamicExpression exp) {
 			foreach (var item in Variables) {

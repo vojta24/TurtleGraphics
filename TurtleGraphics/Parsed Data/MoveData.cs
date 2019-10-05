@@ -10,7 +10,7 @@ namespace TurtleGraphics {
 		private readonly IGenericExpression<double> x;
 		private readonly IGenericExpression<double> y;
 
-		public MoveData(string[] args, Dictionary<string, object> variables, string line) : base(variables, line, args) {
+		public MoveData(string[] args, VariableStore variables, string line) : base(variables, line, args) {
 			ExpressionContext expression = FleeHelper.GetExpression(variables);
 			string exceptionMessage = "";
 			try {
@@ -42,7 +42,7 @@ namespace TurtleGraphics {
 			};
 		}
 
-		public override IList<TurtleData> CompileBlock(CancellationToken token) {
+		public override IList<TurtleData> CompileBlock(CancellationToken token, int indent) {
 			throw new NotImplementedException();
 		}
 	}

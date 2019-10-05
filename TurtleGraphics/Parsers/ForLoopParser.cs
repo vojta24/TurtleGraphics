@@ -5,7 +5,7 @@ using Flee.PublicTypes;
 
 namespace TurtleGraphics.Parsers {
 	public class ForLoopParser {
-		public static ForLoopData ParseForLoop(string line, StringReader reader, Dictionary<string, object> inherited) {
+		public static ForLoopData ParseForLoop(string line, StringReader reader, VariableStore inherited) {
 
 			ExpressionContext context = FleeHelper.GetExpression(inherited);
 
@@ -39,7 +39,7 @@ namespace TurtleGraphics.Parsers {
 				errorMessage = "Redefinition of variable!";
 				string variableName = mod.Split('=')[0].Trim();
 
-				if (inherited.ContainsKey(variableName)) {
+				if (inherited.ContainsVariable(variableName)) {
 					throw new ParsingException(errorMessage, line);
 				}
 
@@ -131,7 +131,7 @@ namespace TurtleGraphics.Parsers {
 				}
 				List<string> lines = BlockParser.ParseBlock(reader);
 
-				return new ForLoopData(inherited.Copy(), line) {
+				return new ForLoopData(inherited, line) {
 					From = startValueExp,
 					To = endValueExp,
 					LoopVariable = variableName,

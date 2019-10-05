@@ -6,7 +6,7 @@ using System.Windows;
 namespace TurtleGraphics {
 	class StoredPositionData : ParsedData {
 
-		public StoredPositionData(string[] args, Dictionary<string, object> variables, string line) : base(variables, line, args) { }
+		public StoredPositionData(string[] args, VariableStore variables, string line) : base(variables, line, args) { }
 
 		public override bool IsBlock => false;
 
@@ -23,7 +23,7 @@ namespace TurtleGraphics {
 			};
 		}
 
-		public override IList<TurtleData> CompileBlock(CancellationToken token) {
+		public override IList<TurtleData> CompileBlock(CancellationToken token, int indent) {
 			throw new NotImplementedException();
 		}
 	}
