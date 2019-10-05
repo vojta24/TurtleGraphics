@@ -216,7 +216,7 @@
     <Resource Include="Resources\turtle.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="SavedData\HowTo.txt">
+    <None Include="SavedData\HowTo.tgs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
