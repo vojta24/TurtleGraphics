@@ -34,13 +34,13 @@ namespace TurtleGraphics {
 
 		public abstract IList<TurtleData> CompileBlock(TurtleData previous, CancellationToken token);
 
-		protected void UpdateVars(IDynamicExpression exp) {
+		internal void UpdateVars(IDynamicExpression exp) {
 			foreach (var item in Variables) {
 				exp.Context.Variables[item.Key] = item.Value;
 			}
 		}
 
-		protected void UpdateVars<T>(IGenericExpression<T> exp) {
+		internal void UpdateVars<T>(IGenericExpression<T> exp) {
 			foreach (var item in Variables) {
 				exp.Context.Variables[item.Key] = item.Value;
 			}

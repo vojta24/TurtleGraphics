@@ -54,9 +54,18 @@ namespace TurtleGraphics {
 				token.ThrowIfCancellationRequested();
 				for (int counter = 0; counter < data.Count; counter++) {
 					current = data[counter];
+
 					current.Variables[LoopVariable] = i;
+					foreach (var item in Variables) {
+						current.Variables[item.Key] = item.Value;
+					}
+
 					if (current.IsBlock) {
 						interData.AddRange(current.CompileBlock(previous, token));
+					}
+					else if (current is VariableData variableChange) {
+						current.UpdateVars(variableChange.Value);
+						Variables[variableChange.VariableName] = variableChange.Value.Evaluate();
 					}
 					else {
 						interData.Add(current.Compile(previous, token));

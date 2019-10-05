@@ -113,5 +113,41 @@ namespace TurtleGraphics.Validation {
 			bool isElse = split.Length == 1 && split[0].TrimEnd(' ', '{') == "else";
 			return isIf || isElseIf || isElse;
 		}
+
+		internal static bool IsVariableDeclaration(string line, Dictionary<string, object> variables, out (string, string, string) data) {
+			data = (null, null, null);
+			string[] values = line.Split('=');
+			values[0].Trim();
+			values[1].Trim();
+			if (values.Length != 2) { return false; }
+			string[] typeName = values[0].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+			if (typeName.Length == 2) {
+				typeName[0].TrimEnd();
+				typeName[1].TrimStart();
+				if (!SupportedTypes.Types.Contains(typeName[0])) { return false; }
+				if (typeName[1] == "Width" || typeName[1] == "Height" || variables.ContainsKey(typeName[1])) { throw new ParsingException($"'{typeName[1]}' is already defined in an outer scope!", line); }
+				if (!values[1].EndsWith(";")) { return false; }
+				values[1] = values[1].TrimEnd(' ', ';');
+				data = (typeName[0], typeName[1], values[1]);
+				return true;
+			}
+			else {
+				//Variable assignment
+				if (IsVariableAssignment(new string[] { typeName[0].TrimEnd(), values[1] }, line, variables, out (string, string) assignData)) {
+					data = (null, assignData.Item1, assignData.Item2);
+					return true;
+				}
+				return false;
+			}
+		}
+
+		private static bool IsVariableAssignment(string[] info, string line, Dictionary<string, object> variables, out (string, string) data) {
+			if (!variables.ContainsKey(info[0])) { throw new ParsingException("Unable to assign value to an undefined variable!", line); }
+			if (info[0] == "Width" || info[0] == "Height") { throw new ParsingException($"'{info[0]}' is a read-only variable!", line); }
+			if (!info[1].EndsWith(";")) { throw new ParsingException($"Missing a semicolon at the end of variable assignment!", line); }
+			info[1] = info[1].TrimEnd(' ', ';');
+			data = (info[0].Trim(), info[1].TrimStart());
+			return true;
+		}
 	}
 }

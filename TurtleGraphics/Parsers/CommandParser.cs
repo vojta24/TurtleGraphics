@@ -154,6 +154,14 @@ namespace TurtleGraphics {
 					return null;
 				}
 			}
+
+			if (LineValidators.IsVariableDeclaration(line, variables, out (string, string, string) variableDef)) {
+				IDynamicExpression valueObj = ParseDynamicExpression(variableDef.Item3, original, variables);
+				object value = valueObj.Evaluate();
+				variables[variableDef.Item2] = value;
+				return new VariableData(variableDef.Item2, valueObj, variables, line);
+			}
+
 			throw new ParsingException($"Unexpected squence!", line);
 		}
 
@@ -164,6 +172,16 @@ namespace TurtleGraphics {
 			}
 			catch (Exception e) {
 				throw new ParsingException($"Unable to parse expression of {typeof(T).FullName} from '{line}'", line, e);
+			}
+		}
+
+		private static IDynamicExpression ParseDynamicExpression(string line, string fullLine, Dictionary<string, object> variables) {
+			ExpressionContext context = FleeHelper.GetExpression(variables);
+			try {
+				return context.CompileDynamic(line);
+			}
+			catch (Exception e) {
+				throw new ParsingException($"Unable to parse expression from '{line}'", line, e);
 			}
 		}
 	}

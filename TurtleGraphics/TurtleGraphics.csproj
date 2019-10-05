@@ -110,8 +110,10 @@
     <Compile Include="InteliCommands\InteliCommandsState.cs" />
     <Compile Include="Parsed Data\RestorePositionData.cs" />
     <Compile Include="Parsed Data\StoredPositionData.cs" />
+    <Compile Include="Parsed Data\VariableData.cs" />
     <Compile Include="Parsers\ArgParser.cs" />
     <Compile Include="Parsers\FunctionNames.cs" />
+    <Compile Include="Parsers\SupportedTypes.cs" />
     <Compile Include="XAML\CompilationStatus.xaml.cs">
       <DependentUpon>CompilationStatus.xaml</DependentUpon>
     </Compile>
