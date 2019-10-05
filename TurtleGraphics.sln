@@ -1,24 +1,26 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2000
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29326.143
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurtleGraphics", "TurtleGraphics/TurtleGraphics.csproj", "{94BDA964-0894-4CF4-80A6-44A1E789F181}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurtleGraphics", "TurtleGraphics\TurtleGraphics.csproj", "{CDCAEC9F-9787-4FCC-B962-A17106FEFA08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		Debug I|Any CPU = Debug I|Any CPU
+		Debug NOI|Any CPU = Debug NOI|Any CPU
+		Release I|Any CPU = Release I|Any CPU
+		Release NOI|Any CPU = Release NOI|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{94BDA964-0894-4CF4-80A6-44A1E789F181}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{94BDA964-0894-4CF4-80A6-44A1E789F181}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{94BDA964-0894-4CF4-80A6-44A1E789F181}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{94BDA964-0894-4CF4-80A6-44A1E789F181}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EE85F07A-8303-4CB5-922C-C8C3A5D39086}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EE85F07A-8303-4CB5-922C-C8C3A5D39086}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EE85F07A-8303-4CB5-922C-C8C3A5D39086}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EE85F07A-8303-4CB5-922C-C8C3A5D39086}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDCAEC9F-9787-4FCC-B962-A17106FEFA08}.Debug I|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDCAEC9F-9787-4FCC-B962-A17106FEFA08}.Debug I|Any CPU.Build.0 = Debug|Any CPU
+		{CDCAEC9F-9787-4FCC-B962-A17106FEFA08}.Debug NOI|Any CPU.ActiveCfg = Debug NOI|Any CPU
+		{CDCAEC9F-9787-4FCC-B962-A17106FEFA08}.Debug NOI|Any CPU.Build.0 = Debug NOI|Any CPU
+		{CDCAEC9F-9787-4FCC-B962-A17106FEFA08}.Release I|Any CPU.ActiveCfg = Release|Any CPU
+		{CDCAEC9F-9787-4FCC-B962-A17106FEFA08}.Release I|Any CPU.Build.0 = Release|Any CPU
+		{CDCAEC9F-9787-4FCC-B962-A17106FEFA08}.Release NOI|Any CPU.ActiveCfg = Release NOI|Any CPU
+		{CDCAEC9F-9787-4FCC-B962-A17106FEFA08}.Release NOI|Any CPU.Build.0 = Release NOI|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

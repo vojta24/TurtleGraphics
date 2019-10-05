@@ -37,6 +37,7 @@ namespace TurtleGraphics {
 			MainWindow.Instance.ExceptionDialogActive = true;
 			_turtleVisibilityBck = MainWindow.Instance.ShowTurtleCheckBox;
 			MainWindow.Instance.ShowTurtleCheckBox = false;
+			FocusMe.Focus();
 		}
 
 		private bool _turtleVisibilityBck;

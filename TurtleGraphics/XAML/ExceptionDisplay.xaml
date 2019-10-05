@@ -15,7 +15,7 @@
 			<TextBlock Text="Stack Trace:" FontWeight="Bold" Margin="5 0"/>
 			<TextBlock TextWrapping="Wrap" Text="{Binding StackTrace}" Margin="5 0"/>
 			<Grid Margin="5">
-				<Button Content="I'll do better." HorizontalAlignment="Right" Padding="5" Command="{Binding DismissCommand}"/>
+				<Button Content="I'll do better." HorizontalAlignment="Right" Padding="5" Command="{Binding DismissCommand}" x:Name="FocusMe"/>
 			</Grid>
 		</StackPanel>
 	</Grid>

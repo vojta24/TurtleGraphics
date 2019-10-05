@@ -25,6 +25,9 @@ namespace TurtleGraphics {
 			_showTurtleBck = MainWindow.Instance.ShowTurtleCheckBox;
 			MainWindow.Instance.ShowTurtleCheckBox = false;
 			SaveCommand = new Command(() => {
+				if (string.IsNullOrWhiteSpace(SaveFileName)) {
+					return;
+				}
 				MainWindow.Instance.FSSManager.Save(SaveFileName, MainWindow.Instance.CommandsText);
 				Common();
 			});
