@@ -1,0 +1,39 @@
+﻿// Moves the turtle forwarn by p pixels
+//Forward(int p);
+
+// Rotates the trutle by 'a' degrees, optionally a boolean value can be provided to snap to the angle instead of an addition
+//Rotate(int{deg} a, bool _);
+
+// Moves the turtle to specified 'x','y' coordinates
+//MoveTo(int x, int y);
+
+// Sets pen color
+// 1) a string foramtted as "#xxxxxx" where each pair of x-es represents a hex value
+// 2) a byte value for each color channel
+// 3) a literal color name, see https://docs.microsoft.com/en-us/dotnet/api/system.windows.media.brushes?view=netframework-4.8
+// 4) a byte value for each color channel where the first one represents aplha/transparency
+//SetColor(string{hex} c);
+//SetColor(byte r, byte g, byte b);
+//SetColor(string{literal} c);
+//SetColor(byte a, byte r, byte g, byte b);
+
+// Sets pen size in 's' pixels
+//SetBrushSize(int s);
+
+// Sets the line ending style to one of listed below
+//SetLineCapping(Capping{Flat|Round|Triangle|Square} c);
+
+// Stores turtle's position and angle into memory
+//StoreTurtlePosition();
+
+// Non-destructively restores turtle's position and angle, optionally a boolean value can be provided to snap to become destructive ie. forgets the stored information
+//RestoreTurtlePosition(bool _);
+
+// Makes the turtle stop drawing when moving
+//PenUp();
+
+// Makes the turtle draw when moving
+//PenDown();
+
+
+//for, if, if/else
