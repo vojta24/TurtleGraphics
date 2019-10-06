@@ -44,7 +44,7 @@ namespace TurtleGraphics.Validation {
 			//Func(RandX(),Rand(20,50));
 			//for (int i = 0; i < 20, i++)
 			//if (True)
-
+			//int x = Rand(0,100);
 			info = null;
 			string[] split = line.Split(new[] { '(' }, 2, StringSplitOptions.RemoveEmptyEntries);
 
@@ -53,7 +53,7 @@ namespace TurtleGraphics.Validation {
 			//Func RandX(),Rand(20,50));
 			//for int i = 0; i < 20, i++)
 			//if True)
-
+			//int x = Rand 0,100);
 
 			if (split.Length < 2)
 				return false;
@@ -71,6 +71,7 @@ namespace TurtleGraphics.Validation {
 			//Func RandX(),Rand(20,50))
 			//for int i = 0; i < 20, i++)
 			//if True)
+			//int x = Rand 0,100)
 
 			split[1] = split[1].Remove(split[1].Length - 1, 1);
 
@@ -79,12 +80,17 @@ namespace TurtleGraphics.Validation {
 			//Func RandX(),Rand(20,50)
 			//for int i = 0; i < 20, i++
 			//if True
+			//int x = Rand 0,100
 
 			if (IsType(split[1].Split()[0], out _))
 				return false;
 
 			if (split[0].TrimEnd() == "for" || split[0].TrimEnd() == "if")
 				return false;
+
+			if (split[0].Contains("=")) {
+				return false;
+			}
 
 			FunctionCallInfo i = new FunctionCallInfo();
 			i.FunctionName = split[0].TrimEnd();
