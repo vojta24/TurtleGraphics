@@ -6,17 +6,18 @@ namespace TurtleGraphics {
 
 	public abstract class ParsedData {
 
-		public ParsedData(VariableStore variables, string originalLine, params string[] parameters) {
+
+		public ParsedData(VariableStore variables, string originalLine, int index, params string[] parameters) {
 			Parameters = parameters;
 			Variables = variables;
 			Line = originalLine;
+			LineIndex = index;
 		}
 
 		public abstract bool IsBlock { get; }
 
 		public abstract string Line { get; set; }
-
-		public int LineHash => Line.GetHashCode();
+		public int LineIndex { get; }
 
 		public VariableStore Variables { get; set; }
 

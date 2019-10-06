@@ -9,10 +9,11 @@ namespace TurtleGraphics {
 
 		public IGenericExpression<bool> IfCondition { get; set; }
 		public Queue<ParsedData> IfData { get; set; }
+		public VariableStore IfVariables { get; set; }
 		public Queue<ParsedData> ElseData { get; set; } = null;
+		public VariableStore ElseVariables { get; set; }
 		public IList<(IGenericExpression<bool>, Queue<ParsedData>)> ElseIfs { get; set; }
 		public bool IsModifiable { get; set; } = true;
-		public int LineIndex { get; set; }
 
 		public override bool IsBlock => true;
 
@@ -22,14 +23,14 @@ namespace TurtleGraphics {
 
 		public int Indentaion { get; set; }
 
-		public ConditionalData(string line, IGenericExpression<bool> ifCondition, Queue<ParsedData> data, VariableStore variables, int indentation) : base(variables, line, line) {
+		public ConditionalData(string line, IGenericExpression<bool> ifCondition, Queue<ParsedData> data, VariableStore variables, int lineIndex) : base(variables, line, lineIndex, line) {
 			IfCondition = ifCondition;
 			IfData = data;
 			Line = line;
-			Indentaion = indentation;
+			IfVariables = variables;
 		}
 
-		public void AddElse(StringReader reader, string line) {
+		public void AddElse(StringReader reader, string line, VariableStore variables) {
 			if (!line.EndsWith("{")) {
 				BlockParser.ReadToBlock(reader, line);
 			}
@@ -37,6 +38,7 @@ namespace TurtleGraphics {
 
 			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), CommandParser.Window, Indentaion, Variables);
 			ElseData = data;
+			ElseVariables = variables;
 		}
 
 		public override IList<TurtleData> CompileBlock(CancellationToken token, int indent) {
@@ -44,17 +46,17 @@ namespace TurtleGraphics {
 			UpdateVars(IfCondition);
 
 			if (IfCondition.Evaluate()) {
-				ret.AddRange(CompileQueue(IfData, token));
+				ret.AddRange(CompileQueue(IfData, IfVariables, token));
 			}
 			else {
 				if (ElseData != null) {
-					ret.AddRange(CompileQueue(ElseData, token));
+					ret.AddRange(CompileQueue(ElseData, ElseVariables, token));
 				}
 			}
 			return ret;
 		}
 
-		private IEnumerable<TurtleData> CompileQueue(Queue<ParsedData> data, CancellationToken token) {
+		private IEnumerable<TurtleData> CompileQueue(Queue<ParsedData> data, VariableStore variables, CancellationToken token) {
 			List<TurtleData> interData = new List<TurtleData>();
 			ParsedData current;
 			int counter = 0;

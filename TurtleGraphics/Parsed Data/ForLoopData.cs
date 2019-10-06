@@ -17,11 +17,9 @@ namespace TurtleGraphics {
 		public override bool IsBlock => true;
 
 		public override ParsedAction Action => ParsedAction.NONE;
-
-		public int LineIndex { get; set; }
 		public override string Line { get; set; }
 
-		public ForLoopData(VariableStore dictionary, string line) : base(dictionary, line) { }
+		public ForLoopData(VariableStore dictionary, string line, int lineIndex) : base(dictionary, line, lineIndex) { }
 
 		public override TurtleData Compile(CancellationToken token) {
 			throw new NotImplementedException();

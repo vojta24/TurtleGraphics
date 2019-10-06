@@ -11,7 +11,7 @@ namespace TurtleGraphics {
 		private readonly char[] HEX = new[] { '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 		private readonly Random _random;
 
-		public ColorData(string[] args, VariableStore variables, string line) : base(variables, line, args) {
+		public ColorData(string[] args, VariableStore variables, string line, int lineIndex) : base(variables, line, lineIndex, args) {
 			_random = new Random((int)DateTime.Now.Ticks);
 		}
 
@@ -30,7 +30,7 @@ namespace TurtleGraphics {
 
 				foreach (string key in Variables.Keys) {
 					if (colorData.Contains(key) && colorData != "random") {
-						colorData = colorData.Replace(key, Variables[key].ToString());
+						colorData = colorData.Replace(key, Variables.Get(key, LineIndex).ToString());
 					}
 				}
 				try {

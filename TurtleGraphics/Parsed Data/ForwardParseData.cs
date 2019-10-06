@@ -9,7 +9,7 @@ namespace TurtleGraphics {
 
 		private readonly IGenericExpression<double> _expression;
 
-		public ForwardParseData(IGenericExpression<double> expression, VariableStore variables, string line) : base(variables, line) {
+		public ForwardParseData(IGenericExpression<double> expression, VariableStore variables, string line, int lineIndex) : base(variables, line, lineIndex) {
 			_expression = expression;
 		}
 

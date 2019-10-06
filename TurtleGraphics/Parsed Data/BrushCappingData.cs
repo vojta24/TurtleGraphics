@@ -5,7 +5,7 @@ using System.Windows.Media;
 
 namespace TurtleGraphics {
 	public class BrushCappingData : ParsedData {
-		public BrushCappingData(string[] args, VariableStore variables, string line) : base(variables, line, args) { }
+		public BrushCappingData(string[] args, VariableStore variables, string line, int lineIndex) : base(variables, line, lineIndex, args) { }
 
 		public override bool IsBlock => false;
 

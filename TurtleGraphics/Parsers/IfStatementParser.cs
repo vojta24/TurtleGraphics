@@ -5,7 +5,7 @@ using Flee.PublicTypes;
 
 namespace TurtleGraphics.Parsers {
 	public class IfStatementParser {
-		public static ConditionalData ParseIfBlock(string line, StringReader reader, VariableStore variables, int indentaion) {
+		public static ConditionalData ParseIfBlock(string line, StringReader reader, VariableStore variables, int indentaion, int lineIndex, out int readLines) {
 
 			//if (i > 50) {
 			//if (i <= 50) {
@@ -43,16 +43,19 @@ namespace TurtleGraphics.Parsers {
 
 			try {
 				IGenericExpression<bool> ifCondition = context.CompileGeneric<bool>(mod);
+				int linesRead = 0;
 				if (!line.EndsWith("{")) {
-					BlockParser.ReadToBlock(reader, line);
+					linesRead += BlockParser.ReadToBlock(reader, line);
 				}
+				int totalRead = linesRead + lineIndex;
 				List<string> lines = BlockParser.ParseBlock(reader);
+				linesRead += lines.Count;
 
 				List<ParsedData> isStatement = new List<ParsedData>();
 
-				Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), MainWindow.Instance, indentaion, variables);
+				Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), MainWindow.Instance, indentaion, ref totalRead, variables);
 				isStatement.AddRange(data);
-
+				readLines = linesRead;
 				return new ConditionalData(line, ifCondition, data, variables, indentaion);
 			}
 			catch (ParsingException) {

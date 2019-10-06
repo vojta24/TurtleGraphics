@@ -5,7 +5,7 @@ using System.Threading;
 namespace TurtleGraphics {
 	public class PenPositionData : ParsedData {
 
-		public PenPositionData(bool state, VariableStore variables, string line) : base(variables, line) {
+		public PenPositionData(bool state, VariableStore variables, string line, int lineIndex) : base(variables, line, lineIndex) {
 			PenState = state;
 		}
 

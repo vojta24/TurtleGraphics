@@ -5,7 +5,7 @@ using Flee.PublicTypes;
 
 namespace TurtleGraphics.Parsers {
 	public class ForLoopParser {
-		public static ForLoopData ParseForLoop(string line, StringReader reader, VariableStore inherited) {
+		public static ForLoopData ParseForLoop(string line, StringReader reader, VariableStore inherited, int lineIndex, out int readLines) {
 
 			ExpressionContext context = FleeHelper.GetExpression(inherited);
 
@@ -126,12 +126,14 @@ namespace TurtleGraphics.Parsers {
 
 				// {
 				//{
+				int linesRead = 0;
 				if (!mod.Contains("{")) {
-					BlockParser.ReadToBlock(reader, line);
+					linesRead = BlockParser.ReadToBlock(reader, line);
 				}
 				List<string> lines = BlockParser.ParseBlock(reader);
-
-				return new ForLoopData(inherited, line) {
+				linesRead += lines.Count;
+				readLines = linesRead;
+				return new ForLoopData(inherited, line, lineIndex) {
 					From = startValueExp,
 					To = endValueExp,
 					LoopVariable = variableName,

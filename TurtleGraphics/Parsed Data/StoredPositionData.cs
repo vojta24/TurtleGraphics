@@ -6,7 +6,7 @@ using System.Windows;
 namespace TurtleGraphics {
 	class StoredPositionData : ParsedData {
 
-		public StoredPositionData(string[] args, VariableStore variables, string line) : base(variables, line, args) { }
+		public StoredPositionData(string[] args, VariableStore variables, string line, int lineIndex) : base(variables, line, lineIndex, args) { }
 
 		public override bool IsBlock => false;
 

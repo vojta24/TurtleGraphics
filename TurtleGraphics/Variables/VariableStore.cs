@@ -4,29 +4,58 @@ using System.Collections.Generic;
 using Flee.PublicTypes;
 
 namespace TurtleGraphics {
-	public class VariableStore : IEnumerable<KeyValuePair<string,object>> {
+	public class VariableStore : IEnumerable<KeyValuePair<string, object>> {
 
-		private readonly Dictionary<string, object> data = new Dictionary<string, object>();
-		private readonly List<(int, string)> layerKeys = new List<(int, string)>();
+		private readonly Dictionary<string, object> data;
+		private readonly List<(int, string)> layerKeys;
+		private readonly Dictionary<string, int> accessibleSinceLine;
+		public VariableStore Parent { get; set; }
 
-		public object this[string index] {
-			get => data[index];
+		public object Get(string key, int myLine) {
+			if (data.ContainsKey(key) && myLine > accessibleSinceLine[key]) {
+				return data[key];
+			}
+			else if (Parent != null) {
+				return Parent.Get(key, myLine);
+			}
+			throw new Exception("Not Found!");
 		}
 
 		public ICollection<string> Keys => data.Keys;
 
-		public void Add(string key, object value, int indentation) {
+		public VariableStore() {
+			Parent = null;
+			data = new Dictionary<string, object>();
+			accessibleSinceLine = new Dictionary<string, int>();
+			layerKeys = new List<(int, string)>();
+		}
+
+		public VariableStore(VariableStore parent) {
+			Parent = parent;
+			data = new Dictionary<string, object>();
+			layerKeys = new List<(int, string)>();
+			accessibleSinceLine = new Dictionary<string, int>();
+		}
+
+		public void Add(string key, object value, int indentation, int accessibleSince) {
 			if (data.ContainsKey(key)) {
 				data[key] = value;
 			}
 			else {
 				data.Add(key, value);
 				layerKeys.Add((indentation, key));
+				accessibleSinceLine.Add(key, accessibleSince);
 			}
 		}
 
 		public bool ContainsVariable(string key) {
-			return data.ContainsKey(key);
+			if (data.ContainsKey(key)) {
+				return true;
+			}
+			else if (Parent != null) {
+				return Parent.ContainsVariable(key);
+			}
+			return false;
 		}
 
 		public IEnumerator<KeyValuePair<string, object>> GetEnumerator() {

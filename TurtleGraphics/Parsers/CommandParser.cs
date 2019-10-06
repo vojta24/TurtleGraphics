@@ -11,7 +11,7 @@ namespace TurtleGraphics {
 		public static MainWindow Window { get; set; }
 		private static readonly Stack<ConditionalData> conditionals = new Stack<ConditionalData>();
 		public static Dictionary<string, int> LineIndexes = new Dictionary<string, int>();
-
+		private static int lineIndex = 0;
 		public static Queue<ParsedData> ParseCommands(string commands, MainWindow window) {
 			LineIndexes.Clear();
 			string[] split = commands.Replace("\r", "").Split('\n');
@@ -35,28 +35,30 @@ namespace TurtleGraphics {
 			}
 
 			commands = string.Join(Environment.NewLine, split);
-			return Parse(commands, window, 0);
+			return Parse(commands, window, 0, ref lineIndex);
 		}
 
-		public static Queue<ParsedData> Parse(string commands, MainWindow window, int indentationLevel, VariableStore additionalVars = null) {
+		public static Queue<ParsedData> Parse(string commands, MainWindow window, int indentationLevel, ref int lineIndex, VariableStore additionalVars = null) {
 			Window = window;
 			conditionals.Clear();
 
-			VariableStore variables = new VariableStore();
-			variables.Add("Width", Window.DrawWidth, 0);
-			variables.Add("Height", Window.DrawHeight, 0);
+			VariableStore variables = new VariableStore {
+				{ "Width", Window.DrawWidth, 0, 0 },
+				{ "Height", Window.DrawHeight, 0 , 0 }
+			};
 
 			Queue<ParsedData> ret = new Queue<ParsedData>();
 			using (StringReader reader = new StringReader(commands)) {
 
 				if (additionalVars != null) {
 					foreach (var item in additionalVars) {
-						variables.Add(item.Key ,item.Value, indentationLevel);
+						variables.Add(item.Key, item.Value, indentationLevel, lineIndex);
 					}
 				}
 
 				while (reader.Peek() != -1) {
-					ParsedData data = ParseLine(reader.ReadLine(), reader, variables, indentationLevel);
+					ParsedData data = ParseLine(reader.ReadLine(), reader, variables, indentationLevel, ref lineIndex);
+					lineIndex++;
 					if (data != null) {
 						ret.Enqueue(data);
 					}
@@ -66,7 +68,7 @@ namespace TurtleGraphics {
 		}
 
 
-		private static ParsedData ParseLine(string line, StringReader reader, VariableStore variables, int indentationLevel) {
+		private static ParsedData ParseLine(string line, StringReader reader, VariableStore variables, int indentationLevel, ref int lineIndex) {
 			if (string.IsNullOrWhiteSpace(line) || line.Trim() == "}")
 				return null;
 			string original = line;
@@ -87,43 +89,43 @@ namespace TurtleGraphics {
 				}
 				switch (info.FunctionName) {
 					case "Rotate": {
-						return new RotateParseData(ParseGenericExpression<double>(info.Arguments[0], variables), info, variables, original);
+						return new RotateParseData(ParseGenericExpression<double>(info.Arguments[0], variables), info, variables, original, lineIndex);
 					}
 
 					case "Forward": {
-						return new ForwardParseData(ParseGenericExpression<double>(info.Arguments[0], variables), variables, original);
+						return new ForwardParseData(ParseGenericExpression<double>(info.Arguments[0], variables), variables, original, lineIndex);
 					}
 
 					case "SetBrushSize": {
-						return new BrushSizeData(ParseGenericExpression<double>(info.Arguments[0], variables), variables, original);
+						return new BrushSizeData(ParseGenericExpression<double>(info.Arguments[0], variables), variables, original, lineIndex);
 					}
 
 					case "PenUp": {
-						return new PenPositionData(false, variables, original);
+						return new PenPositionData(false, variables, original, lineIndex);
 					}
 
 					case "PenDown": {
-						return new PenPositionData(true, variables, original);
+						return new PenPositionData(true, variables, original, lineIndex);
 					}
 
 					case "SetColor": {
-						return new ColorData(info.Arguments, variables, original);
+						return new ColorData(info.Arguments, variables, original, lineIndex);
 					}
 
 					case "MoveTo": {
-						return new MoveData(info.Arguments, variables, original);
+						return new MoveData(info.Arguments, variables, original, lineIndex);
 					}
 
 					case "SetLineCapping": {
-						return new BrushCappingData(info.Arguments, variables, original);
+						return new BrushCappingData(info.Arguments, variables, original, lineIndex);
 					}
 
 					case "StoreTurtlePosition": {
-						return new StoredPositionData(info.Arguments, variables, original);
+						return new StoredPositionData(info.Arguments, variables, original, lineIndex);
 					}
 
 					case "RestoreTurtlePosition": {
-						return new RestorePositionData(info.Arguments, variables, original);
+						return new RestorePositionData(info.Arguments, variables, original, lineIndex);
 					}
 
 					default: {
@@ -136,25 +138,30 @@ namespace TurtleGraphics {
 				if (conditionals.Count > 0) {
 					conditionals.Peek().IsModifiable = false;
 				}
-				ForLoopData data = ForLoopParser.ParseForLoop(line, reader, variables);
+				ForLoopData data = ForLoopParser.ParseForLoop(line, reader, new VariableStore(variables), lineIndex, out int readLines);
+				lineIndex += readLines;
 				return data;
 			}
 
 			if (LineValidators.IsConditional(line)) {
 				if (line.Contains("if")) {
-					ConditionalData data = IfStatementParser.ParseIfBlock(line, reader, variables, indentationLevel + 1);
+					ConditionalData data = IfStatementParser.ParseIfBlock(line, reader, new VariableStore(variables), indentationLevel + 1, lineIndex, out int linesRead);
 					conditionals.Push(data);
+					lineIndex += linesRead;
 					return data;
 				}
 				if (line.Contains("else")) {
 					ConditionalData latest = conditionals.Peek();
-					latest.AddElse(reader, line);
+					latest.AddElse(reader, line, new VariableStore(variables));
 					latest.IsModifiable = false;
 					return null;
 				}
 			}
 
-			if (LineValidators.IsVariableDeclaration(line, variables, out (string, string, string) variableDef)) {
+			if (LineValidators.IsVariableDeclaration(line, variables, out (string, string, string) variableDef), lineIndex) {
+				if (conditionals.Count > 0) {
+					conditionals.Peek().IsModifiable = false;
+				}
 				IDynamicExpression valueObj = ParseDynamicExpression(variableDef.Item3, variables);
 				object value = valueObj.Evaluate();
 				variables.Add(variableDef.Item2, value, indentationLevel);

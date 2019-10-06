@@ -31,15 +31,20 @@ namespace TurtleGraphics {
 			return ret;
 		}
 
-		public static void ReadToBlock(StringReader reader, string lineToReport) {
+		public static int ReadToBlock(StringReader reader, string lineToReport) {
+			int lineCounter = 0;
 			int read = reader.Read();
 
 			while (read != '{') {
 				if (!char.IsWhiteSpace((char)read)) {
 					throw new ParsingException("Invalid characters between a control and its block", lineToReport);
 				}
+				if((char)read == '\n') {
+					lineCounter++;
+				}
 				read = reader.Read();
 			}
+			return lineCounter;
 		}
 	}
 }

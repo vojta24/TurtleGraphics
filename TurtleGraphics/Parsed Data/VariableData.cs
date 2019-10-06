@@ -13,7 +13,7 @@ namespace TurtleGraphics {
 		public string VariableName { get; }
 		public IDynamicExpression Value { get; }
 
-		public VariableData(string varName, IDynamicExpression value, VariableStore variables, string line) : base(variables, line) {
+		public VariableData(string varName, IDynamicExpression value, VariableStore variables, string line, int lineIndex) : base(variables, line, lineIndex) {
 			VariableName = varName;
 			Value = value;
 		}
