@@ -4,47 +4,44 @@ using System.Collections.Generic;
 using Flee.PublicTypes;
 
 namespace TurtleGraphics {
-	public class VariableStore : IEnumerable<KeyValuePair<string, object>> {
+	public class VariableStore : IEnumerable<KeyValuePair<string, Variable>> {
 
-		private readonly Dictionary<string, object> data;
-		private readonly List<(int, string)> layerKeys;
-		private readonly Dictionary<string, int> accessibleSinceLine;
+		private readonly Dictionary<string, Variable> data;
+
 		public VariableStore Parent { get; set; }
 
 		public object Get(string key, int myLine) {
-			if (data.ContainsKey(key) && myLine > accessibleSinceLine[key]) {
-				return data[key];
-			}
-			else if (Parent != null) {
-				return Parent.Get(key, myLine);
-			}
-			throw new Exception("Not Found!");
+			return data[key].GetValue(myLine);
 		}
 
 		public ICollection<string> Keys => data.Keys;
 
 		public VariableStore() {
 			Parent = null;
-			data = new Dictionary<string, object>();
-			accessibleSinceLine = new Dictionary<string, int>();
-			layerKeys = new List<(int, string)>();
+			data = new Dictionary<string, Variable>();
 		}
 
 		public VariableStore(VariableStore parent) {
 			Parent = parent;
-			data = new Dictionary<string, object>();
-			layerKeys = new List<(int, string)>();
-			accessibleSinceLine = new Dictionary<string, int>();
+			data = new Dictionary<string, Variable>();
 		}
 
-		public void Add(string key, object value, int indentation, int accessibleSince) {
-			if (data.ContainsKey(key)) {
-				data[key] = value;
+		public void Add(string key, object value, int accessibleSince, bool isUpdate) {
+			if (isUpdate && data.ContainsKey(key)) {
+				data[key].UpdateValue(accessibleSince, value);
+			}
+			else if (isUpdate && !data.ContainsKey(key)) {
+				VariableStore parent = Parent;
+				while (parent != null) {
+					if (parent.data.ContainsKey(key)) {
+						parent.data[key].UpdateValue(accessibleSince, value);
+						return;
+					}
+					parent = parent.Parent;
+				}
 			}
 			else {
-				data.Add(key, value);
-				layerKeys.Add((indentation, key));
-				accessibleSinceLine.Add(key, accessibleSince);
+				data.Add(key, new Variable(key, accessibleSince,value));
 			}
 		}
 
@@ -58,7 +55,17 @@ namespace TurtleGraphics {
 			return false;
 		}
 
-		public IEnumerator<KeyValuePair<string, object>> GetEnumerator() {
+		public bool ContainsAccessibleVariable(string key, int lineIndex) {
+			if (data.ContainsKey(key) && lineIndex > data[key].DefinitionLine) {
+				return true;
+			}
+			else if (Parent != null) {
+				return Parent.ContainsAccessibleVariable(key, lineIndex);
+			}
+			return false;
+		}
+
+		public IEnumerator<KeyValuePair<string, Variable>> GetEnumerator() {
 			return data.GetEnumerator();
 		}
 
@@ -66,26 +73,25 @@ namespace TurtleGraphics {
 			return data.GetEnumerator();
 		}
 
-		public void OnBlockLeave(int layer) {
-			foreach ((int _layer, string key) in layerKeys) {
-				if (layer == _layer) {
-					data.Remove(key);
-				}
+		public void Update<T>(IGenericExpression<T> exp, int lineIndex) {
+			exp.Context.Variables.AddRange(data,lineIndex);
+			if (Parent != null) {
+				Parent.Update(exp, lineIndex);
 			}
-			layerKeys.RemoveAll(p => p.Item1 == layer);
 		}
 
-		public void Update<T>(IGenericExpression<T> exp) {
-			exp.Context.Variables.AddRange(data);
+		public void Update(IDynamicExpression exp, int lineIndex) {
+			exp.Context.Variables.AddRange(data, lineIndex);
+			if (Parent != null) {
+				Parent.Update(exp, lineIndex);
+			}
 		}
 
-		public void Update(IDynamicExpression exp) {
-			exp.Context.Variables.AddRange(data);
+		internal void Update(ExpressionContext c, int lineIndex) {
+			c.Variables.AddRange(data, lineIndex);
+			if (Parent != null) {
+				Parent.Update(c, lineIndex);
+			}
 		}
-
-		internal void Update(ExpressionContext c) {
-			c.Variables.AddRange(data);
-		}
-
 	}
 }

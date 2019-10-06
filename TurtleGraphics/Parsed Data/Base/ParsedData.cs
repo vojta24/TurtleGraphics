@@ -34,17 +34,5 @@ namespace TurtleGraphics {
 
 
 		public abstract IList<TurtleData> CompileBlock(CancellationToken token, int indent);
-
-		internal void UpdateVars(IDynamicExpression exp) {
-			foreach (var item in Variables) {
-				exp.Context.Variables[item.Key] = item.Value;
-			}
-		}
-
-		internal void UpdateVars<T>(IGenericExpression<T> exp) {
-			foreach (var item in Variables) {
-				exp.Context.Variables[item.Key] = item.Value;
-			}
-		}
 	}
 }

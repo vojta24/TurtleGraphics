@@ -35,29 +35,34 @@ namespace TurtleGraphics {
 			}
 
 			commands = string.Join(Environment.NewLine, split);
-			return Parse(commands, window, 0, ref lineIndex);
+			return Parse(commands, window);
 		}
 
-		public static Queue<ParsedData> Parse(string commands, MainWindow window, int indentationLevel, ref int lineIndex, VariableStore additionalVars = null) {
+		public static Queue<ParsedData> Parse(string commands, MainWindow window, VariableStore additionalVars = null) {
 			Window = window;
 			conditionals.Clear();
-
-			VariableStore variables = new VariableStore {
-				{ "Width", Window.DrawWidth, 0, 0 },
-				{ "Height", Window.DrawHeight, 0 , 0 }
-			};
+			VariableStore variables = null;
+			if (additionalVars != null) {
+				variables = additionalVars;
+			}
+			else {
+				variables = new VariableStore {
+					{ "Width", Window.DrawWidth, 0, false},
+					{ "Height", Window.DrawHeight, 0, false }
+				};
+			}
 
 			Queue<ParsedData> ret = new Queue<ParsedData>();
 			using (StringReader reader = new StringReader(commands)) {
 
-				if (additionalVars != null) {
-					foreach (var item in additionalVars) {
-						variables.Add(item.Key, item.Value, indentationLevel, lineIndex);
-					}
-				}
+				//if (additionalVars != null) {
+				//	foreach (var item in additionalVars) {
+				//		variables.Add(item.Key, item.Value, lineIndex);
+				//	}
+				//}
 
 				while (reader.Peek() != -1) {
-					ParsedData data = ParseLine(reader.ReadLine(), reader, variables, indentationLevel, ref lineIndex);
+					ParsedData data = ParseLine(reader.ReadLine(), reader, variables);
 					lineIndex++;
 					if (data != null) {
 						ret.Enqueue(data);
@@ -68,7 +73,7 @@ namespace TurtleGraphics {
 		}
 
 
-		private static ParsedData ParseLine(string line, StringReader reader, VariableStore variables, int indentationLevel, ref int lineIndex) {
+		private static ParsedData ParseLine(string line, StringReader reader, VariableStore variables) {
 			if (string.IsNullOrWhiteSpace(line) || line.Trim() == "}")
 				return null;
 			string original = line;
@@ -89,43 +94,43 @@ namespace TurtleGraphics {
 				}
 				switch (info.FunctionName) {
 					case "Rotate": {
-						return new RotateParseData(ParseGenericExpression<double>(info.Arguments[0], variables), info, variables, original, lineIndex);
+						return new RotateParseData(ParseGenericExpression<double>(info.Arguments[0], LineIndexes[original], variables), info, variables, original, LineIndexes[original]);
 					}
 
 					case "Forward": {
-						return new ForwardParseData(ParseGenericExpression<double>(info.Arguments[0], variables), variables, original, lineIndex);
+						return new ForwardParseData(ParseGenericExpression<double>(info.Arguments[0], LineIndexes[original], variables), variables, original, LineIndexes[original]);
 					}
 
 					case "SetBrushSize": {
-						return new BrushSizeData(ParseGenericExpression<double>(info.Arguments[0], variables), variables, original, lineIndex);
+						return new BrushSizeData(ParseGenericExpression<double>(info.Arguments[0], LineIndexes[original], variables), variables, original, LineIndexes[original]);
 					}
 
 					case "PenUp": {
-						return new PenPositionData(false, variables, original, lineIndex);
+						return new PenPositionData(false, variables, original, LineIndexes[original]);
 					}
 
 					case "PenDown": {
-						return new PenPositionData(true, variables, original, lineIndex);
+						return new PenPositionData(true, variables, original, LineIndexes[original]);
 					}
 
 					case "SetColor": {
-						return new ColorData(info.Arguments, variables, original, lineIndex);
+						return new ColorData(info.Arguments, variables, original, LineIndexes[original]);
 					}
 
 					case "MoveTo": {
-						return new MoveData(info.Arguments, variables, original, lineIndex);
+						return new MoveData(info.Arguments, variables, original, LineIndexes[original]);
 					}
 
 					case "SetLineCapping": {
-						return new BrushCappingData(info.Arguments, variables, original, lineIndex);
+						return new BrushCappingData(info.Arguments, variables, original, LineIndexes[original]);
 					}
 
 					case "StoreTurtlePosition": {
-						return new StoredPositionData(info.Arguments, variables, original, lineIndex);
+						return new StoredPositionData(info.Arguments, variables, original, LineIndexes[original]);
 					}
 
 					case "RestoreTurtlePosition": {
-						return new RestorePositionData(info.Arguments, variables, original, lineIndex);
+						return new RestorePositionData(info.Arguments, variables, original, LineIndexes[original]);
 					}
 
 					default: {
@@ -138,41 +143,44 @@ namespace TurtleGraphics {
 				if (conditionals.Count > 0) {
 					conditionals.Peek().IsModifiable = false;
 				}
-				ForLoopData data = ForLoopParser.ParseForLoop(line, reader, new VariableStore(variables), lineIndex, out int readLines);
-				lineIndex += readLines;
+				ForLoopData data = ForLoopParser.ParseForLoop(line, reader, new VariableStore(variables), LineIndexes[original]);
 				return data;
 			}
 
 			if (LineValidators.IsConditional(line)) {
 				if (line.Contains("if")) {
-					ConditionalData data = IfStatementParser.ParseIfBlock(line, reader, new VariableStore(variables), indentationLevel + 1, lineIndex, out int linesRead);
+					ConditionalData data = IfStatementParser.ParseIfBlock(line, reader, new VariableStore(variables), LineIndexes[original]);
 					conditionals.Push(data);
-					lineIndex += linesRead;
 					return data;
 				}
 				if (line.Contains("else")) {
 					ConditionalData latest = conditionals.Peek();
-					latest.AddElse(reader, line, new VariableStore(variables));
+					latest.AddElse(reader, line, new VariableStore(variables), LineIndexes[original]);
 					latest.IsModifiable = false;
 					return null;
 				}
 			}
 
-			if (LineValidators.IsVariableDeclaration(line, variables, out (string, string, string) variableDef), lineIndex) {
+			if (LineValidators.IsVariableDeclaration(line, LineIndexes[original], variables, out (string, string, string) variableDef)) {
 				if (conditionals.Count > 0) {
 					conditionals.Peek().IsModifiable = false;
 				}
-				IDynamicExpression valueObj = ParseDynamicExpression(variableDef.Item3, variables);
+				IDynamicExpression valueObj = ParseDynamicExpression(variableDef.Item3, LineIndexes[original], variables);
 				object value = valueObj.Evaluate();
-				variables.Add(variableDef.Item2, value, indentationLevel);
-				return new VariableData(variableDef.Item2, valueObj, variables, line);
+				variables.Add(variableDef.Item2, value, LineIndexes[original], variableDef.Item1 == null);
+				return new VariableData(variableDef.Item2, valueObj, variableDef.Item1 != null, variables, line, LineIndexes[original]);
 			}
 
 			throw new ParsingException($"Unexpected squence!", line);
 		}
 
-		private static IGenericExpression<T> ParseGenericExpression<T>(string line, VariableStore variables) {
-			ExpressionContext context = FleeHelper.GetExpression(variables);
+
+		public static int GetLineIndex(string originalLine) {
+			return LineIndexes[originalLine];
+		}
+
+		private static IGenericExpression<T> ParseGenericExpression<T>(string line, int lineIndex, VariableStore variables) {
+			ExpressionContext context = FleeHelper.GetExpression(variables, lineIndex);
 			try {
 				return context.CompileGeneric<T>(line);
 			}
@@ -181,8 +189,8 @@ namespace TurtleGraphics {
 			}
 		}
 
-		private static IDynamicExpression ParseDynamicExpression(string line, VariableStore variables) {
-			ExpressionContext context = FleeHelper.GetExpression(variables);
+		private static IDynamicExpression ParseDynamicExpression(string line, int lineIndex, VariableStore variables) {
+			ExpressionContext context = FleeHelper.GetExpression(variables, lineIndex);
 			try {
 				return context.CompileDynamic(line);
 			}

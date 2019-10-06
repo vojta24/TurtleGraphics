@@ -32,7 +32,7 @@ namespace TurtleGraphics {
 
 		public override TurtleData Compile(CancellationToken token) {
 			token.ThrowIfCancellationRequested();
-			UpdateVars(_expression);
+			Variables.Update(_expression, LineIndex);
 			return new TurtleData {
 				Angle = _expression == null ? 0 : _expression.Evaluate(),
 				SetAngle = SetRotation,

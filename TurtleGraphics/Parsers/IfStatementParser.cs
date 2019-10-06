@@ -5,7 +5,7 @@ using Flee.PublicTypes;
 
 namespace TurtleGraphics.Parsers {
 	public class IfStatementParser {
-		public static ConditionalData ParseIfBlock(string line, StringReader reader, VariableStore variables, int indentaion, int lineIndex, out int readLines) {
+		public static ConditionalData ParseIfBlock(string line, StringReader reader, VariableStore variables, int lineIndex) {
 
 			//if (i > 50) {
 			//if (i <= 50) {
@@ -39,24 +39,21 @@ namespace TurtleGraphics.Parsers {
 			mod = mod.Replace("==", "=");
 			mod = mod.Replace("!=", "<>");
 
-			ExpressionContext context = FleeHelper.GetExpression(variables);
+			ExpressionContext context = FleeHelper.GetExpression(variables, lineIndex);
 
 			try {
 				IGenericExpression<bool> ifCondition = context.CompileGeneric<bool>(mod);
-				int linesRead = 0;
+
 				if (!line.EndsWith("{")) {
-					linesRead += BlockParser.ReadToBlock(reader, line);
+					BlockParser.ReadToBlock(reader, line);
 				}
-				int totalRead = linesRead + lineIndex;
 				List<string> lines = BlockParser.ParseBlock(reader);
-				linesRead += lines.Count;
 
 				List<ParsedData> isStatement = new List<ParsedData>();
 
-				Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), MainWindow.Instance, indentaion, ref totalRead, variables);
+				Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), MainWindow.Instance, variables);
 				isStatement.AddRange(data);
-				readLines = linesRead;
-				return new ConditionalData(line, ifCondition, data, variables, indentaion);
+				return new ConditionalData(line, ifCondition, data, variables, lineIndex);
 			}
 			catch (ParsingException) {
 				throw;

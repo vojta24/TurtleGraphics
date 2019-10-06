@@ -13,9 +13,12 @@ namespace TurtleGraphics {
 		public string VariableName { get; }
 		public IDynamicExpression Value { get; }
 
-		public VariableData(string varName, IDynamicExpression value, VariableStore variables, string line, int lineIndex) : base(variables, line, lineIndex) {
+		public bool IsDefinition { get; set; }
+
+		public VariableData(string varName, IDynamicExpression value, bool isDef, VariableStore variables, string line, int lineIndex) : base(variables, line, lineIndex) {
 			VariableName = varName;
 			Value = value;
+			IsDefinition = isDef;
 		}
 
 		public override TurtleData Compile(CancellationToken token) {

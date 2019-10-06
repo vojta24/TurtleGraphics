@@ -41,7 +41,7 @@ namespace TurtleGraphics {
 				}
 			}
 			else if (Parameters.Length == 3) {
-				ExpressionContext c = FleeHelper.GetExpression(Variables);
+				ExpressionContext c = FleeHelper.GetExpression(Variables, LineIndex);
 				try {
 					byte r = Convert.ToByte(c.CompileGeneric<double>(Arg1).Evaluate());
 					byte g = Convert.ToByte(c.CompileGeneric<double>(Arg2).Evaluate());
@@ -53,7 +53,7 @@ namespace TurtleGraphics {
 				}
 			}
 			else if (Parameters.Length == 4) {
-				ExpressionContext c = FleeHelper.GetExpression(Variables);
+				ExpressionContext c = FleeHelper.GetExpression(Variables, LineIndex);
 				try {
 					byte a = Convert.ToByte(c.CompileGeneric<double>(Arg1).Evaluate());
 					byte r = Convert.ToByte(c.CompileGeneric<double>(Arg2).Evaluate());

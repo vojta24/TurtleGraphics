@@ -23,7 +23,7 @@ namespace TurtleGraphics {
 
 		public override TurtleData Compile(CancellationToken token) {
 			token.ThrowIfCancellationRequested();
-			UpdateVars(_expression);
+			Variables.Update(_expression, LineIndex);
 			Distance = _expression.Evaluate();
 			return new TurtleData {
 				Distance = Distance,

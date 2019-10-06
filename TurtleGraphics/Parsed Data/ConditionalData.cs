@@ -10,8 +10,10 @@ namespace TurtleGraphics {
 		public IGenericExpression<bool> IfCondition { get; set; }
 		public Queue<ParsedData> IfData { get; set; }
 		public VariableStore IfVariables { get; set; }
+		public int IfLineIndex { get; set; }
 		public Queue<ParsedData> ElseData { get; set; } = null;
 		public VariableStore ElseVariables { get; set; }
+		public int ElseLineIndex { get; set; }
 		public IList<(IGenericExpression<bool>, Queue<ParsedData>)> ElseIfs { get; set; }
 		public bool IsModifiable { get; set; } = true;
 
@@ -26,24 +28,26 @@ namespace TurtleGraphics {
 		public ConditionalData(string line, IGenericExpression<bool> ifCondition, Queue<ParsedData> data, VariableStore variables, int lineIndex) : base(variables, line, lineIndex, line) {
 			IfCondition = ifCondition;
 			IfData = data;
+			IfLineIndex = lineIndex;
 			Line = line;
 			IfVariables = variables;
 		}
 
-		public void AddElse(StringReader reader, string line, VariableStore variables) {
+		public void AddElse(StringReader reader, string line, VariableStore variables, int lineIndex) {
 			if (!line.EndsWith("{")) {
 				BlockParser.ReadToBlock(reader, line);
 			}
 			List<string> lines = BlockParser.ParseBlock(reader);
 
-			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), CommandParser.Window, Indentaion, Variables);
+			Queue<ParsedData> data = CommandParser.Parse(string.Join(Environment.NewLine, lines), CommandParser.Window, Variables);
 			ElseData = data;
 			ElseVariables = variables;
+			ElseLineIndex = lineIndex;
 		}
 
 		public override IList<TurtleData> CompileBlock(CancellationToken token, int indent) {
 			List<TurtleData> ret = new List<TurtleData>(4096);
-			UpdateVars(IfCondition);
+			Variables.Update(IfCondition, LineIndex);
 
 			if (IfCondition.Evaluate()) {
 				ret.AddRange(CompileQueue(IfData, IfVariables, token));

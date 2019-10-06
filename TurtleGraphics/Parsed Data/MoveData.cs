@@ -11,7 +11,7 @@ namespace TurtleGraphics {
 		private readonly IGenericExpression<double> y;
 
 		public MoveData(string[] args, VariableStore variables, string line, int lineIndex) : base(variables, line, lineIndex, args) {
-			ExpressionContext expression = FleeHelper.GetExpression(variables);
+			ExpressionContext expression = FleeHelper.GetExpression(variables, LineIndex);
 			string exceptionMessage = "";
 			try {
 				exceptionMessage = "Invalid expression for X coordinate!";
@@ -32,8 +32,8 @@ namespace TurtleGraphics {
 
 		public override TurtleData Compile(CancellationToken token) {
 			token.ThrowIfCancellationRequested();
-			UpdateVars(x);
-			UpdateVars(y);
+			Variables.Update(x, LineIndex);
+			Variables.Update(y, LineIndex);
 
 			return new TurtleData {
 				MoveTo = new Point(x.Evaluate(), y.Evaluate()),

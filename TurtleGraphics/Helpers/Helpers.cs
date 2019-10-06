@@ -19,9 +19,9 @@ namespace TurtleGraphics {
 		}
 
 
-		public static void AddRange(this VariableCollection a, Dictionary<string, object> b) {
+		public static void AddRange(this VariableCollection a, Dictionary<string, Variable> b, int lineIndex) {
 			foreach (var item in b) {
-				a[item.Key] = item.Value;
+				a[item.Key] = item.Value.GetValue(lineIndex);
 			}
 		}
 

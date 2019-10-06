@@ -21,7 +21,7 @@ namespace TurtleGraphics {
 
 		public override TurtleData Compile(CancellationToken token) {
 			token.ThrowIfCancellationRequested();
-			UpdateVars(_expression);
+			Variables.Update(_expression, LineIndex);
 			return new TurtleData {
 				BrushThickness = _expression.Evaluate(),
 				Action = Action,
