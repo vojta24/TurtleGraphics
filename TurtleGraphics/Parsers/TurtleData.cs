@@ -12,7 +12,6 @@ namespace TurtleGraphics {
 		public Brush Brush { get; set; }
 		public double BrushThickness { get; set; }
 		public bool PenDown { get; set; }
-		public bool Jump { get; set; }
 		public ParsedAction Action { get; set; }
 		public PenLineCap LineCap { get; set; }
 	}

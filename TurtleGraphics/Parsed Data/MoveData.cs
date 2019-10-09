@@ -37,7 +37,6 @@ namespace TurtleGraphics {
 
 			return new TurtleData {
 				MoveTo = new Point(x.Evaluate(), y.Evaluate()),
-				Jump = true,
 				Action = Action,
 			};
 		}
