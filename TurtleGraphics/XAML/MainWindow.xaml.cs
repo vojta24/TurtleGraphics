@@ -252,9 +252,11 @@ namespace TurtleGraphics {
 		}
 
 		protected override void OnKeyDown(KeyEventArgs e) {
-			if(e.Key == Key.F5) {
-				ButtonCommand.Execute(null);
-				e.Handled = true;
+			if (e.Key == Key.F5) {
+				if (!ExceptionDialogActive) {
+					ButtonCommand.Execute(null);
+					e.Handled = true;
+				}
 			}
 		}
 

@@ -88,15 +88,15 @@ namespace TurtleGraphics {
 				}
 				switch (info.FunctionName) {
 					case "Rotate": {
-						return new RotateParseData(ParseGenericExpression<double>(info.Arguments[0], line, variables), info, variables.Copy(), original);
+						return new RotateParseData(ParseGenericExpression<double>(info.GetArg(0, line), line, variables), info, variables.Copy(), original);
 					}
 
 					case "Forward": {
-						return new ForwardParseData(ParseGenericExpression<double>(info.Arguments[0], line, variables), variables.Copy(), original);
+						return new ForwardParseData(ParseGenericExpression<double>(info.GetArg(0, line), line, variables), variables.Copy(), original);
 					}
 
 					case "SetBrushSize": {
-						return new BrushSizeData(ParseGenericExpression<double>(info.Arguments[0], line, variables), variables.Copy(), original);
+						return new BrushSizeData(ParseGenericExpression<double>(info.GetArg(0, line), line, variables), variables.Copy(), original);
 					}
 
 					case "PenUp": {
