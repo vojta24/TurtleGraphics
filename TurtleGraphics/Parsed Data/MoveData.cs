@@ -13,6 +13,9 @@ namespace TurtleGraphics {
 		public MoveData(string[] args, Dictionary<string, object> variables, string line) : base(variables, line, args) {
 			ExpressionContext expression = FleeHelper.GetExpression(variables);
 			string exceptionMessage = "";
+			if(args.Length > 2) {
+				throw new ParsingException("Extra agruments supplied, maximum of 2 allowed for this function.", line);
+			}
 			try {
 				exceptionMessage = "Invalid expression for X coordinate!";
 				x = expression.CompileGeneric<double>(args[0]);

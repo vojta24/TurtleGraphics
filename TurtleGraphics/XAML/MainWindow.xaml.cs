@@ -249,7 +249,7 @@ namespace TurtleGraphics {
 						string region = _commandsText.Substring(0, CommandsTextInput.CaretIndex);
 						int indentLevel = region.Count(s => s == '{') - region.Count(s => s == '}');
 						int carret = CommandsTextInput.CaretIndex;
-						CommandsTextInput.Text = CommandsTextInput.Text.Insert(change.Offset + change.AddedLength, new string(' ', 3 * indentLevel));
+						CommandsTextInput.Text = CommandsTextInput.Text.Insert(change.Offset + change.AddedLength, new string(' ', 3 * indentLevel < 0 ? 0 : indentLevel));
 #if INTELI_COMMANDS
 						InteliCommandsText = CommandsTextInput.Text;
 #endif

@@ -155,5 +155,15 @@ namespace TurtleGraphics.Validation {
 			data = (info[0].Trim(), info[1].TrimStart());
 			return true;
 		}
+
+		public static bool IsEmptyLine(string value, int carret) {
+			while (char.IsWhiteSpace(value[carret])) {
+				if(value[carret] == Environment.NewLine[0]) {
+					return true;
+				}
+				carret++;
+			}
+			return false;
+		}
 	}
 }

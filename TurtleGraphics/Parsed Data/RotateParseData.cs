@@ -11,13 +11,16 @@ namespace TurtleGraphics {
 		public RotateParseData(IGenericExpression<double> expression, FunctionCallInfo info, Dictionary<string, object> variables, string line) : base(variables, line) {
 			_expression = expression;
 			string exceptionMessage = "Invalid arguments for rotation";
-			try {
-				if (info.Arguments.Length == 2) {
-					SetRotation = bool.Parse(info.Arguments[1]);
-				}
+			if(info.Arguments.Length > 2) {
+				throw new ParsingException("Extra agruments supplied, maximum of 2 allowed for this function." ,line);
 			}
-			catch (Exception e) {
-				throw new ParsingException(exceptionMessage, line, e);
+			if (info.Arguments.Length == 2) {
+				try {
+					SetRotation = bool.Parse(info.GetArg(1, line));
+				}
+				catch (Exception e) {
+					throw new ParsingException(exceptionMessage, line, e);
+				}
 			}
 		}
 

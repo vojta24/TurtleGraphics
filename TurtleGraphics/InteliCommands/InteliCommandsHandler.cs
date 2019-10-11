@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
+using TurtleGraphics.Validation;
 
 namespace TurtleGraphics {
 	public class InteliCommandsHandler {
@@ -98,10 +99,16 @@ namespace TurtleGraphics {
 						int indent = CountIndent(inputControl, carret - 2);
 						if (indent > 3 * _currentIndentLevel) {
 							int difference = Math.Abs(indent - 3 * _currentIndentLevel);
-							_ignoreEvent = true;
-							window.CommandsText = inputControl.Text.Remove(carret - 1 - indent, difference);
-							_ignoreEvent = true;
-							inputControl.CaretIndex = carret - difference;
+							if (_currentIndentLevel < 0) {
+								window.InteliCommandsText = newText;
+								window.CommandsText = newText;
+							}
+							else {
+								_ignoreEvent = true;
+								window.CommandsText = inputControl.Text.Remove(carret - 1 - indent, difference);
+								_ignoreEvent = true;
+								inputControl.CaretIndex = carret - difference;
+							}
 						}
 					}
 					else {
@@ -206,7 +213,7 @@ namespace TurtleGraphics {
 
 			if (carret < value.Length) {
 				//TODO smarter
-				if (value[carret] != Environment.NewLine[0]) {
+				if (!LineValidators.IsEmptyLine(value, carret)) {
 					return false;
 				}
 			}
