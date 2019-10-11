@@ -23,19 +23,19 @@ namespace TurtleGraphics {
 
 		public ForLoopData(Dictionary<string, object> dictionary, string line) : base(dictionary, line) { }
 
-		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
+		public override TurtleData Compile(CancellationToken token) {
 			throw new NotImplementedException();
 		}
 
-		public override IList<TurtleData> CompileBlock(TurtleData previous, CancellationToken token) {
+		public override IList<TurtleData> CompileBlock(CancellationToken token) {
 			List<TurtleData> ret = new List<TurtleData>(4096);
 			List<ParsedData> loopContents = CompileLoop();
 
-			ret.AddRange(CompileQueue(previous, loopContents, token));
+			ret.AddRange(CompileQueue(loopContents, token));
 			return ret;
 		}
 
-		private IEnumerable<TurtleData> CompileQueue(TurtleData previous, List<ParsedData> data, CancellationToken token) {
+		private IEnumerable<TurtleData> CompileQueue(List<ParsedData> data, CancellationToken token) {
 			List<TurtleData> interData = new List<TurtleData>();
 			ParsedData current;
 
@@ -54,15 +54,21 @@ namespace TurtleGraphics {
 				token.ThrowIfCancellationRequested();
 				for (int counter = 0; counter < data.Count; counter++) {
 					current = data[counter];
+
 					current.Variables[LoopVariable] = i;
+					foreach (var item in Variables) {
+						current.Variables[item.Key] = item.Value;
+					}
+
 					if (current.IsBlock) {
-						interData.AddRange(current.CompileBlock(previous, token));
+						interData.AddRange(current.CompileBlock(token));
+					}
+					else if (current is VariableData variableChange) {
+						current.UpdateVars(variableChange.Value);
+						Variables[variableChange.VariableName] = variableChange.Value.Evaluate();
 					}
 					else {
-						interData.Add(current.Compile(previous, token));
-					}
-					if (interData.Count != 0) {
-						previous = interData[interData.Count - 1];
+						interData.Add(current.Compile(token));
 					}
 				}
 			}

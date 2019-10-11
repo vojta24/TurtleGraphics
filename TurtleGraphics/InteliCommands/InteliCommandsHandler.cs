@@ -112,7 +112,6 @@ namespace TurtleGraphics {
 				_textLength = window.CommandsText.Length;
 			}
 			else {
-				//TODO rescan for new intelicommands after skipping cuurrent
 				int carret = inputControl.CaretIndex;
 				int lastChar = inputControl.CaretIndex - 1;
 
@@ -158,6 +157,7 @@ namespace TurtleGraphics {
 					}
 				}
 				State = InteliCommandsState.Normal;
+				Handle(window, inputControl);
 			}
 		}
 

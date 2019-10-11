@@ -13,7 +13,7 @@
 	<Grid x:Name="Paths" Background="{Binding ElementName=BackgroundColor, Path=Text}">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="*" x:Name="ControlArea"/>
-			<ColumnDefinition Width="4*" x:Name="DrawAreaX"/>
+			<ColumnDefinition Width="3*" x:Name="DrawAreaX"/>
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
 			<RowDefinition x:Name="DrawAreaY"/>
@@ -37,36 +37,41 @@
 					 IsHitTestVisible="False" Opacity="0.5" Background="Transparent"
 					 x:Name="InteliCommands">
 			</TextBox>
-			
-			<StackPanel Grid.Row="1">
-				<TextBlock>
+			<StackPanel Grid.Row="1" Visibility="{Binding ControlsVisible, Converter={StaticResource BoolToVis}}">
+				<StackPanel>
+					<TextBlock>
 					<Run Text="Angle:"/>
-					<Run Text="{Binding Angle}"/>
-				</TextBlock>
-				<TextBlock>
+					<Run Text="{Binding AngleStr, Mode=OneWay}"/>
+					</TextBlock>
+					<TextBlock>
 					<Run Text="X:"/>
-					<Run Text="{Binding X}"/>
-				</TextBlock>
-				<TextBlock>
+					<Run Text="{Binding XStr, Mode=OneWay}"/>
+					</TextBlock>
+					<TextBlock>
 					<Run Text="Y:"/>
-					<Run Text="{Binding Y}"/>
-				</TextBlock>
-				<TextBox Name="BackgroundColor" Text="Transparent"/>
-				<CheckBox Content="Show Turtle" IsChecked="{Binding ShowTurtleCheckBox}"/>
-				<CheckBox Content="Animate Path" IsChecked="{Binding AnimatePath}"/>
-				<Slider Value="{Binding IterationCount, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="50" TickFrequency="1" />
-				<Slider Value="{Binding CalculationFramesPreUIUpdate, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="50" TickFrequency="1" Name="D"/>
-				<TextBlock TextWrapping="Wrap">
-					<Run Text="Calculations before UI update:"/>
+					<Run Text="{Binding YStr, Mode=OneWay}"/>
+					</TextBlock>
+					<TextBlock Text="Background Color:"/>
+					<TextBox Name="BackgroundColor" Text="Transparent"/>
+					<CheckBox Content="Show Turtle" IsChecked="{Binding ShowTurtleCheckBox}"/>
+					<CheckBox Content="Animate Path" IsChecked="{Binding AnimatePath}"/>
+					<Slider Value="{Binding IterationCount, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="50" TickFrequency="1" />
+					<Slider Value="{Binding CalculationFramesPreUIUpdate, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="50" TickFrequency="1" Name="D"/>
+					<TextBlock TextWrapping="Wrap">
+					<Run Text="Speed:"/>
 					<Run Text="{Binding ElementName=D, Path=Value}"/>
-				</TextBlock>
+					</TextBlock>
+				</StackPanel>
+				<StackPanel>
+					<Button Content="{Binding ButtonText, FallbackValue='Run/Stop'}" Command="{Binding ButtonCommand}"/>
+					<Button Content="{Binding ButtonTextFullSize, FallbackValue='Run Full-size'}" Command="{Binding ButtonFullSizeCommand}"/>
+					<Button Content="Toggle Fullscreen" Command="{Binding ToggleFullScreenCommand}" IsEnabled="{Binding ToggleFullscreenEnabled}"/>
+					<Button Content="Save" Command="{Binding SaveCommand}"/>
+					<Button Content="Load" Command="{Binding LoadCommand}"/>
+				</StackPanel>
 			</StackPanel>
 			<StackPanel Grid.Row="2">
-				<Button Content="{Binding ButtonText, FallbackValue='Run/Stop'}" Command="{Binding ButtonCommand}"/>
-				<Button Content="{Binding ButtonTextFullSize, FallbackValue='Run Full-size'}" Command="{Binding ButtonFullSizeCommand}"/>
-				<Button Content="Toggle Fullscreen" Command="{Binding ToggleFullScreenCommand}" IsEnabled="{Binding ToggleFullscreenEnabled}"/>
-				<Button Content="Save" Command="{Binding SaveCommand}"/>
-				<Button Content="Load" Command="{Binding LoadCommand}"/>
+				<Button Content="Show/Hide Control Panel" Command="{Binding ControlsVisibleCommand}"/>
 			</StackPanel>
 		</Grid>
 

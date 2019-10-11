@@ -10,5 +10,6 @@
 		Capping,
 		StorePos,
 		RestorePos,
+		VariableChange,
 	}
 }

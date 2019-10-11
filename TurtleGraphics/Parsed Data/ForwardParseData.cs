@@ -21,18 +21,17 @@ namespace TurtleGraphics {
 
 		public override string Line { get; set; }
 
-		public override TurtleData Compile(TurtleData previous, CancellationToken token) {
+		public override TurtleData Compile(CancellationToken token) {
 			token.ThrowIfCancellationRequested();
 			UpdateVars(_expression);
 			Distance = _expression.Evaluate();
 			return new TurtleData {
-				MoveTo = new Point(previous.MoveTo.X + Math.Cos(previous.Angle) * Distance, previous.MoveTo.Y + Math.Sin(previous.Angle) * Distance),
 				Distance = Distance,
 				Action = Action,
 			};
 		}
 
-		public override IList<TurtleData> CompileBlock(TurtleData previous, CancellationToken token) {
+		public override IList<TurtleData> CompileBlock(CancellationToken token) {
 			throw new NotImplementedException();
 		}
 	}

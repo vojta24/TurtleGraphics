@@ -55,7 +55,14 @@ namespace TurtleGraphics {
 		private ICommand _loadCommand;
 		private int _anotherDelay = 1;
 		private PenLineCap _lineCapping;
+		private bool _controlsVisible = true;
+		private ICommand _controlsVisibleCommand;
 
+		public ICommand ControlsVisibleCommand { get => _controlsVisibleCommand; set { _controlsVisibleCommand = value; Notify(nameof(ControlsVisibleCommand)); } }
+		public bool ControlsVisible { get => _controlsVisible; set { _controlsVisible = value; Notify(nameof(ControlsVisible)); } }
+		public string AngleStr { get => $"{Math.Floor(ContextExtensions.AsDeg(Angle))}°"; }
+		public string XStr { get => $"{Math.Round(X, 2)}"; }
+		public string YStr { get => $"{Math.Round(Y, 2)}"; }
 		public PenLineCap LineCapping { get => _lineCapping; set { _lineCapping = value; Notify(nameof(LineCapping)); } }
 		public int CalculationFramesPreUIUpdate { get => _anotherDelay; set { _anotherDelay = value; Notify(nameof(CalculationFramesPreUIUpdate)); } }
 		public ICommand LoadCommand { get => _loadCommand; set { _loadCommand = value; Notify(nameof(LoadCommand)); } }
@@ -72,9 +79,9 @@ namespace TurtleGraphics {
 		public int IterationCount { get => _iterationCount; set { _iterationCount = value; Notify(nameof(IterationCount)); } }
 		public bool PenDown { get => _penDown; set { if (value == _penDown) return; _penDown = value; NewPath(); Notify(nameof(PenDown)); } }
 		public int PathAnimationFrames { get => _delay; set { _delay = value; Notify(nameof(PathAnimationFrames)); } }
-		public double Y { get => _y; set { _y = value; Notify(nameof(Y)); } }
-		public double X { get => _x; set { _x = value; Notify(nameof(X)); } }
-		public double Angle { get => _angle; set { _angle = value; Notify(nameof(Angle)); } }
+		public double Y { get => _y; set { _y = value; Notify(nameof(Y)); Notify(nameof(YStr)); } }
+		public double X { get => _x; set { _x = value; Notify(nameof(X)); Notify(nameof(XStr)); } }
+		public double Angle { get => _angle; set { _angle = value; Notify(nameof(Angle)); Notify(nameof(AngleStr)); } }
 		public string CommandsText { get => _commandsText; set { _commandsText = value; Notify(nameof(CommandsText)); } }
 		public ICommand RunCommand { get => _runCommand; set { _runCommand = value; Notify(nameof(RunCommand)); } }
 		public Point StartPoint { get => _startPoint; set { _startPoint = value; Notify(nameof(StartPoint)); } }
@@ -147,6 +154,7 @@ namespace TurtleGraphics {
 					CommandsText = data.Code;
 				}
 			});
+			ControlsVisibleCommand = new Command(() => ControlsVisible ^= true);
 			SizeChanged += MainWindow_SizeChanged;
 			CommandsTextInput.SelectionChanged += CommandsTextInput_SelectionChanged;
 			CommandsTextInput.TextChanged += CommandsTextInput_TextChanged; ;
@@ -457,20 +465,18 @@ namespace TurtleGraphics {
 
 		private Task<List<TurtleData>> CompileTasks(Queue<ParsedData> tasks, CancellationToken token) {
 			return Task.Run(() => {
-				List<TurtleData> ret = new List<TurtleData>(8192);
-
-				TurtleData initial = new TurtleData() { Angle = Angle, Brush = Brushes.Blue, BrushThickness = BrushSize, MoveTo = new Point(X, Y), PenDown = true };
-				ret.Add(initial);
+				List<TurtleData> ret = new List<TurtleData>(8192) {
+					new TurtleData() { Angle = Angle, Brush = Brushes.Blue, BrushThickness = BrushSize, MoveTo = new Point(X, Y), PenDown = true }
+				};
 
 				while (tasks.Count > 0) {
 					ParsedData current = tasks.Dequeue();
 					if (current.IsBlock) {
-						ret.AddRange(current.CompileBlock(initial, token));
+						ret.AddRange(current.CompileBlock(token));
 					}
 					else {
-						ret.Add(current.Compile(initial, token));
+						ret.Add(current.Compile(token));
 					}
-					initial = ret[ret.Count - 1];
 				}
 				return ret;
 			});
