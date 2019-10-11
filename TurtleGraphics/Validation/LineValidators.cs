@@ -123,9 +123,9 @@ namespace TurtleGraphics.Validation {
 		internal static bool IsVariableDeclaration(string line, Dictionary<string, object> variables, out (string, string, string) data) {
 			data = (null, null, null);
 			string[] values = line.Split('=');
+			if (values.Length != 2) { return false; }
 			values[0].Trim();
 			values[1].Trim();
-			if (values.Length != 2) { return false; }
 			string[] typeName = values[0].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 			if (typeName.Length == 2) {
 				typeName[0].TrimEnd();
