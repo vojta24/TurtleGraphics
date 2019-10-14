@@ -3,8 +3,11 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace TurtleGraphicsCode {
+	/// <summary>
+	/// This is a private space, you do not need to be here ;)
+	/// </summary>
 	class Program {
-		static void Main() {
+		public static void Main() {
 			Launch(new Code().ToExecute());
 		}
 
