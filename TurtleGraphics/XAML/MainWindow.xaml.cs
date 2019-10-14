@@ -203,7 +203,29 @@ namespace TurtleGraphics {
 			_inteliCommandsScroller = FindDescendant<ScrollViewer>(InteliCommands);
 			Init();
 			CommandsText = FSSManager.RestoreCodeIfExists();
+			App application = (Application.Current as App);
+			if (application.LaunchFullScreen.HasValue && application.LaunchFullScreen.Value) {
+				ToggleFullScreenCommand.Execute(null);
+			}
+			if (application.Deserialized != null) {
+				cancellationTokenSource = new CancellationTokenSource();
+				_ = ExecuteCode(application.Deserialized);
+			}
 			Loaded -= MainWindow_Loaded;
+		}
+
+		private async Task ExecuteCode(TurtleGraphicsCodeData deserialized) {
+			WindowState = WindowState.Maximized;
+			ControlArea.Width = new GridLength(0, GridUnitType.Pixel);
+			PreviewKeyDown += MainWindow_KeyDown;
+			await Task.Delay(1);
+			DrawWidth = DrawAreaX.ActualWidth;
+			Init();
+			ShowTurtleCheckBox = deserialized.ShowTurtle;
+			AnimatePath = deserialized.AnimatePath;
+			PathAnimationFrames = deserialized.PathAnimationSpeed;
+			CalculationFramesPreUIUpdate = deserialized.TurtleSpeed;
+			await DrawData(deserialized.Data);
 		}
 
 		private void MainWindow_Closed(object sender, EventArgs e) {
@@ -328,7 +350,7 @@ namespace TurtleGraphics {
 
 		#region Drawing lines
 
-		private async Task DrawData(List<TurtleData> compiledTasks) {
+		private async Task DrawData(IList<TurtleData> compiledTasks) {
 			Stack<(Point, double)> storedPositions = new Stack<(Point, double)>();
 
 			for (int i = 0; i < compiledTasks.Count; i++) {
@@ -357,7 +379,12 @@ namespace TurtleGraphics {
 						break;
 					}
 					case ParsedAction.Color: {
-						Color = ((SolidColorBrush)data.Brush).Color.ToString();
+						if (data.Brush == null) {
+							Color = data.SerializedBrush;
+						}
+						else {
+							Color = ((SolidColorBrush)data.Brush).Color.ToString();
+						}
 						NewPath();
 						break;
 					}

@@ -114,6 +114,7 @@
     <Compile Include="Parsers\ArgParser.cs" />
     <Compile Include="Parsers\FunctionNames.cs" />
     <Compile Include="Parsers\SupportedTypes.cs" />
+    <Compile Include="SavedData\TurtleGraphicsCodeData.cs" />
     <Compile Include="XAML\CompilationStatus.xaml.cs">
       <DependentUpon>CompilationStatus.xaml</DependentUpon>
     </Compile>

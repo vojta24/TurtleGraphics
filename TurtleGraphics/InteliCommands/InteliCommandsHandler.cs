@@ -212,7 +212,6 @@ namespace TurtleGraphics {
 			string possibleCommand = value.Substring(lastChar + whiteSpaceCount, carret - (lastChar + whiteSpaceCount));
 
 			if (carret < value.Length) {
-				//TODO smarter
 				if (!LineValidators.IsEmptyLine(value, carret)) {
 					return false;
 				}
