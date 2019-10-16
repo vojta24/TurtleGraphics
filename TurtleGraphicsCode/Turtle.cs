@@ -31,6 +31,41 @@ namespace TurtleGraphicsCode {
 		public bool ShowTurtle { get; set; } = true;
 
 		/// <summary>
+		/// Get the screen width in pixels
+		/// </summary>
+		public double ScreenWidth => SystemParameters.PrimaryScreenWidth;
+
+		/// <summary>
+		/// Get the screen height in pixels
+		/// </summary>
+		public double ScreenHeight => SystemParameters.PrimaryScreenHeight;
+
+		/// <summary>
+		/// Turtles current X position
+		/// </summary>
+		public double X { get; private set; }
+
+		/// <summary>
+		/// Turtles current Y position
+		/// </summary>
+		public double Y { get; private set; }
+
+		/// <summary>
+		/// Turltes current angle in radians
+		/// </summary>
+		public double Angle { get; private set; }
+
+		/// <summary>
+		/// Screen ceter point X coordinate
+		/// </summary>
+		public double MidX => ScreenWidth / 2;
+
+		/// <summary>
+		/// Screen center point Y coordinate
+		/// </summary>
+		public double MidY => ScreenHeight / 2;
+
+		/// <summary>
 		/// Animate the path the turtle is drawing
 		/// </summary>
 		public bool AnimatePath { get; set; }
@@ -69,6 +104,8 @@ namespace TurtleGraphicsCode {
 		/// <param name="runFullscreen"></param>
 		public Turtle(bool runFullscreen = false) {
 			FullScreen = runFullscreen;
+			X = ScreenWidth / 2;
+			Y = ScreenHeight / 2;
 		}
 
 		/// <summary>
@@ -76,6 +113,8 @@ namespace TurtleGraphicsCode {
 		/// </summary>
 		/// <param name="distance">by given amount of pixels</param>
 		public void Forward(double distance) {
+			X += Math.Cos(Angle) * distance;
+			Y += Math.Sin(Angle) * distance;
 			_data.Add(new TurtleData() { Distance = distance, Action = ParsedAction.Forward });
 		}
 
@@ -85,6 +124,12 @@ namespace TurtleGraphicsCode {
 		/// <param name="angle">the angle in degrees</param>
 		/// <param name="setAngle">false = rotate by, true = rotate to</param>
 		public void Rotate(double angle, bool setAngle = false) {
+			if (setAngle) {
+				Angle = angle * Math.PI / 180;
+			}
+			else {
+				Angle += angle * Math.PI / 180;
+			}
 			_data.Add(new TurtleData() { Angle = angle, SetAngle = setAngle, Action = ParsedAction.Rotate });
 		}
 
@@ -94,7 +139,23 @@ namespace TurtleGraphicsCode {
 		/// <param name="x">the X coordinate</param>
 		/// <param name="y">the Y coordinate</param>
 		public void MoveTo(double x, double y) {
+			X = x;
+			Y = y;
 			_data.Add(new TurtleData() { MoveTo = new Point(x, y), Action = ParsedAction.MoveTo });
+		}
+
+		/// <summary>
+		/// Moves the turtle to given coordinates and draws the path.
+		/// </summary>
+		/// <param name="x">the X coordinate</param>
+		/// <param name="y">the Y coordinate</param>
+		public void DrawTo(double x, double y) {
+			Vector directionalVec = new Vector(x, -y) - new Vector(X, -Y);
+			Vector xAxisVec = new Vector(1, 0);
+			double degreesBetween = Vector.AngleBetween(directionalVec, xAxisVec);
+
+			Rotate(degreesBetween, true);
+			Forward(directionalVec.Length);
 		}
 
 		/// <summary>
