@@ -170,20 +170,70 @@ namespace TurtleGraphicsCode {
 		}
 
 		/// <summary>
+		/// Set the Brush color by providing all values.
+		/// </summary>
+		/// <param name="a">alpha component</param>
+		/// <param name="r">red component</param>
+		/// <param name="g">green component</param>
+		/// <param name="b">blue component</param>
+		public void SetColor(int a, int r, int g, int b) {
+			_data.Add(new TurtleData() {
+				Brush = new SolidColorBrush(
+				new Color() { A = (byte)a, R = (byte)r, G = (byte)g, B = (byte)b }),
+				Action = ParsedAction.Color
+			});
+		}
+
+		/// <summary>
+		/// Set the Brush color by providing all values.
+		/// </summary>
+		/// <param name="a">alpha component</param>
+		/// <param name="r">red component</param>
+		/// <param name="g">green component</param>
+		/// <param name="b">blue component</param>
+		public void SetColor(double a, double r, double g, double b) {
+			_data.Add(new TurtleData() {
+				Brush = new SolidColorBrush(
+				new Color() { A = Convert.ToByte(a), R = Convert.ToByte(r), G = Convert.ToByte(g), B = Convert.ToByte(b) }),
+				Action = ParsedAction.Color
+			});
+		}
+
+		/// <summary>
 		/// Set the Brush color with full opacity.
 		/// </summary>
 		/// <param name="r">red component</param>
 		/// <param name="g">green component</param>
 		/// <param name="b">blue component</param>
 		public void SetColor(byte r, byte g, byte b) {
+			SetColor(byte.MaxValue, r, g, b);
+		}
+
+		/// <summary>
+		/// Set the Brush color with full opacity.
+		/// </summary>
+		/// <param name="r">red component</param>
+		/// <param name="g">green component</param>
+		/// <param name="b">blue component</param>
+		public void SetColor(int r, int g, int b) {
 			SetColor(255, r, g, b);
+		}
+
+		/// <summary>
+		/// Set the Brush color with full opacity.
+		/// </summary>
+		/// <param name="r">red component</param>
+		/// <param name="g">green component</param>
+		/// <param name="b">blue component</param>
+		public void SetColor(double r, double g, double b) {
+			SetColor(byte.MaxValue, Convert.ToByte(r), Convert.ToByte(g), Convert.ToByte(b));
 		}
 
 		/// <summary>
 		/// Set the Brush color with given string data.
 		/// </summary>
 		/// <param name="color">the predefined color name or hex value prefixed with '#'</param>
-		public void SetBrushColor(string color) {
+		public void SetColor(string color) {
 			_data.Add(new TurtleData() { Brush = (SolidColorBrush)new BrushConverter().ConvertFromString(color), Action = ParsedAction.Color });
 		}
 
