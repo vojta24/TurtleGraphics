@@ -338,6 +338,7 @@ namespace TurtleGraphics {
 				Angle += ContextExtensions.AsRad(angle);
 				TurtleRotation.Angle += angle;
 			}
+
 			if (Angle > 2 * Math.PI) {
 				Angle -= 2 * Math.PI;
 			}
