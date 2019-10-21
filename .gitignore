@@ -10,3 +10,5 @@ packages/*Fody*
 
 #Implementations
 Bezanyi*
+TurtleGraphicsCode/Rules/*.cs
+*Ignored*

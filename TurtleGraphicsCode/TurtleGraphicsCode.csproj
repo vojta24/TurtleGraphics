@@ -49,8 +49,15 @@
     <Compile Include="Bezanyi.cs" />
     <Compile Include="BezanyiRefactor.cs" />
     <Compile Include="Code.cs" />
+    <Compile Include="Ignored\DrawLSys.cs" />
+    <Compile Include="Rules\Base\IRule.cs" />
+    <Compile Include="LSystem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rules\CodingTrain.cs" />
+    <Compile Include="Rules\HilbertCurve.cs" />
+    <Compile Include="Rules\KochCurve.cs" />
+    <Compile Include="Rules\Sierpinsky.cs" />
     <Compile Include="Turtle.cs" />
   </ItemGroup>
   <ItemGroup>

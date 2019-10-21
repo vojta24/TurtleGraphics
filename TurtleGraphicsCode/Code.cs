@@ -8,7 +8,6 @@ namespace TurtleGraphicsCode {
 		/// This is the place to put your turtle code
 		/// </summary>
 		public Turtle ToExecute() {
-			return new BezanyiRefactor().Draw();
 			Turtle t = new Turtle();
 			t.Rotate(-90);
 
@@ -19,7 +18,6 @@ namespace TurtleGraphicsCode {
 		}
 
 		void DrawSection(Turtle t, int p) {
-
 			t.Forward(10);
 			t.StoreTurtlePosition();
 			t.Rotate(-45);
@@ -28,7 +26,7 @@ namespace TurtleGraphicsCode {
 			t.Rotate(45);
 			t.Forward(p);
 			t.RestoreTurtlePosition(true);
-		}	
+		}
 	}
 }
 

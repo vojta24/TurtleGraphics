@@ -18,7 +18,7 @@ namespace TurtleGraphicsCode {
 				bf.Serialize(fs, turtle.Data);
 			}
 
-			ProcessStartInfo info = new ProcessStartInfo("TurtleGraphics.exe", turtle.FullScreen ? "-f " : "" + "data.tgc");
+			ProcessStartInfo info = new ProcessStartInfo("TurtleGraphics.exe", (turtle.FullScreen ? "-f " : "") + "data.tgc");
 			using (Process p = new Process() { StartInfo = info }) {
 				p.EnableRaisingEvents = true;
 				p.Start();

@@ -27,7 +27,7 @@
 // Stores turtle's position and angle into memory
 //StoreTurtlePosition();
 
-// Non-destructively restores turtle's position and angle, optionally a boolean value can be provided to snap to become destructive ie. forgets the stored information
+// Non-destructively restores turtle's position and angle, optionally a boolean value can be provided so that the operation becomes destructive ie. forgets the stored information
 //RestoreTurtlePosition(bool _);
 
 // Makes the turtle stop drawing when moving
@@ -69,3 +69,4 @@
 //  Non-read only:
 //    Can be reassigned:
 //      {existing_variable_name} = {new_variable_value};
+//      NOT FULLY FUNCTIONAL - variable change across scopes will not propagate
