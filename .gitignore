@@ -7,3 +7,8 @@ Logs
 packages/Flee*
 packages/System.*
 packages/*Fody*
+
+#Implementations
+Bezanyi*
+TurtleGraphicsCode/Rules/*.cs
+*Ignored*

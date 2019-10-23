@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Code.cs" />
+    <Compile Include="Rules\Base\IRule.cs" />
+    <Compile Include="LSystem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Turtle.cs" />

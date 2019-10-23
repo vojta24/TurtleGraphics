@@ -18,6 +18,7 @@ namespace TurtleGraphicsCode {
 			AnimatePath = AnimatePath,
 			PathAnimationSpeed = PathAnimationSpeed,
 			TurtleSpeed = TurtleSpeed,
+			BackgroundColor = BackgroundColor,
 		};
 
 		/// <summary>
@@ -39,6 +40,11 @@ namespace TurtleGraphicsCode {
 		/// Get the screen height in pixels
 		/// </summary>
 		public double ScreenHeight => SystemParameters.PrimaryScreenHeight;
+
+		/// <summary>
+		/// Current brush color
+		/// </summary>
+		public string BrushColor { get; private set; }
 
 		/// <summary>
 		/// Turtles current X position
@@ -97,6 +103,9 @@ namespace TurtleGraphicsCode {
 				_turtleSpeed = value;
 			}
 		}
+
+
+		public string BackgroundColor { get; set; }
 
 		/// <summary>
 		/// Create a new Turtle
@@ -177,11 +186,7 @@ namespace TurtleGraphicsCode {
 		/// <param name="g">green component</param>
 		/// <param name="b">blue component</param>
 		public void SetColor(int a, int r, int g, int b) {
-			_data.Add(new TurtleData() {
-				Brush = new SolidColorBrush(
-				new Color() { A = (byte)a, R = (byte)r, G = (byte)g, B = (byte)b }),
-				Action = ParsedAction.Color
-			});
+			SetColor((byte)a, (byte)r, (byte)g, (byte)b);
 		}
 
 		/// <summary>
@@ -192,11 +197,7 @@ namespace TurtleGraphicsCode {
 		/// <param name="g">green component</param>
 		/// <param name="b">blue component</param>
 		public void SetColor(double a, double r, double g, double b) {
-			_data.Add(new TurtleData() {
-				Brush = new SolidColorBrush(
-				new Color() { A = Convert.ToByte(a), R = Convert.ToByte(r), G = Convert.ToByte(g), B = Convert.ToByte(b) }),
-				Action = ParsedAction.Color
-			});
+			SetColor(Convert.ToByte(a), Convert.ToByte(r), Convert.ToByte(g), Convert.ToByte(b));
 		}
 
 		/// <summary>

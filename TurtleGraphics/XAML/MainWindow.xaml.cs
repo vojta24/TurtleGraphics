@@ -226,6 +226,8 @@ namespace TurtleGraphics {
 			AnimatePath = deserialized.AnimatePath;
 			PathAnimationFrames = deserialized.PathAnimationSpeed;
 			CalculationFramesPreUIUpdate = deserialized.TurtleSpeed;
+			BackgroundColor.Text = deserialized.BackgroundColor;
+
 			await DrawData(deserialized.Data);
 		}
 
@@ -337,6 +339,7 @@ namespace TurtleGraphics {
 				Angle += ContextExtensions.AsRad(angle);
 				TurtleRotation.Angle += angle;
 			}
+
 			if (Angle > 2 * Math.PI) {
 				Angle -= 2 * Math.PI;
 			}
@@ -382,11 +385,15 @@ namespace TurtleGraphics {
 					case ParsedAction.Color: {
 						if (data.Brush == null) {
 							Color = data.SerializedBrush;
+							NewPath();
 						}
 						else {
-							Color = ((SolidColorBrush)data.Brush).Color.ToString();
+							string newColor = ((SolidColorBrush)data.Brush).Color.ToString();
+							if (newColor != Color) {
+								Color = newColor;
+								NewPath();
+							}
 						}
-						NewPath();
 						break;
 					}
 					case ParsedAction.Thickness: {
