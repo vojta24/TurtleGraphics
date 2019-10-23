@@ -9,11 +9,14 @@ namespace TurtleGraphicsCode {
 		public Dictionary<char, string> Rules { get; private set; }
 		public IRule Rule { get; }
 
-		public LSystem(IRule rule) {
+		public LSystem(IRule rule, int generations) {
 			Rule = rule;
 			Axiom = rule.Axiom;
 			Rules = rule.Rules;
 			Sentence = Axiom;
+			for (int i = 0; i < generations; i++) {
+				Sentence = Generate();
+			}
 		}
 
 		public string Generate() {
@@ -29,6 +32,18 @@ namespace TurtleGraphicsCode {
 			}
 			Sentence = newSentence.ToString();
 			return Sentence;
+		}
+
+		public Turtle Draw(bool fullScreen) {
+			Turtle t = new Turtle(fullScreen);
+
+			foreach (char c in Sentence) {
+				if (Rule.Actions.ContainsKey(c)) {
+					Rule.Actions[c].Invoke(t);
+				}
+			}
+
+			return t;
 		}
 	}
 }
