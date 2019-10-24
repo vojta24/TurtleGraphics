@@ -4,16 +4,12 @@ using System.Text;
 namespace TurtleGraphicsCode {
 	public class LSystem {
 
-		public string Axiom { get; private set; }
 		public string Sentence { get; private set; }
-		public Dictionary<char, string> Rules { get; private set; }
-		public IRule Rule { get; }
+		public IRule Setup { get; }
 
-		public LSystem(IRule rule, int generations) {
-			Rule = rule;
-			Axiom = rule.Axiom;
-			Rules = rule.Rules;
-			Sentence = Axiom;
+		public LSystem(IRule setup, int generations) {
+			Setup = setup;
+			Sentence = Setup.Axiom;
 			for (int i = 0; i < generations; i++) {
 				Sentence = Generate();
 			}
@@ -23,8 +19,8 @@ namespace TurtleGraphicsCode {
 			StringBuilder newSentence = new StringBuilder();
 
 			foreach (char c in Sentence) {
-				if (Rules.ContainsKey(c)) {
-					newSentence.Append(Rules[c]);
+				if (Setup.Rules.ContainsKey(c)) {
+					newSentence.Append(Setup.Rules[c]);
 				}
 				else {
 					newSentence.Append(c);
@@ -35,11 +31,12 @@ namespace TurtleGraphicsCode {
 		}
 
 		public Turtle Draw(bool fullScreen) {
-			Turtle t = new Turtle(fullScreen);
+			Turtle t = Setup.Turtle ?? new Turtle();
+			t.FullScreen = fullScreen;
 
 			foreach (char c in Sentence) {
-				if (Rule.Actions.ContainsKey(c)) {
-					Rule.Actions[c].Invoke(t);
+				if (Setup.Actions.ContainsKey(c)) {
+					Setup.Actions[c].Invoke(t);
 				}
 			}
 

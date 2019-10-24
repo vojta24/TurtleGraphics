@@ -24,7 +24,7 @@ namespace TurtleGraphicsCode {
 		/// <summary>
 		/// Run the application in full-screen mode
 		/// </summary>
-		public bool FullScreen { get; private set; }
+		public bool FullScreen { get; set; }
 
 		/// <summary>
 		/// Show the turtle while drawing
