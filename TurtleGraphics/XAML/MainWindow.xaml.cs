@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -100,7 +101,7 @@ namespace TurtleGraphics {
 		private ScrollViewer _inteliCommandsScroller;
 		private readonly CompilationStatus _compilationStatus = new CompilationStatus();
 		private readonly ExceptionDisplay _exceptionDisplay = new ExceptionDisplay();
-
+		private readonly BrushConverter _brushConverter = new BrushConverter();
 
 		public double DrawWidth { get; set; }
 		public double DrawHeight { get; set; }
@@ -306,7 +307,7 @@ namespace TurtleGraphics {
 				_currentPath.Stroke = Brushes.Transparent;
 			}
 			else {
-				_currentPath.Stroke = (Brush)new BrushConverter().ConvertFromString(Color);
+				_currentPath.Stroke = (Brush)_brushConverter.ConvertFromString(Color);
 			}
 			_currentPath.StrokeThickness = BrushSize;
 			_currentPath.StrokeEndLineCap = LineCapping;
@@ -348,7 +349,7 @@ namespace TurtleGraphics {
 			double targetX = X + Math.Cos(Angle) * length;
 			double targetY = Y + Math.Sin(Angle) * length;
 
-			await Draw(new Point(targetX, targetY));
+			await Draw(targetX, targetY);
 		}
 
 		#region Drawing lines
@@ -431,15 +432,15 @@ namespace TurtleGraphics {
 			}
 		}
 
-		public async Task Draw(Point to) {
+		public async Task Draw(double _x, double _y) {
 			_currentSegment.Points.Add(new Point(X, Y));
-			X = to.X;
-			Y = to.Y;
-			await Displace(to);
+			X = _x;
+			Y = _y;
+			await Displace(_x, _y);
 		}
 
 
-		public async Task Displace(Point to) {
+		public async Task Displace(double _x, double _y) {
 			int last = _currentSegment.Points.Count - 1;
 			Point origin = _currentSegment.Points[last];
 			double increment = 1d / IterationCount;
@@ -449,7 +450,7 @@ namespace TurtleGraphics {
 				if (cancellationTokenSource.Token.IsCancellationRequested) {
 					break;
 				}
-				_currentSegment.Points[last] = new Point(Lerp(origin.X, to.X, currentInterpolation), Lerp(origin.Y, to.Y, currentInterpolation));
+				_currentSegment.Points[last] = new Point(Lerp(origin.X, _x, currentInterpolation), Lerp(origin.Y, _y, currentInterpolation));
 				TurtleTranslation.X = _currentSegment.Points[last].X;
 				TurtleTranslation.Y = _currentSegment.Points[last].Y;
 				currentInterpolation += increment;
@@ -478,7 +479,10 @@ namespace TurtleGraphics {
 				_compilationStatus.Status = "Compiling...";
 				List<TurtleData> compiledTasks = await CompileTasks(tasks, cancellationTokenSource.Token);
 				_compilationStatus.Stop();
+				Stopwatch s = new Stopwatch();
+				s.Start();
 				await DrawData(compiledTasks);
+				s.Stop();
 			}
 			catch (OperationCanceledException) {
 				//Operation was cancelled
